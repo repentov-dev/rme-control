@@ -12,7 +12,7 @@
   --color-paper: oklch(0% 0 0); --color-paper-2: oklch(22.6% 0.003 250); --color-paper-3: oklch(26.9% 0.003 250);
   --color-ink: oklch(96.1% 0.003 250); --color-ink-2: oklch(87.6% 0.003 250); --color-muted: oklch(69.3% 0.006 250);
   --color-rule: oklch(34.8% 0.004 250);
-  --color-accent: oklch(74.5% 0.145 65); --color-accent-deep: oklch(61.2% 0.123 61); --color-accent-ink: oklch(0% 0 0); --color-focus: oklch(74.5% 0.145 65);
+  --color-accent: oklch(77.5% 0.152 64); --color-accent-deep: oklch(63% 0.13 62); --color-accent-ink: oklch(0% 0 0); --color-focus: oklch(77.5% 0.152 64);
   --font-display: "Sofia Sans Extra Condensed", ui-sans-serif, sans-serif; --font-body: "Barlow", ui-sans-serif, sans-serif;
   --font-outlier: var(--font-body);
   --radius-card: 0; --radius-pill: 0; --rule-hair: 1px; --shadow-card: none;
