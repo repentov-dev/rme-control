@@ -17,7 +17,7 @@
   <div class="container nav__inner">
     <a class="nav__mark" href="./">RME Control</a>
     <nav class="nav__links" aria-label="Sections">
-      <a href="https://github.com/repentov-dev/rme-control#features">Features</a>
+      <a href="#features">Features</a>
       <a href="#panels">The panels</a>
       <a href="#install">Install</a>
       <a href="#specs">Specs</a>
@@ -48,26 +48,75 @@
   <div class="tour__grid">
     <figure class="shot">
       <img src="./screenshots/eq.png" width="880" height="660" alt="Equalizer window for the GTR input with four bands, a low cut at 94 Hz and a 4.2 kHz bell at plus 5 dB.">
-      <figcaption>Four bands a channel. Low cut, two bells and a shelf, drawn as the curve TotalMix draws.</figcaption>
+      <figcaption>Low cut, two bells and a shelf, drawn as TotalMix draws them.</figcaption>
     </figure>
     <figure class="shot">
       <img src="./screenshots/compressor.png" width="760" height="560" alt="Compressor window for the MIC2 input: threshold, ratio, attack, release and gain, with input, gain reduction and output meters.">
-      <figcaption>Dynamics for the same inputs. The compressor TotalMix runs, with the meters beside it.</figcaption>
+      <figcaption>The compressor TotalMix runs, with meters beside it.</figcaption>
     </figure>
     <figure class="shot shot--wide">
       <img src="./screenshots/levels.png" width="376" height="160" alt="The level window: MIC1, MIC2, MIC3 and GTR meters showing minus 19.0, minus 22.2, minus 29.6 and minus 12.7 dB.">
-      <figcaption>Levels, always on top. Four inputs, the value beside each bar, clipping flagged in red.</figcaption>
+      <figcaption>Always on top: four inputs, a value beside each bar.</figcaption>
     </figure>
-    <div class="tour__sheet">
-      <h3>What the keys do</h3>
+    <div class="tour__note">
+      <h3>Above every window</h3>
+      <p>Every input gets a bar, its value in dB, and red when it clips.</p>
+      <p class="tour__more">Everything else the app does is <a href="#features">listed below</a>.</p>
+    </div>
+  </div>
+</section>
+
+
+<section class="features container" id="features">
+  <h2>Everything in the app</h2>
+  <div class="features__grid">
+    <div class="group">
+      <h3>Outputs</h3>
       <dl class="sheet">
-        <div class="sheet__row"><dt>Volume keys</dt><dd>Any output, one to ten dB a step</dd></div>
-        <div class="sheet__row"><dt>Mute key</dt><dd>Dim or mute, your choice</dd></div>
-        <div class="sheet__row"><dt>Shift Cmd M</dt><dd>Mono</dd></div>
-        <div class="sheet__row"><dt>Option Up / Down</dt><dd>Switches the output the keys control</dd></div>
+        <div class="sheet__row"><dt>Volume keys</dt><dd>Any output, 1 to 10 dB a step</dd></div>
+        <div class="sheet__row"><dt>Dim and mute</dt><dd>On the Mac mute key, either one</dd></div>
+        <div class="sheet__row"><dt>Mono</dt><dd>Shift Cmd M</dd></div>
         <div class="sheet__row"><dt>Speaker B</dt><dd>The second pair of monitors</dd></div>
+        <div class="sheet__row"><dt>Output switch</dt><dd>Option Up or Down, optionally muting the rest</dd></div>
+        <div class="sheet__row"><dt>Channels</dt><dd>Edit, rename, add and remove</dd></div>
+        <div class="sheet__row"><dt>Sends</dt><dd>From any input to any output</dd></div>
       </dl>
-      <p class="tour__more">Every shortcut can be reassigned. <a href="https://github.com/repentov-dev/rme-control#readme">The README</a> lists the rest.</p>
+    </div>
+    <div class="group">
+      <h3>Inputs</h3>
+      <dl class="sheet">
+        <div class="sheet__row"><dt>Phantom power</dt><dd>+48V on any number of channels</dd></div>
+        <div class="sheet__row"><dt>Instrument mode</dt><dd>Inst per channel</dd></div>
+        <div class="sheet__row"><dt>EQ</dt><dd>Four bands a channel</dd></div>
+        <div class="sheet__row"><dt>Compressor</dt><dd>Threshold, ratio, attack, release, gain</dd></div>
+        <div class="sheet__row"><dt>Meters</dt><dd>Input, gain reduction and output</dd></div>
+      </dl>
+    </div>
+    <div class="group">
+      <h3>Interface</h3>
+      <dl class="sheet">
+        <div class="sheet__row"><dt>Levels window</dt><dd>Always on top</dd></div>
+        <div class="sheet__row"><dt>Clipping</dt><dd>Flagged in red</dd></div>
+        <div class="sheet__row"><dt>Notifications</dt><dd>Volume, Dim, Mono, Mute, also from TotalMix</dd></div>
+        <div class="sheet__row"><dt>Mute notice</dt><dd>Names the silent output</dd></div>
+        <div class="sheet__row"><dt>Menu</dt><dd>Customizable</dd></div>
+        <div class="sheet__row"><dt>Presets</dt><dd>Save and restore every setting</dd></div>
+        <div class="sheet__row"><dt>Shortcuts</dt><dd>Every one can be reassigned</dd></div>
+        <div class="sheet__row"><dt>Languages</dt><dd>14</dd></div>
+      </dl>
+    </div>
+    <div class="group">
+      <h3>TotalMix</h3>
+      <dl class="sheet">
+        <div class="sheet__row"><dt>Synchronization</dt><dd>Two-way, read at launch</dd></div>
+        <div class="sheet__row"><dt>Fail-safe</dt><dd>Values freeze, keys return to macOS</dd></div>
+        <div class="sheet__row"><dt>OSC monitor</dt><dd>Watch the network commands in Connection</dd></div>
+      </dl>
+      <h3 class="group__second">Remote control</h3>
+      <dl class="sheet">
+        <div class="sheet__row"><dt>Web server</dt><dd>One toggle in Settings</dd></div>
+        <div class="sheet__row"><dt>QR code</dt><dd>Opens the remote on a phone in the same Wi-Fi</dd></div>
+      </dl>
     </div>
   </div>
 </section>
@@ -82,7 +131,7 @@
       </li>
       <li class="steps__item">
         <span class="steps__num">02</span>
-        <p>The app is not notarized, so allow it once under Privacy and Security. The installer clears the quarantine flag for you.</p>
+        <p>Not notarized: allow it once under Privacy and Security. The installer clears the quarantine flag.</p>
       </li>
       <li class="steps__item">
         <span class="steps__num">03</span>
