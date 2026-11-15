@@ -2,8 +2,9 @@
 
 <img src="docs/icon.png" width="128" align="right" alt="RME Control icon">
 
-A macOS menu bar app that controls **RME TotalMix FX** over OSC: output volume, Dim / Mono /
-Speaker B, +48V and Inst on inputs, level meters, and a web remote for your phone.
+Menu bar open-source application for controlling RME audio interfaces via **TotalMix FX**.
+
+Works via Global OSC only with TotalMix 2.1+.
 
 [Website](https://repentov-dev.github.io/rme-control/) · [Русская версия](README.ru.md) · [MIT License](LICENSE) · [Instagram](https://www.instagram.com/repentov)
 

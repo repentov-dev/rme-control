@@ -2,8 +2,10 @@
 
 <img src="docs/icon.png" width="128" align="right" alt="RME Control">
 
-Приложение в строке меню macOS для управления RME TotalMix FX по OSC: громкость выходов,
-Dim / Mono / Speaker B, +48V / Inst на входах, уровни и веб-пульт для телефона.
+Приложение в строке меню с открытым исходным кодом для управления аудиоинтерфейсами RME
+через **TotalMix FX**.
+
+Работает только через Global OSC и только с TotalMix 2.1+.
 
 [Сайт](https://repentov-dev.github.io/rme-control/) · [English version](README.md) · [Лицензия MIT](LICENSE) · [Instagram](https://www.instagram.com/repentov)
 
