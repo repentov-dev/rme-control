@@ -27,3 +27,6 @@ xcuserdata/
 # "RME Control/Resources/AppIcon.icns"
 /AppIcon.icns
 /newicon*
+
+# Hallmark skill metadata (local)
+.hallmark/
