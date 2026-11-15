@@ -5,7 +5,7 @@
 Приложение в строке меню macOS для управления RME TotalMix FX по OSC: громкость выходов,
 Dim / Mono / Speaker B, +48V / Inst на входах, уровни и веб-пульт для телефона.
 
-[English version](README.md) · [Лицензия MIT](LICENSE)
+[Сайт](https://repentov-dev.github.io/rme-control/) · [English version](README.md) · [Лицензия MIT](LICENSE)
 
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-black)
 ![Swift 6](https://img.shields.io/badge/Swift-6.0-orange)

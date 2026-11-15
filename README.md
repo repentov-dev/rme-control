@@ -5,7 +5,7 @@
 A macOS menu bar app that controls **RME TotalMix FX** over OSC: output volume, Dim / Mono /
 Speaker B, +48V and Inst on inputs, level meters, and a web remote for your phone.
 
-[Русская версия](README.ru.md) · [MIT License](LICENSE)
+[Website](https://repentov-dev.github.io/rme-control/) · [Русская версия](README.ru.md) · [MIT License](LICENSE)
 
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-black)
 ![Swift 6](https://img.shields.io/badge/Swift-6.0-orange)
