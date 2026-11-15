@@ -86,20 +86,4 @@
     });
   }
 
-  /* Slow drift: the product trails the page as it scrolls away. */
-  if (stage && !window.matchMedia('(prefers-reduced-transparency: reduce)').matches) {
-    var drift = false;
-    function onDrift() {
-      if (drift) return;
-      drift = true;
-      requestAnimationFrame(function () {
-        drift = false;
-        var y = Math.min(window.scrollY, 700);
-        var offset = Math.max(-40, y * -0.06);
-        stage.style.transform = offset === 0 ? '' : 'translate3d(0,' + offset.toFixed(1) + 'px,0)';
-      });
-    }
-    onDrift();
-    window.addEventListener('scroll', onDrift, { passive: true });
-  }
 })();
