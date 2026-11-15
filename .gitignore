@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Xcode
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+*.moved-aside
+
+# Swift Package Manager / compiler caches
+.build/
+.swiftpm/
+
+# Build products and installers (produced by build.sh / make-installer.sh)
+*.app
+*.pkg
+*.dmg
+*.zip
+
+# Working copies of the app icon — the icon used by the app is
+# "RME Control/Resources/AppIcon.icns"
+/AppIcon.icns
+/newicon*

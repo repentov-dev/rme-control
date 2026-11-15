@@ -1,0 +1,10 @@
+#!/bin/bash
+# Перед установкой закрываем запущенную копию и убираем старый бандл,
+# чтобы в /Applications не оставалось файлов от предыдущих версий.
+# $3 — точка монтирования целевого тома ("/" при установке в систему).
+set -u
+APP="${3:-/}"
+APP="${APP%/}/Applications/RME Control.app"
+/usr/bin/pkill -x "RME Control" 2>/dev/null || true
+/bin/rm -rf "$APP"
+exit 0

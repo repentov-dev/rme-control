@@ -1,0 +1,11 @@
+#!/bin/bash
+# Установщик запускается один раз (после одобрения в System Settings),
+# а приложение из его payload уже не должно нести карантин: иначе при первом
+# запуске Gatekeeper скажет, что приложение повреждено или не проверено.
+# $3 — точка монтирования целевого тома ("/" при установке в систему).
+set -u
+APP="${3:-/}"
+APP="${APP%/}/Applications/RME Control.app"
+/usr/bin/xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
+/usr/bin/xattr -dr com.apple.quarantine "$APP/Contents/MacOS/RME Control" 2>/dev/null || true
+exit 0

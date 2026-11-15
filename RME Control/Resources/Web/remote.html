@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RME Control Remote">
+<title>RME Control Remote</title>
+<style>
+  :root {
+    --bg:#000000;
+    --panel:#17171c;
+    --panel-2:#202027;
+    --line:rgba(255,255,255,.08);
+    --text:#f5f5f7;
+    --sub:#8e8e9a;
+    --accent:#0a84ff;
+    --green:#30d158;
+    --orange:#ff9f0a;
+    --red:#ff453a;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  [hidden] { display:none !important; }
+  html { color-scheme:dark; }
+  body {
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  body.sheet-open { overflow:hidden; }
+  button { font:inherit; color:inherit; border:0; background:none; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .app { width:min(100%, 980px); margin:0 auto; padding:calc(14px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom)); }
+
+  .topbar { position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 0 14px; background:linear-gradient(var(--bg) 65%, transparent); backdrop-filter:blur(14px); }
+  .brand { display:flex; align-items:center; gap:10px; min-width:0; }
+  .brand h1 { font-size:16px; line-height:1.1; letter-spacing:.01em; white-space:nowrap; }
+  .brand .sub { display:block; font-size:10px; color:var(--sub); letter-spacing:.14em; text-transform:uppercase; margin-top:3px; }
+  .top-actions { display:flex; align-items:center; gap:6px; margin-left:auto; min-width:0; }
+  .status { display:inline-flex; align-items:center; gap:6px; max-width:150px; overflow:hidden; font-size:12px; color:var(--sub); padding:6px 9px; border-radius:999px; background:rgba(255,255,255,.055); border:1px solid var(--line); white-space:nowrap; }
+  #device { overflow:hidden; text-overflow:ellipsis; }
+  .dot { width:7px; height:7px; flex:0 0 auto; border-radius:50%; background:var(--sub); }
+  .dot.on { background:var(--green); box-shadow:0 0 8px rgba(48,209,88,.7); }
+  .dot.off { background:var(--red); }
+  .headerBtn { padding:8px 11px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid var(--line); font-size:12px; font-weight:600; color:var(--sub); }
+  .headerBtn:hover, .headerBtn.active { color:var(--text); background:rgba(255,255,255,.1); }
+
+  .section { margin-top:8px; }
+  .section-head { display:flex; align-items:baseline; gap:8px; margin:0 2px 8px; }
+  .section-head h2 { font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--sub); }
+  .count { font-size:11px; color:var(--sub); opacity:.7; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(238px, 1fr)); gap:10px; }
+  #outputs { align-items:start; }
+  .channel { min-width:0; padding:13px 14px 12px; border-radius:15px; background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.022)); border:1px solid var(--line); box-shadow:0 10px 30px rgba(0,0,0,.16); }
+  .channel-send { border-color:rgba(10,132,255,.22); }
+  .channel-output { padding:10px 12px 8px; }
+  .channel-head { display:flex; align-items:center; gap:8px; margin-bottom:9px; }
+  .channel-output .channel-head { margin-bottom:2px; }
+  .channel-name { flex:1; min-width:0; font-size:14px; font-weight:650; line-height:1.25; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .channel-name .route { color:var(--accent); font-weight:500; margin-right:4px; }
+  .channel-meta { display:flex; align-items:center; gap:6px; flex:0 0 auto; }
+  .db { flex:0 0 auto; font-size:11px; color:var(--sub); padding:3px 7px; border-radius:7px; background:rgba(255,255,255,.055); font-variant-numeric:tabular-nums; }
+  input[type=range] { -webkit-appearance:none; width:100%; height:34px; background:transparent; margin:0 0 4px; }
+  input[type=range]::-webkit-slider-runnable-track { height:5px; border-radius:999px; background:rgba(255,255,255,.12); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; margin-top:-6.5px; border-radius:50%; background:var(--accent); box-shadow:0 2px 8px rgba(0,0,0,.55); }
+  input[type=range]::-moz-range-track { height:5px; border-radius:999px; background:rgba(255,255,255,.12); }
+  input[type=range]::-moz-range-thumb { width:18px; height:18px; border:0; border-radius:50%; background:var(--accent); }
+  .channel-actions { display:flex; flex-wrap:wrap; gap:6px; }
+  .channel-output input[type=range] { margin-bottom:0; }
+  .channel-output .channel-actions { margin-top:6px; }
+
+  .chip { display:inline-flex; align-items:center; justify-content:center; min-height:28px; padding:5px 9px; border-radius:8px; background:rgba(255,255,255,.065); border:1px solid transparent; font-size:11px; font-weight:650; color:var(--sub); }
+  .chip:hover { color:var(--text); background:rgba(255,255,255,.1); }
+  .chip.compact { min-height:24px; padding:3px 8px; border-radius:7px; font-size:10.5px; }
+  .chip.on { background:rgba(48,209,88,.18); border-color:rgba(48,209,88,.36); color:#7bf29d; }
+  .chip.mute.on { background:rgba(255,159,10,.18); border-color:rgba(255,159,10,.38); color:#ffc45c; }
+  .chip.phantom.on { background:rgba(255,69,58,.2); border-color:rgba(255,69,58,.4); color:#ff9188; }
+  .chip.inst.on { background:rgba(255,159,10,.18); border-color:rgba(255,159,10,.38); color:#ffc45c; }
+
+  .control { padding:12px; border-radius:15px; background:var(--panel); border:1px solid var(--line); }
+  .control-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(90px, 1fr)); gap:8px; }
+  .control-btn { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 12px; border-radius:11px; background:rgba(255,255,255,.06); border:1px solid var(--line); color:var(--sub); font-size:13px; font-weight:650; }
+  .control-btn .dot { width:8px; height:8px; }
+  .control-btn.on { color:#fff; background:rgba(10,132,255,.2); border-color:rgba(10,132,255,.45); }
+  .control-btn.on .dot { background:var(--green); box-shadow:0 0 8px rgba(48,209,88,.7); }
+
+  .input-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(198px, 1fr)); gap:9px; }
+  .input-card { min-width:0; padding:11px 12px; border-radius:13px; background:rgba(255,255,255,.04); border:1px solid var(--line); }
+  .input-head { display:flex; align-items:center; gap:6px; margin-bottom:8px; }
+  .input-name { flex:1; min-width:0; font-size:13px; font-weight:650; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .rename { margin-left:auto; padding:3px 0 3px 6px; font-size:10px; font-weight:600; color:var(--sub); opacity:.7; }
+  .rename:hover { opacity:1; color:var(--accent); }
+  .input-tags { display:flex; flex-wrap:wrap; gap:5px; }
+  .input-tags .chip { min-height:25px; padding:4px 8px; font-size:10.5px; }
+
+  .meters { padding:13px 14px; border-radius:15px; background:var(--panel); border:1px solid var(--line); }
+  .meter-row { display:grid; grid-template-columns:minmax(52px, 92px) 1fr 48px; align-items:center; gap:9px; margin-top:9px; }
+  .meter-row:first-child { margin-top:0; }
+  .meter-name { font-size:12px; color:var(--sub); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .meter-track { height:7px; border-radius:999px; background:rgba(255,255,255,.09); overflow:hidden; }
+  .meter-fill { height:100%; width:0; border-radius:999px; background:linear-gradient(90deg, #30d158, #9be15d); transition:width .07s linear; }
+  .meter-fill.warn { background:linear-gradient(90deg, #ff9f0a, #ffd60a); }
+  .meter-fill.hot { background:linear-gradient(90deg, #ff453a, #ff9f0a); }
+  .meter-db { font-size:10px; color:var(--sub); text-align:right; font-variant-numeric:tabular-nums; }
+
+  .offline { display:flex; gap:12px; padding:15px; border-radius:15px; background:rgba(255,159,10,.08); border:1px solid rgba(255,159,10,.25); }
+  .offline-mark { width:32px; height:32px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center; background:rgba(255,159,10,.18); color:var(--orange); font-weight:800; }
+  .offline h2 { font-size:14px; margin-bottom:4px; }
+  .offline p { font-size:12px; line-height:1.45; color:var(--sub); }
+
+  .overlay { position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.62); backdrop-filter:blur(10px); }
+  .overlay.open { display:flex; }
+  .sheet { width:min(100%, 430px); max-height:min(620px, 86vh); overflow:auto; padding:18px; border-radius:20px; background:#1b1b21; border:1px solid rgba(255,255,255,.1); box-shadow:0 30px 80px rgba(0,0,0,.6); }
+  .sheet-head { display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; }
+  .sheet-head h2 { font-size:18px; }
+  .sheet-head p { font-size:12px; color:var(--sub); margin-top:3px; line-height:1.4; }
+  .done { margin-left:auto; padding:7px 11px; border-radius:9px; background:var(--accent); color:#fff; font-size:12px; font-weight:700; }
+  .setting-row { display:flex; align-items:center; gap:14px; padding:12px 0; border-top:1px solid var(--line); }
+  .setting-row:first-child { border-top:0; }
+  .setting-copy { flex:1; min-width:0; }
+  .setting-name { font-size:13px; font-weight:600; }
+  .setting-desc { margin-top:2px; font-size:11px; color:var(--sub); line-height:1.35; }
+  .switch { width:44px; height:26px; flex:0 0 auto; padding:3px; border-radius:999px; background:rgba(255,255,255,.13); transition:background .16s; }
+  .switch::after { content:""; display:block; width:20px; height:20px; border-radius:50%; background:#fff; opacity:.72; transition:transform .16s, opacity .16s; }
+  .switch.on { background:var(--accent); }
+  .switch.on::after { transform:translateX(18px); opacity:1; }
+
+  @media (max-width: 520px) {
+    .app { padding-left:12px; padding-right:12px; }
+    .topbar { gap:8px; }
+    .brand { gap:8px; }
+    .brand h1 { font-size:15px; }
+    .brand .sub { display:none; }
+    .top-actions { gap:5px; }
+    .status { max-width:110px; padding:6px 8px; }
+    .headerBtn { padding:7px 9px; font-size:11.5px; }
+  }
+
+  @media (max-width: 430px) {
+    .status { max-width:none; }
+    .status #device { display:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div>
+          <h1>RME Control</h1>
+          <span class="sub">Remote</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="status" id="status"><span class="dot" id="dot"></span><span id="device">Connecting…</span></span>
+        <button id="levelsBtn" class="headerBtn" type="button">Levels</button>
+        <button id="gear" class="headerBtn" type="button">Settings</button>
+      </div>
+    </header>
+
+    <main id="mainContent">
+      <section id="metersSection" class="section meters" hidden>
+        <div class="section-head"><h2>Levels</h2><span class="count" id="metersCount"></span></div>
+        <div id="meter"></div>
+      </section>
+      <section id="offlineCard" class="offline" hidden>
+        <div class="offline-mark">!</div>
+        <div>
+          <h2>Not connected</h2>
+          <p>TotalMix FX is not detected. Connect your RME interface and make sure TotalMix FX is running on your Mac, then reload this page.</p>
+        </div>
+      </section>
+
+      <section id="outputSection" class="section" hidden>
+        <div class="section-head"><h2>Outputs</h2><span class="count" id="outputCount"></span></div>
+        <div id="outputs" class="grid"></div>
+      </section>
+
+      <section id="sendSection" class="section" hidden>
+        <div class="section-head"><h2>Sends</h2><span class="count" id="sendCount"></span></div>
+        <div id="sends" class="grid"></div>
+      </section>
+
+      <section id="controlSection" class="section control" hidden>
+        <div class="control-row">
+          <button id="dim" class="control-btn" type="button"><span>Dim</span><span class="dot"></span></button>
+          <button id="mono" class="control-btn" type="button"><span>Mono</span><span class="dot"></span></button>
+          <button id="speakerB" class="control-btn" type="button"><span>Speaker B</span><span class="dot"></span></button>
+        </div>
+      </section>
+
+      <section id="inputSection" class="section" hidden>
+        <div class="section-head"><h2>Inputs</h2><span class="count" id="inputCount"></span></div>
+        <div id="inputs" class="input-grid"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="settingsOverlay" class="overlay" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="sheet-head">
+        <div>
+          <h2 id="settingsTitle">Settings</h2>
+          <p>Choose what appears on this remote.</p>
+        </div>
+        <button id="closeSettings" class="done" type="button">Done</button>
+      </div>
+      <div id="settingRows"></div>
+    </div>
+  </div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  let connectedState = false;
+  let showFlags = { dim:true, mono:true, speakerB:true };
+
+  const DEFAULT_SETTINGS = { buttons:true, inputs:true, levels:true, mute:true };
+  let settings = Object.assign({}, DEFAULT_SETTINGS);
+  let inputsCache = [];
+
+  const SETTING_ROWS = [
+    { key:'buttons', label:'Control Room', desc:'Dim, Mono and Speaker B' },
+    { key:'inputs', label:'Inputs', desc:'Preamps, compressors and EQ' },
+    { key:'levels', label:'Levels', desc:'Input level meters' },
+    { key:'mute', label:'Mute buttons', desc:'Shown on outputs and sends' }
+  ];
+
+  function applyVisibility(ok) {
+    const anyButton = showFlags.dim || showFlags.mono || showFlags.speakerB;
+    show('controlSection', ok && settings.buttons && anyButton);
+    show('inputSection', ok && settings.inputs);
+    show('offlineCard', !ok);
+    show('levelsBtn', true);
+    if (!ok) {
+      show('outputSection', false);
+      show('sendSection', false);
+      show('metersSection', false);
+    }
+    show('dim', showFlags.dim);
+    show('mono', showFlags.mono);
+    show('speakerB', showFlags.speakerB);
+    $('levelsBtn').classList.toggle('active', settings.levels);
+  }
+
+  function show(id, visible) {
+    const el = $(id);
+    if (el) el.hidden = !visible;
+  }
+
+  function renderSetting(key) {
+    const b = $('t-' + key);
+    if (!b) return;
+    b.classList.toggle('on', !!settings[key]);
+    b.setAttribute('aria-checked', settings[key] ? 'true' : 'false');
+  }
+
+  function toggleSetting(key) {
+    settings[key] = !settings[key];
+    act('/api/settings', settings);
+    renderSetting(key);
+    applyVisibility(connectedState);
+    if (connectedState) fetchState();
+    if (key === 'levels') fetchLevels();
+  }
+
+  function showSettings() {
+    $('settingsOverlay').classList.add('open');
+    $('settingsOverlay').setAttribute('aria-hidden', 'false');
+    document.body.classList.add('sheet-open');
+    for (const row of SETTING_ROWS) renderSetting(row.key);
+  }
+
+  function hideSettings() {
+    $('settingsOverlay').classList.remove('open');
+    $('settingsOverlay').setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('sheet-open');
+  }
+
+  async function fetchState() {
+    try {
+      const r = await fetch('/api/state');
+      const s = await r.json();
+      const ok = s.connected;
+      connectedState = ok;
+      $('dot').className = 'dot ' + (ok ? 'on' : 'off');
+      $('device').textContent = ok ? (s.device || 'Connected') : 'Offline';
+      $('status').title = $('device').textContent;
+      $('status').setAttribute('aria-label', $('device').textContent);
+      showFlags = {
+        dim: s.showDim !== false,
+        mono: s.showMono !== false,
+        speakerB: s.showSpeakerB !== false
+      };
+      if (s.settings) {
+        settings = Object.assign(settings, s.settings);
+        for (const row of SETTING_ROWS) renderSetting(row.key);
+      }
+      applyVisibility(ok);
+      if (!ok) return;
+
+      renderOutputs(s.outputs || [], settings.mute);
+      renderSends(s.sends || [], settings.mute);
+      renderInputs(s.inputs || []);
+
+      $('dim').classList.toggle('on', s.dim);
+      $('mono').classList.toggle('on', s.mono);
+      $('speakerB').classList.toggle('on', s.speakerB);
+    } catch (e) {}
+  }
+
+  function renderOutputs(outputs, showMute) {
+    const wrap = $('outputs');
+    const section = $('outputSection');
+    const shown = (outputs || []).filter(o => o.show);
+    $('outputCount').textContent = shown.length ? String(shown.length) : '';
+    if (!shown.length) { wrap.innerHTML = ''; wrap.dataset.key = ''; section.hidden = true; return; }
+    section.hidden = false;
+    const key = JSON.stringify([showMute, shown.map(o => [o.index, o.name, o.hasCompressor, o.hasEQ])]);
+    if (wrap.dataset.key !== key) {
+      wrap.dataset.key = key;
+      wrap.innerHTML = shown.map(o => channelCard(o, false, showMute)).join('');
+    }
+    for (const o of shown) updateChannel(o, false);
+  }
+
+  function renderSends(sends, showMute) {
+    const wrap = $('sends');
+    const section = $('sendSection');
+    const shown = (sends || []).filter(s => s.show);
+    $('sendCount').textContent = shown.length ? String(shown.length) : '';
+    if (!shown.length) { wrap.innerHTML = ''; wrap.dataset.key = ''; section.hidden = true; return; }
+    section.hidden = false;
+    const key = JSON.stringify([showMute, shown.map(s => [s.index, s.name])]);
+    if (wrap.dataset.key !== key) {
+      wrap.dataset.key = key;
+      wrap.innerHTML = shown.map(s => channelCard(s, true, showMute)).join('');
+    }
+    for (const s of shown) updateChannel(s, true);
+  }
+
+  function channelCard(item, isSend, showMute) {
+    const prefix = isSend ? '<span class="route">↳</span>' : '';
+    const mute = '<button class="chip mute compact" type="button" ' +
+      (isSend ? 'data-send-mute' : 'data-mute') + '="' + item.index + '" aria-label="Mute ' + esc(item.name) + '">Mute</button>';
+    let headerControls = '<span class="db" ' + (isSend ? 'data-send-db' : 'data-db') + '="' + item.index + '"></span>';
+    let actions = '';
+    if (showMute) {
+      if (isSend) actions += mute;
+      else headerControls += mute;
+    }
+    if (!isSend && item.hasCompressor) actions += '<button class="chip compact" type="button" data-comp="' + item.index + '">Comp</button>';
+    if (!isSend && item.hasEQ) actions += '<button class="chip compact" type="button" data-eq="' + item.index + '">EQ</button>';
+    return '<article class="channel' + (isSend ? ' channel-send' : ' channel-output') + '">' +
+      '<div class="channel-head"><div class="channel-name">' + prefix + esc(item.name) + '</div>' +
+        '<div class="channel-meta">' + headerControls + '</div></div>' +
+      '<input class="level" type="range" min="0" max="1" step="0.001" value="' + item.value + '" ' +
+        (isSend ? 'data-send-vol' : 'data-vol') + '="' + item.index + '" aria-label="' + esc(item.name) + ' volume">' +
+      (actions ? '<div class="channel-actions">' + actions + '</div>' : '') +
+    '</article>';
+  }
+
+  function updateChannel(item, isSend) {
+    const root = $(isSend ? 'sends' : 'outputs');
+    const slider = root.querySelector('[' + (isSend ? 'data-send-vol' : 'data-vol') + '="' + item.index + '"]');
+    if (slider && document.activeElement !== slider && Math.abs(parseFloat(slider.value) - item.value) > 0.002) {
+      slider.value = item.value;
+    }
+    const db = root.querySelector((isSend ? '[data-send-db="' : '[data-db="') + item.index + '"]');
+    if (db) db.textContent = item.muted ? '-∞ dB' : item.db.toFixed(1) + ' dB';
+    const mute = root.querySelector((isSend ? '[data-send-mute="' : '[data-mute="') + item.index + '"]');
+    if (mute) mute.classList.toggle('on', item.muted);
+    if (!isSend) {
+      const comp = root.querySelector('[data-comp="' + item.index + '"]');
+      if (comp) comp.classList.toggle('on', item.compressorOn);
+      const eq = root.querySelector('[data-eq="' + item.index + '"]');
+      if (eq) eq.classList.toggle('on', item.eqOn);
+    }
+  }
+
+  function renderInputs(inputs) {
+    const shown = (inputs || []).filter(i => i.show);
+    $('inputCount').textContent = shown.length ? String(shown.length) : '';
+    if (JSON.stringify(shown) === JSON.stringify(inputsCache)) return;
+    inputsCache = shown;
+    const wrap = $('inputs');
+    if (!shown.length) { wrap.innerHTML = ''; return; }
+    let html = '';
+    for (const inp of shown) {
+      let tags = '';
+      if (inp.has48v) tags += '<button class="chip phantom' + (inp.phantom ? ' on' : '') + '" type="button" data-phantom="' + inp.index + '">+48V</button>';
+      if (inp.hasInst) tags += '<button class="chip inst' + (inp.instrument ? ' on' : '') + '" type="button" data-inst="' + inp.index + '">INST</button>';
+      if (inp.hasCompressor) tags += '<button class="chip' + (inp.compressorOn ? ' on' : '') + '" type="button" data-input-comp="' + inp.index + '">Comp</button>';
+      if (inp.hasEQ) tags += '<button class="chip' + (inp.eqOn ? ' on' : '') + '" type="button" data-input-eq="' + inp.index + '">EQ</button>';
+      html += '<article class="input-card">' +
+        '<div class="input-head"><div class="input-name" data-rename-name="' + inp.index + '" title="Double-click to rename">' + esc(inp.name) + '</div>' +
+          '<button class="rename" type="button" data-rename="' + inp.index + '">Rename</button></div>' +
+        '<div class="input-tags">' + tags + '</div>' +
+      '</article>';
+    }
+    wrap.innerHTML = html;
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+  }
+
+  function openPanel(kind, bus, index) {
+    const params = new URLSearchParams({ bus: bus, index: String(index) });
+    window.location.href = '/' + kind + '?' + params.toString();
+  }
+
+  function renameInput(index) {
+    const input = inputsCache.find(i => i.index === index);
+    if (!input) return;
+    const name = window.prompt('Input name', input.name);
+    if (name === null) return;
+    const trimmed = name.trim();
+    if (!trimmed || trimmed === input.name) return;
+    const next = inputsCache.map(i => i.index === index ? Object.assign({}, i, { name: trimmed }) : i);
+    inputsCache = [];
+    renderInputs(next);
+    act('/api/input-name', { index: index, name: trimmed });
+  }
+
+  async function fetchLevels() {
+    try {
+      const r = await fetch('/api/levels');
+      const d = await r.json();
+      const levels = d.levels || [];
+      const names = d.names || [];
+      if (!connectedState || !settings.levels || !levels.length) { show('metersSection', false); return; }
+      show('metersSection', true);
+      $('metersCount').textContent = String(levels.length);
+      const meter = $('meter');
+      const key = JSON.stringify(names);
+      if (meter.dataset.key !== key) {
+        meter.dataset.key = key;
+        meter.innerHTML = names.map(name =>
+          '<div class="meter-row"><span class="meter-name">' + esc(name) + '</span>' +
+          '<div class="meter-track"><div class="meter-fill"></div></div><span class="meter-db">-∞</span></div>'
+        ).join('');
+      }
+      for (let i = 0; i < levels.length; i++) {
+        const row = meter.children[i];
+        if (!row) continue;
+        const fill = row.querySelector('.meter-fill');
+        const db = row.querySelector('.meter-db');
+        const value = Math.max(0, Math.min(100, (levels[i] + 65) / 71 * 100));
+        fill.style.width = value + '%';
+        fill.className = 'meter-fill' + (levels[i] >= 0 ? ' hot' : value > 82 ? ' warn' : '');
+        db.textContent = levels[i] <= -99.9 ? '-∞' : levels[i].toFixed(1);
+      }
+    } catch (e) {}
+  }
+
+  function act(path, body) {
+    fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body || {})
+    }).catch(() => {});
+  }
+
+  $('outputs').addEventListener('input', function (e) {
+    const t = e.target.closest('[data-vol]');
+    if (t) act('/api/volume', { index: parseInt(t.dataset.vol), value: parseFloat(t.value) });
+  });
+  $('outputs').addEventListener('click', function (e) {
+    const mute = e.target.closest('[data-mute]');
+    if (mute) { act('/api/mute', { index: parseInt(mute.dataset.mute), muted: !mute.classList.contains('on') }); return; }
+    const comp = e.target.closest('[data-comp]');
+    if (comp) { openPanel('compressor', 'output', parseInt(comp.dataset.comp)); return; }
+    const eq = e.target.closest('[data-eq]');
+    if (eq) openPanel('eq', 'output', parseInt(eq.dataset.eq));
+  });
+
+  $('sends').addEventListener('input', function (e) {
+    const t = e.target.closest('[data-send-vol]');
+    if (t) act('/api/send-volume', { index: parseInt(t.dataset.sendVol), value: parseFloat(t.value) });
+  });
+  $('sends').addEventListener('click', function (e) {
+    const mute = e.target.closest('[data-send-mute]');
+    if (mute) act('/api/send-mute', { index: parseInt(mute.dataset.sendMute), muted: !mute.classList.contains('on') });
+  });
+
+  $('inputs').addEventListener('click', function (e) {
+    const rename = e.target.closest('[data-rename]');
+    if (rename) { renameInput(parseInt(rename.dataset.rename)); return; }
+    const phantom = e.target.closest('[data-phantom]');
+    if (phantom) { act('/api/phantom', { index: parseInt(phantom.dataset.phantom) }); return; }
+    const inst = e.target.closest('[data-inst]');
+    if (inst) { act('/api/instrument', { index: parseInt(inst.dataset.inst) }); return; }
+    const comp = e.target.closest('[data-input-comp]');
+    if (comp) { openPanel('compressor', 'input', parseInt(comp.dataset.inputComp)); return; }
+    const eq = e.target.closest('[data-input-eq]');
+    if (eq) openPanel('eq', 'input', parseInt(eq.dataset.inputEq));
+  });
+  $('inputs').addEventListener('dblclick', function (e) {
+    const name = e.target.closest('[data-rename-name]');
+    if (name) renameInput(parseInt(name.dataset.renameName));
+  });
+
+  $('dim').addEventListener('click', () => act('/api/dim'));
+  $('mono').addEventListener('click', () => act('/api/mono'));
+  $('speakerB').addEventListener('click', () => act('/api/speakerB'));
+  $('levelsBtn').addEventListener('click', () => toggleSetting('levels'));
+  $('gear').addEventListener('click', showSettings);
+  $('closeSettings').addEventListener('click', hideSettings);
+  $('settingsOverlay').addEventListener('click', function (e) {
+    if (e.target === $('settingsOverlay')) hideSettings();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') hideSettings();
+  });
+
+  $('settingRows').innerHTML = SETTING_ROWS.map(row =>
+    '<div class="setting-row">' +
+      '<div class="setting-copy"><div class="setting-name">' + row.label + '</div><div class="setting-desc">' + row.desc + '</div></div>' +
+      '<button id="t-' + row.key + '" class="switch" type="button" role="switch" aria-checked="true" aria-label="' + row.label + '"></button>' +
+    '</div>'
+  ).join('');
+  for (const row of SETTING_ROWS) {
+    $('t-' + row.key).addEventListener('click', () => toggleSetting(row.key));
+    renderSetting(row.key);
+  }
+
+  applyVisibility(false);
+  fetchState();
+  setInterval(fetchState, 500);
+  setInterval(fetchLevels, 250);
+</script>
+</body>
+</html>

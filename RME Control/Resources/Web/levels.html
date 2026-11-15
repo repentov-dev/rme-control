@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Levels</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --muted: #6f6f7a;
+    --txt: #f4f4f8;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #root { height: 100%; }
+
+  .app {
+    position: relative;
+    height: 100%;
+    border-radius: 12px;
+    padding: 12px;
+    background: #000000;
+  }
+
+  .rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 8px;
+  }
+
+  .name {
+    flex: 0 0 auto;
+    width: var(--name-w, 38px);
+    line-height: 8px;
+    text-align: right;
+    font-size: 7.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .name.on { color: #ff453a; }
+
+  .bar {
+    position: relative;
+    flex: 0 0 var(--meter-w, 96px);
+    width: var(--meter-w, 96px);
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 999px;
+    transition: width .06s linear;
+  }
+
+  .val {
+    flex: 0 0 auto;
+    width: var(--value-w, 26px);
+    line-height: 8px;
+    text-align: left;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 7.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    white-space: pre;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .val.clip { color: #ff453a; }
+
+  .close {
+    position: absolute;
+    z-index: 10;
+    height: 18px;
+    padding: 0 7px;
+    border: 0;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 7.5px;
+    font-weight: 800;
+    letter-spacing: 0.10em;
+    color: #7c7c87;
+    background: rgba(255, 255, 255, 0.07);
+    transition: color .15s, background .15s;
+  }
+
+  .close:hover { color: #fff; background: #ff453a; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="window-drag.js"></script>
+<script src="react.production.min.js"></script>
+<script src="react-dom.production.min.js"></script>
+<script src="levels.js"></script>
+</body>
+</html>
