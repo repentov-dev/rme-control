@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RME Control: TotalMix in the menu bar</title>
+<meta name="description" content="A macOS menu bar app that controls RME TotalMix FX over OSC: output volume, Dim, Mono, Speaker B, input levels and a web remote for your phone.">
+<link rel="icon" href="./icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sofia+Sans+Extra+Condensed:wght@200;400&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./site.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav__inner">
+    <a class="nav__mark" href="./">RME Control</a>
+    <nav class="nav__links" aria-label="Sections">
+      <a href="#panels">The panels</a>
+      <a href="#install">Install</a>
+      <a href="#specs">Specs</a>
+      <a class="nav__action" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero container">
+  <div class="hero__copy">
+    <h1>TotalMix in the menu bar</h1>
+    <p class="hero__line">Volume, Dim, Mono and levels from your Mac’s keys.</p>
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download 3.8</a>
+      <a class="btn btn--ghost" href="https://github.com/repentov-dev/rme-control">Read the source</a>
+    </div>
+    <p class="hero__note">Runs on macOS 14 or newer, Apple Silicon and Intel.</p>
+  </div>
+  <figure class="hero__capture">
+    <img src="./screenshots/popover-card.png" width="560" height="993" alt="The RME Control popover: output faders for Main, DT990 and FT1, a send, the Speaker B, Dim and Mono buttons, and the input switches.">
+  </figure>
+</section>
+
+<section class="tour container" id="panels">
+  <h2>What the popover opens</h2>
+  <div class="tour__grid">
+    <figure class="shot">
+      <img src="./screenshots/eq.png" width="880" height="660" alt="Equalizer window for the GTR input with four bands, a low cut at 94 Hz and a 4.2 kHz bell at plus 5 dB.">
+      <figcaption>Four bands a channel. Low cut, two bells and a shelf, drawn as the curve TotalMix draws.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="./screenshots/compressor.png" width="760" height="560" alt="Compressor window for the MIC2 input: threshold, ratio, attack, release and gain, with input, gain reduction and output meters.">
+      <figcaption>Dynamics for the same inputs. The compressor TotalMix runs, with the meters beside it.</figcaption>
+    </figure>
+    <figure class="shot shot--wide">
+      <img src="./screenshots/levels.png" width="376" height="160" alt="The level window: MIC1, MIC2, MIC3 and GTR meters showing minus 19.0, minus 22.2, minus 29.6 and minus 12.7 dB.">
+      <figcaption>Levels, always on top. Four inputs, the value beside each bar, clipping flagged in red.</figcaption>
+    </figure>
+    <div class="tour__sheet">
+      <h3>What the keys do</h3>
+      <dl class="sheet">
+        <div class="sheet__row"><dt>Volume keys</dt><dd>Any output, one to ten dB a step</dd></div>
+        <div class="sheet__row"><dt>Mute key</dt><dd>Dim or mute, your choice</dd></div>
+        <div class="sheet__row"><dt>Shift Cmd M</dt><dd>Mono</dd></div>
+        <div class="sheet__row"><dt>Option Up / Down</dt><dd>Switches the output the keys control</dd></div>
+        <div class="sheet__row"><dt>Speaker B</dt><dd>The second pair of monitors</dd></div>
+      </dl>
+      <p class="tour__more">Every shortcut can be reassigned. <a href="https://github.com/repentov-dev/rme-control#readme">The README</a> lists the rest.</p>
+    </div>
+  </div>
+</section>
+
+<section class="install" id="install">
+  <div class="container install__inner grained">
+    <h2>Install in three steps</h2>
+    <ol class="steps">
+      <li class="steps__item">
+        <span class="steps__num">01</span>
+        <p>Download <span class="nowrap">RME-Control-3.8.pkg</span> and open it.</p>
+      </li>
+      <li class="steps__item">
+        <span class="steps__num">02</span>
+        <p>The app is not notarized, so allow it once under Privacy and Security. The installer clears the quarantine flag for you.</p>
+      </li>
+      <li class="steps__item">
+        <span class="steps__num">03</span>
+        <p>Grant Accessibility in the same pane so the volume keys reach TotalMix.</p>
+      </li>
+    </ol>
+    <div class="install__actions">
+      <a class="btn btn--primary" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download the installer</a>
+      <a class="btn btn--ghost" href="https://github.com/repentov-dev/rme-control#build-and-install">Build it yourself</a>
+    </div>
+  </div>
+</section>
+
+<section class="specs container" id="specs">
+  <h2>On the label</h2>
+  <dl class="sheet sheet--wide">
+    <div class="sheet__row"><dt>Version</dt><dd>3.8</dd></div>
+    <div class="sheet__row"><dt>System</dt><dd>macOS 14 Sonoma or newer</dd></div>
+    <div class="sheet__row"><dt>Architecture</dt><dd>arm64 and x86_64, one universal build</dd></div>
+    <div class="sheet__row"><dt>Interface</dt><dd>14 languages</dd></div>
+    <div class="sheet__row"><dt>License</dt><dd>MIT</dd></div>
+    <div class="sheet__row"><dt>Source</dt><dd><a href="https://github.com/repentov-dev/rme-control">github.com/repentov-dev/rme-control</a></dd></div>
+  </dl>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="container foot__inner">
+    <div class="foot__mast">
+      <p class="foot__mark">RME Control</p>
+      <p class="foot__note">A menu bar controller for TotalMix FX, written in Swift and shipped as source.</p>
+    </div>
+    <nav class="foot__links" aria-label="Elsewhere">
+      <a href="https://github.com/repentov-dev/rme-control">Repository</a>
+      <a href="https://github.com/repentov-dev/rme-control/releases">Releases</a>
+      <a href="https://github.com/repentov-dev/rme-control/blob/main/LICENSE">MIT license</a>
+    </nav>
+  </div>
+  <div class="container foot__legal">
+    <p>RME, TotalMix and the RME logo are trademarks of RME Audio AG. This is an independent tool, not affiliated with or endorsed by RME Audio.</p>
+  </div>
+</footer>
+
+</body>
+</html>
