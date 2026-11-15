@@ -135,5 +135,6 @@
 @media (max-width: 40rem) {
   .nav__inner { flex-direction: column; align-items: flex-start; gap: var(--space-xs); }
   .nav__links { gap: var(--space-md) var(--space-lg); }
-  .hero__actions .btn { flex: 1 1 auto; }
+  .hero__actions, .install__actions { flex-direction: column; align-items: stretch; }
+  .hero__actions .btn, .install__actions .btn { width: 100%; }
 }
