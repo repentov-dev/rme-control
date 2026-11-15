@@ -283,10 +283,11 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
   .nav__links { gap: 12px; }
 }
 
-/* Phones: the wordmark goes, the links and the pill keep one row. */
+/* Phones: the wordmark and the panels link go, the rest keeps one row. */
 @media (max-width: 640px) {
   .nav__brand { display: none; }
-  .nav__links { width: 100%; justify-content: space-between; gap: 10px; }
+  .nav__links a[href="#panels"] { display: none; }
+  .nav__links { width: 100%; justify-content: space-between; gap: 8px; }
 }
 
 @media (max-width: 900px) {
