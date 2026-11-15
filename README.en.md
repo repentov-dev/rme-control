@@ -12,6 +12,37 @@ Speaker B, +48V and Inst on inputs, level meters, and a web remote for your phon
 ![Universal](https://img.shields.io/badge/arch-arm64%20%7C%20x86__64-blue)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/popover.png" width="270" alt="Menu bar popover">
+  <img src="docs/screenshots/web-remote.png" width="270" alt="Web remote on a phone">
+  <img src="docs/screenshots/levels.png" width="270" alt="Input level meters">
+</p>
+<p align="center"><sub>Popover · web remote on a phone · input levels</sub></p>
+
+<details>
+<summary>More: settings, compressor, EQ, HUD</summary>
+
+<p align="center">
+  <img src="docs/screenshots/settings-routing.png" width="410" alt="Settings — Routing">
+  <img src="docs/screenshots/settings-connection.png" width="410" alt="Settings — Connection">
+</p>
+<p align="center">
+  <img src="docs/screenshots/settings-hotkeys.png" width="410" alt="Settings — Hotkeys">
+  <img src="docs/screenshots/settings-menu-bar.png" width="410" alt="Settings — Menu Bar Panel">
+</p>
+<p align="center">
+  <img src="docs/screenshots/compressor.png" width="410" alt="Compressor">
+  <img src="docs/screenshots/eq.png" width="410" alt="Equalizer">
+</p>
+<p align="center">
+  <img src="docs/screenshots/settings-web-remote.png" width="410" alt="Settings — Web Remote">
+  <img src="docs/screenshots/hud.png" width="250" alt="Volume HUD">
+</p>
+
+</details>
+
 ## Features
 
 - **Menu bar popover** — output faders with dB readout, Mute, and the Control Room buttons
