@@ -15,7 +15,7 @@ Speaker B, +48V and Inst on inputs, level meters, and a web remote for your phon
 ## Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/popover-card.png" width="280" alt="Menu bar popover">
+  <img src="docs/screenshots/popover-window.png" width="280" alt="Menu bar popover">
   <img src="docs/screenshots/levels.png" width="190" alt="Input level meters">
 </p>
 <p align="center"><sub>Popover · input levels</sub></p>
