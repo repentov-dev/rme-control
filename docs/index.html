@@ -3,170 +3,176 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RME Control: TotalMix in the menu bar</title>
+<title>RME Control — TotalMix in the menu bar</title>
 <meta name="description" content="Menu bar open-source application for controlling RME audio interfaces via TotalMix FX. Works via Global OSC only with TotalMix 2.1+.">
+<meta name="theme-color" content="#000000">
 <link rel="icon" href="./icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sofia+Sans+Extra+Condensed:wght@200;400&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./site.css">
+<script>
+  document.documentElement.classList.add("js");
+  // if the motion file never loads, never leave the page hidden
+  setTimeout(function () {
+    document.querySelectorAll("[data-reveal]").forEach(function (el) { el.classList.add("is-in"); });
+  }, 3500);
+</script>
+<link rel="stylesheet" href="./apple.css">
 </head>
 <body>
 
 <header class="nav">
-  <div class="container nav__inner">
-    <a class="nav__mark" href="./">RME Control</a>
+  <div class="nav__inner">
+    <a class="nav__brand" href="#top">RME Control</a>
     <nav class="nav__links" aria-label="Sections">
       <a href="#features">Features</a>
-      <a href="#panels">The panels</a>
+      <a href="#panels">Panels</a>
       <a href="#install">Install</a>
       <a href="#specs">Specs</a>
-      <a class="nav__action" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download</a>
+      <a class="nav__cta" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download</a>
     </nav>
   </div>
 </header>
 
-<main>
+<main id="top">
 
-<section class="hero">
-  <div class="hero__copy container">
-    <h1>TotalMix in the menu bar</h1>
-    <p class="hero__line">Menu bar open-source application for controlling RME audio interfaces via TotalMix FX.</p>
-    <div class="hero__actions">
-      <a class="btn btn--primary" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download 3.8</a>
-      <a class="btn btn--ghost" href="https://github.com/repentov-dev/rme-control">Read the source</a>
+  <section class="hero">
+    <div class="hero__copy">
+      <h1>TotalMix in the menu bar</h1>
+      <p class="hero__sub">Menu bar open-source application for controlling RME audio interfaces via TotalMix FX.</p>
+      <div class="hero__actions">
+        <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download 3.8</a>
+        <a class="btn btn--tint" href="https://github.com/repentov-dev/rme-control">Read the source</a>
+      </div>
+      <p class="hero__note">Works via Global OSC only with TotalMix 2.1+. Runs on macOS 14 or newer, Apple Silicon and Intel.</p>
     </div>
-    <p class="hero__note">Works via Global OSC only with TotalMix 2.1+. Runs on macOS 14 or newer, Apple Silicon and Intel.</p>
-  </div>
-  <div class="hero__stage">
-    <img class="hero__capture" src="./screenshots/popover-window.png" width="560" height="993" alt="The RME Control popover: output faders for Main, DT990 and FT1, a send, the Speaker B, Dim and Mono buttons, and the input switches.">
-  </div>
-</section>
+    <div class="hero__stage">
+      <div class="hero__tilt">
+        <img class="hero__shot" src="./screenshots/popover-window.png" width="560" height="993" alt="The RME Control popover: output faders for Main, DT990 and FT1, a send, the Speaker B, Dim and Mono buttons, and the input switches.">
+      </div>
+    </div>
+  </section>
 
-<section class="tour container" id="panels">
-  <h2>What the popover opens</h2>
-  <div class="tour__grid">
-    <figure class="shot">
-      <img src="./screenshots/eq.png" width="440" height="330" alt="Equalizer window for the GTR input with four bands, a low cut at 94 Hz and a 4.2 kHz bell at plus 5 dB.">
-      <figcaption>Low cut, two bells and a shelf, drawn as TotalMix draws them.</figcaption>
-    </figure>
-    <figure class="shot">
-      <img src="./screenshots/compressor.png" width="380" height="280" alt="Compressor window for the MIC2 input: threshold, ratio, attack, release and gain, with input, gain reduction and output meters.">
-      <figcaption>The compressor TotalMix runs, with meters beside it.</figcaption>
-    </figure>
-    <figure class="shot shot--wide">
-      <img src="./screenshots/levels.png" width="188" height="80" alt="The level window: MIC1, MIC2, MIC3 and GTR meters showing minus 19.0, minus 22.2, minus 29.6 and minus 12.7 dB.">
-      <figcaption>Always on top: four inputs, a value beside each bar.</figcaption>
-    </figure>
-    <div class="tour__note">
-      <h3>Above every window</h3>
-      <p>Every input gets a bar, its value in dB, and red when it clips.</p>
-      <p class="tour__more">Everything else the app does is <a href="#features">listed below</a>.</p>
+  <section class="panels" id="panels">
+    <h2 data-reveal>What the popover opens</h2>
+    <div class="panels__grid">
+      <figure class="shot" data-reveal style="--i:0">
+        <img src="./screenshots/eq.png" width="440" height="330" alt="Equalizer window for the GTR input with four bands, a low cut at 94 Hz and a 4.2 kHz bell at plus 5 dB.">
+        <figcaption>Low cut, two bells and a shelf, drawn as TotalMix draws them.</figcaption>
+      </figure>
+      <figure class="shot" data-reveal style="--i:1">
+        <img src="./screenshots/compressor.png" width="380" height="280" alt="Compressor window for the MIC2 input: threshold, ratio, attack, release and gain, with input, gain reduction and output meters.">
+        <figcaption>The compressor TotalMix runs, with meters beside it.</figcaption>
+      </figure>
+      <figure class="shot shot--strip" data-reveal style="--i:2">
+        <img src="./screenshots/levels.png" width="188" height="80" alt="The level window: MIC1, MIC2, MIC3 and GTR meters showing minus 19.0, minus 22.2, minus 29.6 and minus 12.7 dB.">
+        <figcaption>Always on top: four inputs, a value beside each bar.</figcaption>
+      </figure>
+      <div class="panels__note" data-reveal style="--i:3">
+        <h3>Above every window</h3>
+        <p>Every input gets a bar, its value in dB, and red when it clips.</p>
+        <p class="panels__more">Everything else the app does is <a href="#features">listed below</a>.</p>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
+  <section class="features" id="features">
+    <h2 data-reveal>Everything in the app</h2>
+    <div class="features__grid">
+      <div class="group" data-reveal style="--i:0">
+        <h3>Outputs</h3>
+        <dl class="sheet">
+          <div class="row"><dt>Volume keys</dt><dd>Any output, 1 to 10 dB a step</dd></div>
+          <div class="row"><dt>Dim and mute</dt><dd>On the Mac mute key, either one</dd></div>
+          <div class="row"><dt>Mono</dt><dd>Shift Cmd M</dd></div>
+          <div class="row"><dt>Speaker B</dt><dd>The second pair of monitors</dd></div>
+          <div class="row"><dt>Output switch</dt><dd>Option Up or Down, optionally muting the rest</dd></div>
+          <div class="row"><dt>Channels</dt><dd>Edit, rename, add and remove</dd></div>
+          <div class="row"><dt>Sends</dt><dd>From any input to any output</dd></div>
+        </dl>
+      </div>
+      <div class="group" data-reveal style="--i:1">
+        <h3>Inputs</h3>
+        <dl class="sheet">
+          <div class="row"><dt>Phantom power</dt><dd>+48V on any number of channels</dd></div>
+          <div class="row"><dt>Instrument mode</dt><dd>Inst per channel</dd></div>
+          <div class="row"><dt>EQ</dt><dd>Four bands a channel</dd></div>
+          <div class="row"><dt>Compressor</dt><dd>Threshold, ratio, attack, release, gain</dd></div>
+          <div class="row"><dt>Meters</dt><dd>Input, gain reduction and output</dd></div>
+        </dl>
+      </div>
+      <div class="group" data-reveal style="--i:2">
+        <h3>Interface</h3>
+        <dl class="sheet">
+          <div class="row"><dt>Levels window</dt><dd>Always on top</dd></div>
+          <div class="row"><dt>Clipping</dt><dd>Flagged in red</dd></div>
+          <div class="row"><dt>Notifications</dt><dd>Volume, Dim, Mono, Mute, also from TotalMix</dd></div>
+          <div class="row"><dt>Mute notice</dt><dd>Names the silent output</dd></div>
+          <div class="row"><dt>Menu</dt><dd>Customizable</dd></div>
+          <div class="row"><dt>Presets</dt><dd>Save and restore every setting</dd></div>
+          <div class="row"><dt>Shortcuts</dt><dd>Every one can be reassigned</dd></div>
+          <div class="row"><dt>Languages</dt><dd>14</dd></div>
+        </dl>
+      </div>
+      <div class="group" data-reveal style="--i:3">
+        <h3>TotalMix</h3>
+        <dl class="sheet">
+          <div class="row"><dt>Synchronization</dt><dd>Two-way, read at launch</dd></div>
+          <div class="row"><dt>Fail-safe</dt><dd>Values freeze, keys return to macOS</dd></div>
+          <div class="row"><dt>OSC monitor</dt><dd>Watch the network commands in Connection</dd></div>
+        </dl>
+        <h3 class="group__second">Remote control</h3>
+        <dl class="sheet">
+          <div class="row"><dt>Web server</dt><dd>One toggle in Settings</dd></div>
+          <div class="row"><dt>QR code</dt><dd>Opens the remote on a phone in the same Wi-Fi</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
 
-<section class="features container" id="features">
-  <h2>Everything in the app</h2>
-  <div class="features__grid">
-    <div class="group">
-      <h3>Outputs</h3>
-      <dl class="sheet">
-        <div class="sheet__row"><dt>Volume keys</dt><dd>Any output, 1 to 10 dB a step</dd></div>
-        <div class="sheet__row"><dt>Dim and mute</dt><dd>On the Mac mute key, either one</dd></div>
-        <div class="sheet__row"><dt>Mono</dt><dd>Shift Cmd M</dd></div>
-        <div class="sheet__row"><dt>Speaker B</dt><dd>The second pair of monitors</dd></div>
-        <div class="sheet__row"><dt>Output switch</dt><dd>Option Up or Down, optionally muting the rest</dd></div>
-        <div class="sheet__row"><dt>Channels</dt><dd>Edit, rename, add and remove</dd></div>
-        <div class="sheet__row"><dt>Sends</dt><dd>From any input to any output</dd></div>
-      </dl>
-    </div>
-    <div class="group">
-      <h3>Inputs</h3>
-      <dl class="sheet">
-        <div class="sheet__row"><dt>Phantom power</dt><dd>+48V on any number of channels</dd></div>
-        <div class="sheet__row"><dt>Instrument mode</dt><dd>Inst per channel</dd></div>
-        <div class="sheet__row"><dt>EQ</dt><dd>Four bands a channel</dd></div>
-        <div class="sheet__row"><dt>Compressor</dt><dd>Threshold, ratio, attack, release, gain</dd></div>
-        <div class="sheet__row"><dt>Meters</dt><dd>Input, gain reduction and output</dd></div>
-      </dl>
-    </div>
-    <div class="group">
-      <h3>Interface</h3>
-      <dl class="sheet">
-        <div class="sheet__row"><dt>Levels window</dt><dd>Always on top</dd></div>
-        <div class="sheet__row"><dt>Clipping</dt><dd>Flagged in red</dd></div>
-        <div class="sheet__row"><dt>Notifications</dt><dd>Volume, Dim, Mono, Mute, also from TotalMix</dd></div>
-        <div class="sheet__row"><dt>Mute notice</dt><dd>Names the silent output</dd></div>
-        <div class="sheet__row"><dt>Menu</dt><dd>Customizable</dd></div>
-        <div class="sheet__row"><dt>Presets</dt><dd>Save and restore every setting</dd></div>
-        <div class="sheet__row"><dt>Shortcuts</dt><dd>Every one can be reassigned</dd></div>
-        <div class="sheet__row"><dt>Languages</dt><dd>14</dd></div>
-      </dl>
-    </div>
-    <div class="group">
-      <h3>TotalMix</h3>
-      <dl class="sheet">
-        <div class="sheet__row"><dt>Synchronization</dt><dd>Two-way, read at launch</dd></div>
-        <div class="sheet__row"><dt>Fail-safe</dt><dd>Values freeze, keys return to macOS</dd></div>
-        <div class="sheet__row"><dt>OSC monitor</dt><dd>Watch the network commands in Connection</dd></div>
-      </dl>
-      <h3 class="group__second">Remote control</h3>
-      <dl class="sheet">
-        <div class="sheet__row"><dt>Web server</dt><dd>One toggle in Settings</dd></div>
-        <div class="sheet__row"><dt>QR code</dt><dd>Opens the remote on a phone in the same Wi-Fi</dd></div>
-      </dl>
-    </div>
-  </div>
-</section>
-
-<section class="install" id="install">
-  <div class="container install__inner grained">
-    <h2>Install in four steps</h2>
-    <ol class="steps">
-      <li class="steps__item">
-        <span class="steps__num">01</span>
-        <p>Download <span class="nowrap">RME-Control-3.8.pkg</span> and open it.</p>
-      </li>
-      <li class="steps__item">
-        <span class="steps__num">02</span>
-        <p>Not notarized: allow it once under Privacy and Security. The installer clears the quarantine flag.</p>
-      </li>
-      <li class="steps__item">
-        <span class="steps__num">03</span>
-        <p>If macOS still refuses to open it, take the app out of quarantine:</p>
-        <pre class="cmd">xattr -dr com.apple.quarantine \
+  <section class="install" id="install">
+    <div class="install__card" data-reveal>
+      <h2>Install in four steps</h2>
+      <ol class="steps">
+        <li class="step">
+          <span class="step__num">01</span>
+          <p>Download <span class="nowrap">RME-Control-3.8.pkg</span> and open it.</p>
+        </li>
+        <li class="step">
+          <span class="step__num">02</span>
+          <p>Not notarized: allow it once under Privacy and Security. The installer clears the quarantine flag.</p>
+        </li>
+        <li class="step">
+          <span class="step__num">03</span>
+          <p>If macOS still refuses to open it, take the app out of quarantine:</p>
+          <pre class="cmd">xattr -dr com.apple.quarantine \
   "/Applications/RME Control.app"</pre>
-      </li>
-      <li class="steps__item">
-        <span class="steps__num">04</span>
-        <p>Grant Accessibility in the same pane so the volume keys reach TotalMix.</p>
-      </li>
-    </ol>
-    <div class="install__actions">
-      <a class="btn btn--primary" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download the installer</a>
-      <a class="btn btn--ghost" href="https://github.com/repentov-dev/rme-control#build-and-install">Build it yourself</a>
+        </li>
+        <li class="step">
+          <span class="step__num">04</span>
+          <p>Grant Accessibility in the same pane so the volume keys reach TotalMix.</p>
+        </li>
+      </ol>
+      <div class="install__actions">
+        <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download the installer</a>
+        <a class="btn btn--tint" href="https://github.com/repentov-dev/rme-control#build-and-install">Build it yourself</a>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="specs container" id="specs">
-  <h2>On the label</h2>
-  <dl class="sheet sheet--wide">
-    <div class="sheet__row"><dt>Version</dt><dd>3.8</dd></div>
-    <div class="sheet__row"><dt>System</dt><dd>macOS 14 Sonoma or newer</dd></div>
-    <div class="sheet__row"><dt>Architecture</dt><dd>arm64 and x86_64, one universal build</dd></div>
-    <div class="sheet__row"><dt>Interface</dt><dd>14 languages</dd></div>
-    <div class="sheet__row"><dt>License</dt><dd>MIT</dd></div>
-    <div class="sheet__row"><dt>Source</dt><dd><a href="https://github.com/repentov-dev/rme-control">github.com/repentov-dev/rme-control</a></dd></div>
-  </dl>
-</section>
+  <section class="specs" id="specs">
+    <h2 data-reveal>On the label</h2>
+    <dl class="sheet sheet--specs" data-reveal style="--i:1">
+      <div class="row"><dt>Version</dt><dd>3.8</dd></div>
+      <div class="row"><dt>System</dt><dd>macOS 14 Sonoma or newer</dd></div>
+      <div class="row"><dt>Architecture</dt><dd>arm64 and x86_64, one universal build</dd></div>
+      <div class="row"><dt>Interface</dt><dd>14 languages</dd></div>
+      <div class="row"><dt>License</dt><dd>MIT</dd></div>
+      <div class="row"><dt>Source</dt><dd><a href="https://github.com/repentov-dev/rme-control">github.com/repentov-dev/rme-control</a></dd></div>
+    </dl>
+  </section>
 
 </main>
 
 <footer class="foot">
-  <div class="container foot__inner">
+  <div class="foot__inner">
     <div class="foot__mast">
       <p class="foot__mark">RME Control</p>
       <p class="foot__note">A menu bar controller for TotalMix FX, written in Swift and shipped as source.</p>
@@ -178,10 +184,11 @@
       <a href="https://www.instagram.com/repentov">Instagram</a>
     </nav>
   </div>
-  <div class="container foot__legal">
+  <div class="foot__legal">
     <p>RME, TotalMix and the RME logo are trademarks of RME Audio AG. This is an independent tool, not affiliated with or endorsed by RME Audio.</p>
   </div>
 </footer>
 
+<script src="./apple.js" defer></script>
 </body>
 </html>
