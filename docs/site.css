@@ -29,7 +29,8 @@
 .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-md); margin-top: var(--space-xl); }
 .hero__note { margin-top: var(--space-lg); font-size: var(--text-sm); color: var(--color-muted); }
 .hero__stage {
-  background: var(--color-paper-3); color: var(--color-ink); border-left: var(--rule-hair) solid var(--color-rule);
+  background: color-mix(in oklab, var(--color-paper-3) 65%, var(--color-paper));
+  color: var(--color-ink); border-left: var(--rule-hair) solid var(--color-rule);
   display: grid; place-items: start center; min-width: 0;
   padding: var(--space-xl) clamp(var(--space-lg), 4vw, var(--space-3xl)) var(--space-xl);
 }
