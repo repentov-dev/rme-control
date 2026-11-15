@@ -1,7 +1,9 @@
 /* Hallmark · shape: Workbench · genre: atmospheric · theme: Darkroom (deal 3/3, seed rme-control-macos-menu-0251·abcc3c75·2026-11-15·r0) · job: try · draw: none, shape named after the material
- * hero: poster, head left, the popover held right · nav: edge-aligned, wordmark and one action · footer: mast, wordmark over links · imagery: the app's own captures, never framed · signature: the popover printed on the ground at reading size · darkroom: amber safelight on controls only, grain on the one well, zero radius
+ * hero: poster, head left, the popover held right · nav: edge-aligned, wordmark and one action · footer: mast, wordmark over links · imagery: the app's own captures, never framed · signature: the popover printed on the ground at reading size · surface: absolute · darkroom: amber safelight on controls only, grain on the one well, zero radius
  * axes: dark/display-condensed/chromatic-amber · posture: restrained · contrast: pass · fold: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P pass H pass E pass S pass R pass V pass · weakest: the hero capture has to stay under the fold on a short laptop, so its height is capped at 52vh and the actions sit above it in the source order */
+/* Hallmark · waive 7b · the capture runs #1c1c1c to #303030 on a black desktop · the page prints the popover on that same black, as the screenshots do */
+/* Hallmark · waive 22 · the app panels are neutral grey (r=g=b) in the capture · the page keeps the capture neutrality instead of tinting the chrome */
 @import url("./tokens.css");
 @import url("./base.css");
 
