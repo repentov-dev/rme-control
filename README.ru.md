@@ -64,16 +64,8 @@
 ## Скриншоты
 
 <p align="center">
-  <img src="docs/screenshots/popover-window.png" width="280" alt="Поповер в строке меню">
-  <img src="docs/screenshots/levels.png" width="190" alt="Индикаторы уровней входов">
+  <img src="docs/screenshots/hero.png" width="900" alt="Поповер, окно уровней, компрессор и эквалайзер.">
 </p>
-<p align="center"><sub>Поповер · уровни входов</sub></p>
-
-<p align="center">
-  <img src="docs/screenshots/compressor.png" width="380" alt="Компрессор">
-  <img src="docs/screenshots/eq.png" width="440" alt="Эквалайзер">
-</p>
-<p align="center"><sub>Компрессор и эквалайзер</sub></p>
 
 ## Сборка без Xcode — пошагово
 

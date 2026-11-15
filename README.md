@@ -16,16 +16,8 @@ Works via Global OSC only with TotalMix 2.1+.
 ## Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/popover-window.png" width="280" alt="Menu bar popover">
-  <img src="docs/screenshots/levels.png" width="190" alt="Input level meters">
+  <img src="docs/screenshots/hero.png" width="900" alt="The popover beside the level window, the compressor and the equalizer.">
 </p>
-<p align="center"><sub>Popover · input levels</sub></p>
-
-<p align="center">
-  <img src="docs/screenshots/compressor.png" width="380" alt="Compressor">
-  <img src="docs/screenshots/eq.png" width="440" alt="Equalizer">
-</p>
-<p align="center"><sub>Compressor and equalizer</sub></p>
 
 ## Features
 
