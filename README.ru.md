@@ -1,6 +1,8 @@
-# RME Control
+<p align="center">
+  <img src="docs/screenshots/banner.png" width="100%" alt="RME Control — управление TotalMix FX из строки меню">
+</p>
 
-<img src="docs/icon.png" width="128" align="right" alt="RME Control">
+# RME Control
 
 Приложение в строке меню с открытым исходным кодом для управления аудиоинтерфейсами RME
 через **TotalMix FX**.

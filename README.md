@@ -1,6 +1,8 @@
-# RME Control
+<p align="center">
+  <img src="docs/screenshots/banner.png" width="100%" alt="RME Control — a menu bar controller for TotalMix FX">
+</p>
 
-<img src="docs/icon.png" width="128" align="right" alt="RME Control icon">
+# RME Control
 
 Menu bar open-source application for controlling RME audio interfaces via **TotalMix FX**.
 
