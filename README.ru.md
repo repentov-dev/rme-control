@@ -62,14 +62,14 @@ Dim / Mono / Speaker B, +48V / Inst на входах, уровни и веб-п
 ## Скриншоты
 
 <p align="center">
-  <img src="docs/screenshots/popover.png" width="270" alt="Поповер в строке меню">
-  <img src="docs/screenshots/levels.png" width="270" alt="Индикаторы уровней входов">
+  <img src="docs/screenshots/popover.png" width="330" alt="Поповер в строке меню">
+  <img src="docs/screenshots/levels.png" width="330" alt="Индикаторы уровней входов">
 </p>
 <p align="center"><sub>Поповер · уровни входов</sub></p>
 
 <p align="center">
-  <img src="docs/screenshots/compressor.png" width="410" alt="Компрессор">
-  <img src="docs/screenshots/eq.png" width="410" alt="Эквалайзер">
+  <img src="docs/screenshots/compressor.png" width="450" alt="Компрессор">
+  <img src="docs/screenshots/eq.png" width="450" alt="Эквалайзер">
 </p>
 <p align="center"><sub>Компрессор и эквалайзер</sub></p>
 

@@ -15,14 +15,14 @@ Speaker B, +48V and Inst on inputs, level meters, and a web remote for your phon
 ## Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/popover.png" width="270" alt="Menu bar popover">
-  <img src="docs/screenshots/levels.png" width="270" alt="Input level meters">
+  <img src="docs/screenshots/popover.png" width="330" alt="Menu bar popover">
+  <img src="docs/screenshots/levels.png" width="330" alt="Input level meters">
 </p>
 <p align="center"><sub>Popover · input levels</sub></p>
 
 <p align="center">
-  <img src="docs/screenshots/compressor.png" width="410" alt="Compressor">
-  <img src="docs/screenshots/eq.png" width="410" alt="Equalizer">
+  <img src="docs/screenshots/compressor.png" width="450" alt="Compressor">
+  <img src="docs/screenshots/eq.png" width="450" alt="Equalizer">
 </p>
 <p align="center"><sub>Compressor and equalizer</sub></p>
 
