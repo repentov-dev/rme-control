@@ -1,223 +1,196 @@
 # RME Control
 
-<img src="docs/icon.png" width="128" align="right" alt="RME Control">
+<img src="docs/icon.png" width="128" align="right" alt="RME Control icon">
 
-Приложение в строке меню macOS для управления RME TotalMix FX по OSC: громкость выходов,
-Dim / Mono / Speaker B, +48V / Inst на входах, уровни и веб-пульт для телефона.
+A macOS menu bar app that controls **RME TotalMix FX** over OSC: output volume, Dim / Mono /
+Speaker B, +48V and Inst on inputs, level meters, and a web remote for your phone.
 
-[English version](README.en.md) · [Лицензия MIT](LICENSE)
+[Русская версия](README.ru.md) · [MIT License](LICENSE) · [Changelog](CHANGELOG.md)
 
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-black)
 ![Swift 6](https://img.shields.io/badge/Swift-6.0-orange)
 ![Universal](https://img.shields.io/badge/arch-arm64%20%7C%20x86__64-blue)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
-- macOS 14 Sonoma и новее
-- Apple Silicon и Intel (сборка универсальная)
-- Исходный код на SwiftUI без внешних зависимостей, 14 языков интерфейса
-
-## Скриншоты
+## Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/popover.png" width="270" alt="Поповер в строке меню">
-  <img src="docs/screenshots/levels.png" width="270" alt="Индикаторы уровней входов">
+  <img src="docs/screenshots/popover.png" width="270" alt="Menu bar popover">
+  <img src="docs/screenshots/levels.png" width="270" alt="Input level meters">
 </p>
-<p align="center"><sub>Поповер · уровни входов</sub></p>
+<p align="center"><sub>Popover · input levels</sub></p>
 
 <p align="center">
-  <img src="docs/screenshots/compressor.png" width="410" alt="Компрессор">
-  <img src="docs/screenshots/eq.png" width="410" alt="Эквалайзер">
+  <img src="docs/screenshots/compressor.png" width="410" alt="Compressor">
+  <img src="docs/screenshots/eq.png" width="410" alt="Equalizer">
 </p>
-<p align="center"><sub>Компрессор и эквалайзер</sub></p>
+<p align="center"><sub>Compressor and equalizer</sub></p>
 
-## Сборка без Xcode — пошагово
+## Features
 
-Полный Xcode не нужен, достаточно **Xcode Command Line Tools**. Все команды ниже
-вводятся в приложении **Терминал** (Программы → Утилиты → Терминал, или ⌘Пробел → «Терминал»).
-Каждую команду вставьте целиком и нажмите Enter.
+### Audio outputs — control and monitoring
 
-### Шаг 1. Установить Command Line Tools (один раз)
+- Volume control for any output (including Main Out and headphones) from the Mac volume
+  keys or the menu bar.
+- Adjustable volume step from 1 to 10 dB.
+- Dim / Mute on the Mac mute key.
+- Mono switch on a global shortcut (Shift + Cmd + M by default).
+- Speaker B button to switch to an alternative pair of monitors.
+- A shortcut switches which output the volume keys control (Option + ↑/↓ by default).
+- Channel editing: modify existing inputs and outputs or add new ones.
+- Sends from input channels to output channels.
+
+### Inputs
+
+- Phantom power (+48V) for any number of input channels.
+- Instrument mode (Inst) for any number of input channels.
+- Convenient EQ and compressor control.
+
+### Interface, notifications and customization
+
+- Dedicated always-on-top window for input level monitoring.
+- Clipping notifications to prevent signal overload.
+- On-screen notifications for volume, Dim, Mono and Mute — also when the values are changed
+  directly in TotalMix; the Mute notification shows the output name.
+- Customizable application menu.
+- Every keyboard shortcut is assignable — the defaults are just a starting point.
+- Presets to save and restore all application settings.
+
+### TotalMix integration and synchronization
+
+- Full two-way synchronization: the app reads the values from TotalMix at startup and keeps
+  a stable connection.
+- Fail-safe disconnection: values freeze and the Mac volume keys return to native system
+  behavior when TotalMix or the audio interface goes away.
+- OSC monitor in the Connection section to watch the network commands.
+
+### Remote control
+
+- Built-in web server, started with a single “HTTP server” toggle in the settings.
+- QR code connection: scan it with a phone or tablet on the same Wi-Fi network and a full
+  RME remote control opens in the mobile browser.
+
+## Requirements
+
+- macOS 14 Sonoma or newer (Apple Silicon or Intel).
+- To build: **Xcode Command Line Tools** (Swift 6.0+) — the full Xcode is only needed to run
+  the test suite, or to build from the Xcode project.
+
+## Build and install
 
 ```bash
-xcode-select --install
-```
-
-Откроется окно установки, нажмите «Установить» и дождитесь конца (5–15 минут).
-Если в ответ пишет `command line tools are already installed`, значит, они уже есть.
-
-Проверьте версию Swift:
-
-```bash
-swiftc --version
-```
-
-Должно быть **Swift version 6.0** или новее. Если версия 5.x, обновите Command Line Tools:
-System Settings → General → Software Update, или скачайте их с
-[developer.apple.com/download/all](https://developer.apple.com/download/all/) (вход по Apple ID).
-
-### Шаг 2. Перейти в папку проекта
-
-Напечатайте `cd ` (с пробелом в конце), затем **перетащите папку проекта из Finder в окно
-Терминала**, путь подставится сам. Нажмите Enter. Должно получиться примерно так:
-
-```bash
-cd /Users/имя/Downloads/rmecontrol
-```
-
-Проверка: команда `ls` должна показать `build.sh`, `README.md` и папку `RME Control`.
-
-### Шаг 3. Собрать и установить
-
-```bash
+xcode-select --install      # once, if the command line tools are missing
+cd rme-control
 ./build.sh --install
 ```
 
-Скрипт пишет, что делает, шагами `[1/5]` … `[5/5]`:
+`build.sh` compiles both architectures (this takes a few minutes and prints nothing while the
+compiler works), copies resources and translations, ad-hoc signs the bundle and installs
+`/Applications/RME Control.app`. Progress is reported as `[1/5]` … `[5/5]`.
 
-```
-==> [1/5] Checking tools
-==> [2/5] Compiling (2 passes: Apple Silicon and Intel). This takes 1-5 minutes and prints nothing - it is not frozen.
-    compiling arm64 ...
-    compiling x86_64 ...
-==> [3/5] Copying resources and translations
-==> [4/5] Signing (ad-hoc)
-==> [5/5] Done
-    Installed: /Applications/RME Control.app
-```
-
-**На шаге 2 несколько минут ничего не происходит, это нормально**: компилятор работает молча.
-Не закрывайте Терминал и не нажимайте Ctrl+C, дождитесь `[5/5] Done`.
-
-После этого приложение копируется в «Программы» и запускается. Его значок появится
-в строке меню справа вверху, отдельного окна нет.
-
-### Шаг 4. Первый запуск и разрешения
-
-При первом запуске открывается мастер настройки: он находит входы и выходы
-в TotalMix FX (пока их нет, в панели из строки меню будет предложено выполнить
-сканирование), проверяет разрешения и предлагает запуск при входе в систему.
-Мастер можно закрыть и вернуться к нему позже: Настройки → General → Run Setup Assistant.
-
-Чтобы работали клавиши громкости на клавиатуре, приложение попросит разрешение
-«Специальные возможности»: System Settings → Privacy & Security → Accessibility →
-включите RME Control, затем перезапустите приложение.
-
-### Варианты запуска скрипта
-
-| Команда | Что делает |
+| Command | Result |
 |---|---|
-| `./build.sh` | Только собирает `build/Release/RME Control.app` в папке проекта |
-| `./build.sh --install` | Собирает, копирует в «Программы» и запускает |
-| `./build.sh --zip` | Собирает и упаковывает в `build/RME-Control-<версия>.zip` для отправки |
+| `./build.sh` | `build/Release/RME Control.app` in the project folder |
+| `./build.sh --install` | builds, copies to `/Applications` and launches |
+| `./build.sh --zip` | builds and packs `build/RME-Control-<version>.zip` for sharing |
+| `./make-installer.sh` | builds a `.pkg` installer from an already built app |
 
-### Ошибки при сборке
+The version comes from `MARKETING_VERSION` in the Xcode project, so it is set in one place.
 
-Если что-то пошло не так, в конце будет строка `BUILD FAILED`, а выше — текст ошибки.
+### Xcode
 
-| Что видно | Что делать |
+Open `RME Control.xcodeproj` and press ⌘R. For a standalone `.app`: Product → Archive →
+Distribute App → Custom → Copy App.
+
+## Configuration
+
+1. Enable OSC in TotalMix FX: **Options → Settings → OSC**, and note the ports.
+2. Open the app's **Settings → Connection** and set the matching send/receive ports
+   (default host is `127.0.0.1`).
+3. Run the setup assistant on first launch, or re-run it from **Settings → General →
+   Run Setup Assistant**, to discover channels and grant permissions.
+
+To make the volume keys work, allow the app in **System Settings → Privacy & Security →
+Accessibility**. The permission is tied to the code signature, so after rebuilding it has to be
+revoked and granted again.
+
+The interface language is chosen in **Settings → General → Interface**; the app has to be
+restarted afterwards.
+
+## Troubleshooting
+
+### Build errors
+
+A failed run ends with `BUILD FAILED` and the compiler output above that line.
+
+| What you see | What to do |
 |---|---|
-| `permission denied: ./build.sh` | Выполнить `chmod +x build.sh` и запустить снова |
-| `no such file or directory: ./build.sh` | Вы не в папке проекта, повторите шаг 2 |
-| `swiftc not found` или `xcrun: error: invalid active developer path` | Установить Command Line Tools, шаг 1 |
-| `error: ... swift-version 6` / ошибки про `Observation`, `@Observable` | Старый Swift, нужен 6.0+, см. шаг 1 |
-| `xcrun: error: unable to find utility "swiftc"` при установленном Xcode | `sudo xcode-select --switch /Library/Developer/CommandLineTools` |
+| `permission denied: ./build.sh` | `chmod +x build.sh`, then run it again |
+| `no such file or directory: ./build.sh` | You are not in the project folder — `cd` into it first |
+| `swiftc not found` or `xcrun: error: invalid active developer path` | Install the Command Line Tools: `xcode-select --install` |
+| `error: ... swift-version 6`, errors about `Observation` or `@Observable` | Swift is older than 6.0 — update the Command Line Tools |
+| `xcrun: error: unable to find utility "swiftc"` while Xcode is installed | `sudo xcode-select --switch /Library/Developer/CommandLineTools` |
 
-Если ошибка другая, пришлите разработчику весь вывод Терминала, начиная с команды `./build.sh`.
+### The app does not start
 
-## Сборка в Xcode
+- **“Damaged” or “cannot be verified”** — clear the quarantine flag, see
+  [Distribution notes](#distribution-notes).
+- **Nothing happens and there is no icon in the menu bar** — check that the Mac runs macOS 14 or
+  newer. An `.app` that was transferred outside a `.zip` can lose its executable bit: rebuild it,
+  or ask for the `.zip`.
+- **The volume keys do nothing** — grant Accessibility in System Settings → Privacy & Security →
+  Accessibility → RME Control. The code signature changes with every rebuild, so the old
+  permission has to be removed and granted again, then restart the app.
+- **No connection to TotalMix** — enable OSC in TotalMix FX (Options → Settings → OSC) and make
+  sure the ports match the ones in RME Control (**Settings → Connection**).
 
-Откройте `RME Control.xcodeproj` и нажмите Run (⌘R). Для отдельного `.app`:
-Product → Archive → Distribute App → Custom → Copy App.
-
-## Как отправить приложение другому человеку
-
-Приложение подписано **без** Apple Developer ID и не нотаризовано (это платная
-программа Apple за $99 в год). Поэтому на чужом Mac macOS блокирует его после
-скачивания: появляется «приложение повреждено», «не удаётся проверить разработчика»
-или оно просто не открывается. Это не зависит от способа сборки: так же ведёт себя
-и `.app` из Xcode Archive.
-
-Есть три варианта.
-
-**1. Получатель собирает сам (надёжнее всего).** Отправьте папку проекта, получатель
-запускает `./build.sh --install`. Приложение, собранное на своём Mac, macOS не блокирует.
-
-**2. Отправить готовое приложение.** Упакуйте его через `./build.sh --zip` и отправьте
-`.zip`, а не `.app` (мессенджеры и облака часто портят бандл `.app`). Получателю нужно:
-
-1. Распаковать архив и перенести `RME Control.app` в «Программы».
-2. Снять карантин в Терминале:
-   ```bash
-   xattr -dr com.apple.quarantine "/Applications/RME Control.app"
-   ```
-   Или: попытаться открыть приложение, затем System Settings → Privacy & Security →
-   внизу «RME Control was blocked…» → **Open Anyway**.
-
-**3. Установщик `.pkg` (сам снимает карантин с приложения).**
-Соберите его командой `./make-installer.sh` — получится `build/RME-Control-<версия>.pkg`.
-Установщик закрывает запущенную копию, кладёт приложение в «Программы» и в
-postinstall-скрипте выполняет `xattr -dr com.apple.quarantine` для установленного
-бандла. После установки приложение запускается без предупреждений.
-
-Важно: сам `.pkg` тоже скачивается с карантином, и без подписи Apple его первый
-запуск macOS заблокирует так же: разрешите его один раз в System Settings →
-Privacy & Security → **Open Anyway**. Полностью без предупреждений работает только
-подписанный и нотаризованный установщик (Developer ID Application + Developer ID
-Installer, $99/год): `make-installer.sh` умеет это, если задать `APP_IDENTITY`,
-`INSTALLER_IDENTITY` и `NOTARY_PROFILE`.
-
-Без Apple Developer ID нулевое предупреждение даёт раздача не через браузер, а
-через `curl` или Homebrew: `curl` не ставит карантин, поэтому скачанный так `.pkg`
-(или `.zip`) устанавливается без Gatekeeper-предупреждений.
-
-## Если приложение не запускается
-
-- **«Повреждено» / «не удаётся проверить»**: снимите карантин, см. выше.
-- **Ничего не происходит, нет значка в строке меню**: проверьте версию macOS (нужна 14+).
-  Если `.app` пришёл не в `.zip`, у файла могли пропасть права на запуск.
-  Пересоберите приложение или попросите прислать `.zip`.
-- **Клавиши громкости не работают**: выдайте разрешение System Settings →
-  Privacy & Security → Accessibility → RME Control. После каждой пересборки подпись
-  меняется, поэтому разрешение нужно удалить и выдать заново, затем перезапустить приложение.
-- **Нет связи с TotalMix**: включите OSC в настройках TotalMix FX (Options → Settings,
-  вкладка OSC). Порты там должны совпадать с портами в RME Control (раздел **Connection**).
-
-## Язык интерфейса
-
-English по умолчанию. Русский включается в настройках (раздел **General** → **Interface**),
-после выбора приложение нужно перезапустить (кнопка Restart now).
-
-## Структура проекта
+## Project structure
 
 ```
 RME Control/
-├── App/          точка входа, AppDelegate, значок в строке меню, менеджер окон
-├── Common/       общие вью, оформление окон, математика фейдера, QR-код
-├── Features/     поповер, HUD, уровни, компрессор, эквалайзер, настройки, мастер настройки
-├── Models/       конфиги каналов, хоткеи, пресеты, языки
-├── Resources/    Localizable.xcstrings, иконки, веб-пульт (HTML/JS)
+├── App/          app entry point, AppDelegate, status bar item, window manager
+├── Common/       reusable views, window chrome, fader math, QR code generation
+├── Features/     popover, HUD, levels, compressor, EQ, settings, setup assistant
+├── Models/       channel configs, hotkeys, presets, language
+├── Resources/    Localizable.xcstrings, icons, web remote HTML/JS
 └── Services/
-    ├── Mixer/    MixerService, MixerState, сканер каналов, монитор соединения
-    ├── OSC/      кодек OSC, клиент, адреса, монитор
-    ├── Settings/ AppSettings и значения по умолчанию
-    ├── Storage/  файл настроек, UserDefaults, миграция
-    ├── System/   специальные возможности, автозапуск, сеть, клавиши громкости
-    └── WebServer/ встроенный HTTP-сервер и JSON API для веб-пульта
-RMEControlTests/  юнит- и интеграционные тесты
-installer/        скрипты preinstall и postinstall для .pkg
+    ├── Mixer/    MixerService, MixerState, channel scanner, connection monitor
+    ├── OSC/      OSC codec, client, addresses, monitor
+    ├── Settings/ AppSettings and defaults
+    ├── Storage/  settings file, UserDefaults storage, migration
+    ├── System/   accessibility, launch at login, network info, volume keys
+    └── WebServer/ built-in HTTP server and JSON API for the web remote
+RMEControlTests/  unit and integration tests
+installer/        preinstall and postinstall scripts for the .pkg
 ```
 
-## Тесты
+The UI is SwiftUI with the Observation framework, and the sources are compiled straight from
+the source tree by `build.sh` — there are no external package dependencies. The web remote uses
+a bundled copy of React (MIT, see the license header in the file).
 
-Нужен полный Xcode:
+## Tests
+
+The test target needs the full Xcode:
 
 ```bash
 xcodebuild test -project "RME Control.xcodeproj" -scheme "RME Control" -destination 'platform=macOS'
 ```
 
-## Лицензия
+## Distribution notes
+
+The app is signed ad-hoc and not notarized, so macOS blocks it on another machine after
+downloading. Build it locally on the target machine, or clear the quarantine flag:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/RME Control.app"
+```
+
+A `.pkg` built by `make-installer.sh` clears the quarantine in its postinstall script; a fully
+warning-free distribution requires a paid Apple Developer ID (see the comments in that script).
+
+## License
 
 [MIT](LICENSE).
 
-RME, TotalMix и логотип RME — товарные знаки RME Audio AG. Проект независимый и не связан
-с RME Audio, не одобрен и не поддерживается ею.
+RME, TotalMix and the RME logo are trademarks of RME Audio AG. This project is an independent
+tool and is not affiliated with, endorsed by, or supported by RME Audio.
