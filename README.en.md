@@ -16,10 +16,10 @@ Speaker B, +48V and Inst on inputs, level meters, and a web remote for your phon
 
 <p align="center">
   <img src="docs/screenshots/popover.png" width="270" alt="Menu bar popover">
-  <img src="docs/screenshots/web-remote.png" width="270" alt="Web remote on a phone">
   <img src="docs/screenshots/levels.png" width="270" alt="Input level meters">
+  <img src="docs/screenshots/hud.png" width="270" alt="Volume HUD">
 </p>
-<p align="center"><sub>Popover · web remote on a phone · input levels</sub></p>
+<p align="center"><sub>Popover · input levels · volume HUD</sub></p>
 
 <details>
 <summary>More: settings, compressor, EQ, HUD</summary>
@@ -38,7 +38,6 @@ Speaker B, +48V and Inst on inputs, level meters, and a web remote for your phon
 </p>
 <p align="center">
   <img src="docs/screenshots/settings-web-remote.png" width="410" alt="Settings — Web Remote">
-  <img src="docs/screenshots/hud.png" width="250" alt="Volume HUD">
 </p>
 
 </details>

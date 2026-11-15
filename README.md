@@ -20,10 +20,10 @@ Dim / Mono / Speaker B, +48V / Inst на входах, уровни и веб-п
 
 <p align="center">
   <img src="docs/screenshots/popover.png" width="270" alt="Поповер в строке меню">
-  <img src="docs/screenshots/web-remote.png" width="270" alt="Веб-пульт на телефоне">
   <img src="docs/screenshots/levels.png" width="270" alt="Индикаторы уровней входов">
+  <img src="docs/screenshots/hud.png" width="270" alt="HUD громкости">
 </p>
-<p align="center"><sub>Поповер · веб-пульт для телефона · уровни входов</sub></p>
+<p align="center"><sub>Поповер · уровни входов · HUD громкости</sub></p>
 
 <details>
 <summary>Ещё скриншоты: настройки, компрессор, эквалайзер, HUD</summary>
@@ -42,7 +42,6 @@ Dim / Mono / Speaker B, +48V / Inst на входах, уровни и веб-п
 </p>
 <p align="center">
   <img src="docs/screenshots/settings-web-remote.png" width="410" alt="Настройки — Web Remote">
-  <img src="docs/screenshots/hud.png" width="250" alt="HUD громкости">
 </p>
 
 </details>
