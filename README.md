@@ -105,10 +105,21 @@ Distribute App → Custom → Copy App.
 
 ## Configuration
 
-1. Enable OSC in TotalMix FX: **Options → Settings → OSC**, and note the ports.
-2. Open the app's **Settings → Connection** and set the matching send/receive ports
-   (default host is `127.0.0.1`).
-3. Run the setup assistant on first launch, or re-run it from **Settings → General →
+### TotalMix
+
+The app talks Global OSC and listens on fixed ports. In TotalMix FX 2.1 or newer:
+
+1. Set the OSC **host** to `127.0.0.1` and the **ports** to `7001` and `9001`.
+2. Open **Options → Mixer Settings → OSC** and set **Compatibility (Mode)** to **Global OSC**.
+3. Turn on **Send Status**.
+4. Turn on **Send level data**.
+5. Turn on **Peak hold**.
+6. Turn on **Send all data on start**.
+
+### The app
+
+1. Open **Settings → Connection** and set the same send and receive ports.
+2. Run the setup assistant on first launch, or re-run it from **Settings → General →
    Run Setup Assistant**, to discover channels and grant permissions.
 
 To make the volume keys work, allow the app in **System Settings → Privacy & Security →

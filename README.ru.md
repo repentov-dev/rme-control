@@ -227,6 +227,20 @@ Installer, $99/год): `make-installer.sh` умеет это, если зада
 - **Нет связи с TotalMix**: включите OSC в настройках TotalMix FX (Options → Settings,
   вкладка OSC). Порты там должны совпадать с портами в RME Control (раздел **Connection**).
 
+## Настройка TotalMix
+
+Приложение работает через Global OSC и слушает фиксированные порты. В TotalMix FX 2.1 или новее:
+
+1. **Host** — `127.0.0.1`, **порты** — `7001` и `9001`.
+2. **Options → Mixer Settings → OSC**, затем **Compatibility (Mode)** → **Global OSC**.
+3. Включите **Send Status**.
+4. Включите **Send level data**.
+5. Включите **Peak hold**.
+6. Включите **Send all data on start**.
+
+Дальше в приложении: **Settings → Connection** — те же порты. Мастер настройки при первом
+запуске (или **Settings → General → Run Setup Assistant**) найдёт каналы и попросит разрешения.
+
 ## Язык интерфейса
 
 English по умолчанию. Русский включается в настройках (раздел **General** → **Interface**),

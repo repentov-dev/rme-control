@@ -252,6 +252,11 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
 .install__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
 .nowrap { white-space: nowrap; }
 
+/* TotalMix setup: the same six-step rhythm as the install card, on the ground. */
+.setup { padding-block: clamp(64px, 10vh, 112px) 0; }
+.setup__lead { margin-top: 14px; font-size: 17px; color: var(--text-2); max-width: 52ch; }
+.setup .steps { margin-top: 28px; }
+
 /* Specs: the label sheet. */
 .specs { padding-block: clamp(64px, 10vh, 112px); }
 .sheet--specs { margin-top: 32px; }
