@@ -278,6 +278,13 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
   .nav__links { gap: 12px; }
 }
 
+/* Phones: the bar takes two rows instead of squeezing five items into one. */
+@media (max-width: 640px) {
+  .nav__inner { flex-wrap: wrap; row-gap: 6px; padding-block: 10px; }
+  .nav__links { width: 100%; justify-content: space-between; gap: 10px; }
+  .nav__cta { margin-left: auto; }
+}
+
 @media (max-width: 900px) {
   .hero { grid-template-columns: minmax(0, 1fr); padding-block: 40px 56px; }
   .hero__stage { order: 2; margin-top: 8px; }
