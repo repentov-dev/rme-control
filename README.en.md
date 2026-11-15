@@ -17,30 +17,14 @@ Speaker B, +48V and Inst on inputs, level meters, and a web remote for your phon
 <p align="center">
   <img src="docs/screenshots/popover.png" width="270" alt="Menu bar popover">
   <img src="docs/screenshots/levels.png" width="270" alt="Input level meters">
-  <img src="docs/screenshots/hud.png" width="270" alt="Volume HUD">
 </p>
-<p align="center"><sub>Popover · input levels · volume HUD</sub></p>
+<p align="center"><sub>Popover · input levels</sub></p>
 
-<details>
-<summary>More: settings, compressor, EQ, HUD</summary>
-
-<p align="center">
-  <img src="docs/screenshots/settings-routing.png" width="410" alt="Settings — Routing">
-  <img src="docs/screenshots/settings-connection.png" width="410" alt="Settings — Connection">
-</p>
-<p align="center">
-  <img src="docs/screenshots/settings-hotkeys.png" width="410" alt="Settings — Hotkeys">
-  <img src="docs/screenshots/settings-menu-bar.png" width="410" alt="Settings — Menu Bar Panel">
-</p>
 <p align="center">
   <img src="docs/screenshots/compressor.png" width="410" alt="Compressor">
   <img src="docs/screenshots/eq.png" width="410" alt="Equalizer">
 </p>
-<p align="center">
-  <img src="docs/screenshots/settings-web-remote.png" width="410" alt="Settings — Web Remote">
-</p>
-
-</details>
+<p align="center"><sub>Compressor and equalizer</sub></p>
 
 ## Features
 
