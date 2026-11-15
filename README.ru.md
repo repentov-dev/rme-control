@@ -62,7 +62,7 @@ Dim / Mono / Speaker B, +48V / Inst на входах, уровни и веб-п
 ## Скриншоты
 
 <p align="center">
-  <img src="docs/screenshots/popover-menu-bar.png" width="280" alt="Поповер в строке меню">
+  <img src="docs/screenshots/popover-card.png" width="280" alt="Поповер в строке меню">
   <img src="docs/screenshots/levels.png" width="190" alt="Индикаторы уровней входов">
 </p>
 <p align="center"><sub>Поповер · уровни входов</sub></p>
