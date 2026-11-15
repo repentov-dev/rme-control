@@ -17,6 +17,7 @@
   <div class="container nav__inner">
     <a class="nav__mark" href="./">RME Control</a>
     <nav class="nav__links" aria-label="Sections">
+      <a href="https://github.com/repentov-dev/rme-control#features">Features</a>
       <a href="#panels">The panels</a>
       <a href="#install">Install</a>
       <a href="#specs">Specs</a>
@@ -27,8 +28,8 @@
 
 <main>
 
-<section class="hero container">
-  <div class="hero__copy">
+<section class="hero">
+  <div class="hero__copy container">
     <h1>TotalMix in the menu bar</h1>
     <p class="hero__line">Volume, Dim, Mono and levels from your Mac’s keys.</p>
     <div class="hero__actions">
@@ -37,9 +38,9 @@
     </div>
     <p class="hero__note">Runs on macOS 14 or newer, Apple Silicon and Intel.</p>
   </div>
-  <figure class="hero__capture">
-    <img src="./screenshots/popover-card.png" width="560" height="993" alt="The RME Control popover: output faders for Main, DT990 and FT1, a send, the Speaker B, Dim and Mono buttons, and the input switches.">
-  </figure>
+  <div class="hero__stage">
+    <img class="hero__capture" src="./screenshots/popover-card.png" width="560" height="993" alt="The RME Control popover: output faders for Main, DT990 and FT1, a send, the Speaker B, Dim and Mono buttons, and the input switches.">
+  </div>
 </section>
 
 <section class="tour container" id="panels">
@@ -73,7 +74,7 @@
 
 <section class="install" id="install">
   <div class="container install__inner grained">
-    <h2>Install in three steps</h2>
+    <h2>Install in four steps</h2>
     <ol class="steps">
       <li class="steps__item">
         <span class="steps__num">01</span>
@@ -85,6 +86,12 @@
       </li>
       <li class="steps__item">
         <span class="steps__num">03</span>
+        <p>If macOS still refuses to open it, take the app out of quarantine:</p>
+        <pre class="cmd">xattr -dr com.apple.quarantine \
+  "/Applications/RME Control.app"</pre>
+      </li>
+      <li class="steps__item">
+        <span class="steps__num">04</span>
         <p>Grant Accessibility in the same pane so the volume keys reach TotalMix.</p>
       </li>
     </ol>
@@ -119,6 +126,7 @@
       <a href="https://github.com/repentov-dev/rme-control">Repository</a>
       <a href="https://github.com/repentov-dev/rme-control/releases">Releases</a>
       <a href="https://github.com/repentov-dev/rme-control/blob/main/LICENSE">MIT license</a>
+      <a href="https://www.instagram.com/repentov">Instagram</a>
     </nav>
   </div>
   <div class="container foot__legal">
