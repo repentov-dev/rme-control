@@ -8,7 +8,7 @@ Menu bar open-source application for controlling RME audio interfaces via **Tota
 
 Works via Global OSC only with TotalMix 2.1+.
 
-[Website](https://repentov-dev.github.io/rme-control/) · [Русская версия](README.ru.md) · [MIT License](LICENSE) · [Instagram](https://www.instagram.com/repentov)
+[Website](https://repentov-dev.github.io/rme-control/) · [MIT License](LICENSE) · [Instagram](https://www.instagram.com/repentov)
 
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-black)
 ![Swift 6](https://img.shields.io/badge/Swift-6.0-orange)
@@ -24,8 +24,15 @@ Works via Global OSC only with TotalMix 2.1+.
 Beta: the calibrator was tested on the Fireface 802 FS and may behave differently on other interfaces.
 
 <p align="center">
-  <img src="docs/screenshots/measure-result.png" width="420" alt="Measure result with measured and corrected curves">
-  <img src="docs/screenshots/room-eq.png" width="360" alt="Room EQ with nine bands, delay, volume calibration and Mix">
+  <img src="docs/screenshots/room-eq.png" width="560" alt="Room EQ">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/measure-result.png" width="660" alt="Measure result">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/measure-setup.png" width="660" alt="Measure setup">
 </p>
 
 ## Screenshots
