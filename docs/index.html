@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RME Control — TotalMix in the menu bar</title>
-<meta name="description" content="Open-source menu bar app for RME audio interfaces: TotalMix control, Room EQ, headphone presets and a room calibration wizard. Global OSC, TotalMix 2.1+, macOS 14+.">
+<meta name="description" content="Free, open-source macOS menu bar control for RME interfaces: TotalMix volume and output switching, Room EQ, room calibration, headphone presets, input and output processing.">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="./icon.png">
 <script>
@@ -13,7 +13,7 @@
     document.querySelectorAll("[data-reveal]").forEach(function (el) { el.classList.add("is-in"); });
   }, 3500);
 </script>
-<link rel="stylesheet" href="./apple.css?v=6">
+<link rel="stylesheet" href="./apple.css?v=7">
 </head>
 <body>
 
@@ -40,10 +40,11 @@
   <section class="hero">
     <div class="hero__copy">
       <h1 data-i18n="hero.title">TotalMix in the menu bar</h1>
-      <p class="hero__sub" data-i18n="hero.sub">Open-source control for RME interfaces — now with Room EQ, headphone presets and a room calibration wizard.</p>
+      <p class="hero__sub" data-i18n="hero.sub">Free, open-source control for TotalMix FX: volume and output switching, Room EQ and calibration, headphone presets — from the menu bar.</p>
       <div class="hero__actions">
         <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v4.0/RME-Control-4.0.pkg" data-i18n="hero.download">Download 4.0</a>
         <a class="btn btn--tint" href="https://github.com/repentov-dev/rme-control" data-i18n="hero.source">Read the source</a>
+        <a class="btn btn--tint" href="https://forum.rme-audio.de/viewtopic.php?id=43536" data-i18n="hero.forum">RME forum</a>
       </div>
       <p class="hero__note" data-i18n="hero.note">Global OSC, TotalMix 2.1 or newer. macOS 14+, Apple Silicon and Intel.</p>
     </div>
@@ -108,38 +109,34 @@
     <div class="section-head" data-reveal>
       <p class="eyebrow" data-i18n="features.eyebrow">Features</p>
       <h2 data-i18n="features.title">Everything in the app</h2>
+      <p class="lead" data-i18n="features.lead">RME Control is a free, open-source macOS utility that controls the TotalMix FX mixer for RME audio interfaces straight from the Mac menu bar. It saves you from opening the main app window for everyday settings.</p>
     </div>
-    <div class="features__grid">
-      <div class="group" data-reveal style="--i:0">
-        <h3 data-i18n="feat.out.title">Outputs</h3>
-        <dl class="sheet">
-          <div class="row"><dt data-i18n="feat.out.volume">Volume keys</dt><dd data-i18n="feat.out.volume.v">Any output, 1–10 dB a step</dd></div>
-          <div class="row"><dt data-i18n="feat.out.dim">Dim and mute</dt><dd data-i18n="feat.out.dim.v">On the Mac mute key, either one</dd></div>
-          <div class="row"><dt data-i18n="feat.out.mono">Mono</dt><dd data-i18n="feat.out.mono.v">Shift Cmd M</dd></div>
-          <div class="row"><dt data-i18n="feat.out.speaker">Speaker B</dt><dd data-i18n="feat.out.speaker.v">The second pair of monitors</dd></div>
-          <div class="row"><dt data-i18n="feat.out.room">Room EQ</dt><dd data-i18n="feat.out.room.v">Nine bands, delay, crossfeed and Mix</dd></div>
-        </dl>
-      </div>
-      <div class="group" data-reveal style="--i:1">
-        <h3 data-i18n="feat.in.title">Inputs</h3>
-        <dl class="sheet">
-          <div class="row"><dt data-i18n="feat.in.phantom">Phantom power</dt><dd data-i18n="feat.in.phantom.v">+48V on any number of channels</dd></div>
-          <div class="row"><dt data-i18n="feat.in.inst">Instrument mode</dt><dd data-i18n="feat.in.inst.v">Inst per channel</dd></div>
-          <div class="row"><dt data-i18n="feat.in.eq">EQ</dt><dd data-i18n="feat.in.eq.v">Four bands a channel</dd></div>
-          <div class="row"><dt data-i18n="feat.in.comp">Compressor</dt><dd data-i18n="feat.in.comp.v">Threshold, ratio, attack, release, gain</dd></div>
-          <div class="row"><dt data-i18n="feat.in.meters">Meters</dt><dd data-i18n="feat.in.meters.v">Input, gain reduction and output</dd></div>
-        </dl>
-      </div>
-      <div class="group" data-reveal style="--i:2">
-        <h3 data-i18n="feat.app.title">The app</h3>
-        <dl class="sheet">
-          <div class="row"><dt data-i18n="feat.app.levels">Levels</dt><dd data-i18n="feat.app.levels.v">Always on top, clipping in red</dd></div>
-          <div class="row"><dt data-i18n="feat.app.presets">Presets</dt><dd data-i18n="feat.app.presets.v">Channels, Room EQ and calibration</dd></div>
-          <div class="row"><dt data-i18n="feat.app.shortcuts">Shortcuts</dt><dd data-i18n="feat.app.shortcuts.v">Every one can be reassigned</dd></div>
-          <div class="row"><dt data-i18n="feat.app.languages">Languages</dt><dd data-i18n="feat.app.languages.v">14</dd></div>
-          <div class="row"><dt data-i18n="feat.app.remote">Remote</dt><dd data-i18n="feat.app.remote.v">Web control from a phone</dd></div>
-        </dl>
-      </div>
+    <div class="keys">
+      <article class="key" data-reveal style="--i:0">
+        <p class="chapter__kicker" data-i18n="feat.out.kicker">Outputs</p>
+        <h3 data-i18n="feat.out.title">Volume, switching and processing</h3>
+        <p data-i18n="feat.out.text">Adjust the volume and switch between outputs from the Mac keyboard, toggle Mute, Dim and Mono, and reach the compressor and 3-band EQ on output channels.</p>
+      </article>
+      <article class="key" data-reveal style="--i:1">
+        <p class="chapter__kicker" data-i18n="feat.eq.kicker">Room EQ</p>
+        <h3 data-i18n="feat.eq.title">Room EQ and calibration</h3>
+        <p data-i18n="feat.eq.text">A full port of Room EQ from TotalMix for every output, with delay and Crossfeed, plus a room calibration wizard that supports measurement microphone calibration files.</p>
+      </article>
+      <article class="key" data-reveal style="--i:2">
+        <p class="chapter__kicker" data-i18n="feat.hp.kicker">Headphones</p>
+        <h3 data-i18n="feat.hp.title">Headphone presets</h3>
+        <p data-i18n="feat.hp.text">A built-in library of EQ curves for 80 headphone models across 25 popular brands.</p>
+      </article>
+      <article class="key" data-reveal style="--i:3">
+        <p class="chapter__kicker" data-i18n="feat.in.kicker">Inputs</p>
+        <h3 data-i18n="feat.in.title">Input settings</h3>
+        <p data-i18n="feat.in.text">Quick access to +48V phantom power, Instrument mode (Inst), EQ and compressor on input channels.</p>
+      </article>
+      <article class="key" data-reveal style="--i:4">
+        <p class="chapter__kicker" data-i18n="feat.more.kicker">More</p>
+        <h3 data-i18n="feat.more.title">Levels, presets and the phone</h3>
+        <p data-i18n="feat.more.text">Always-on-top level meters, custom presets, customizable keyboard shortcuts and web-based remote control from a phone browser.</p>
+      </article>
     </div>
   </section>
 
@@ -202,7 +199,7 @@
   <div class="foot__inner">
     <div class="foot__mast">
       <p class="foot__mark">RME Control</p>
-      <p class="foot__note" data-i18n="foot.note">A menu bar controller for TotalMix FX, written in Swift and shipped as source.</p>
+      <p class="foot__note" data-i18n="foot.note">A free, open-source menu bar controller for TotalMix FX, written in Swift.</p>
     </div>
     <nav class="foot__links" aria-label="Elsewhere">
       <a href="https://github.com/repentov-dev/rme-control" data-i18n="foot.repo">Repository</a>
@@ -216,7 +213,7 @@
   </div>
 </footer>
 
-<script src="./i18n.js?v=2" defer></script>
+<script src="./i18n.js?v=3" defer></script>
 <script src="./apple.js?v=3" defer></script>
 </body>
 </html>

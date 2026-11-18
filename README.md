@@ -4,7 +4,7 @@
 
 # RME Control
 
-Menu bar open-source application for controlling RME audio interfaces via **TotalMix FX**.
+RME Control is a free, open-source macOS utility that controls the TotalMix FX mixer for RME audio interfaces straight from the Mac menu bar. It saves you from opening the main app window for everyday settings.
 
 Works via Global OSC only with TotalMix 2.1+.
 
@@ -27,49 +27,13 @@ Beta: the calibrator was tested on the Fireface 802 FS and may behave differentl
   <img src="docs/screenshots/measure.png" width="760" alt="Measure setup, Room EQ and the measurement result">
 </p>
 
-## Features
+## Key features
 
-### Audio outputs — control and monitoring
-
-- Volume control for any output (including Main Out and headphones) from the Mac volume
-  keys or the menu bar.
-- Adjustable volume step from 1 to 10 dB.
-- Dim / Mute on the Mac mute key.
-- Mono switch on a global shortcut (Shift + Cmd + M by default).
-- Speaker B button to switch to an alternative pair of monitors.
-- A shortcut switches which output the volume keys control (Option + ↑/↓ by default).
-- Channel editing: modify existing inputs and outputs or add new ones.
-- Sends from input channels to output channels.
-
-### Inputs
-
-- Phantom power (+48V) for any number of input channels.
-- Instrument mode (Inst) for any number of input channels.
-- Convenient EQ and compressor control.
-
-### Interface, notifications and customization
-
-- Dedicated always-on-top window for input level monitoring.
-- Clipping notifications to prevent signal overload.
-- On-screen notifications for volume, Dim, Mono and Mute — also when the values are changed
-  directly in TotalMix; the Mute notification shows the output name.
-- Customizable application menu.
-- Every keyboard shortcut is assignable — the defaults are just a starting point.
-- Presets to save and restore all application settings.
-
-### TotalMix integration and synchronization
-
-- Full two-way synchronization: the app reads the values from TotalMix at startup and keeps
-  a stable connection.
-- Fail-safe disconnection: values freeze and the Mac volume keys return to native system
-  behavior when TotalMix or the audio interface goes away.
-- OSC monitor in the Connection section to watch the network commands.
-
-### Remote control
-
-- Built-in web server, started with a single “HTTP server” toggle in the settings.
-- QR code connection: scan it with a phone or tablet on the same Wi-Fi network and a full
-  RME remote control opens in the mobile browser.
+- **Outputs and processing** — volume and quick output switching from the Mac keyboard, Mute, Dim and Mono, plus the compressor and 3-band EQ on output channels.
+- **Room EQ and room calibration** — a full port of Room EQ from TotalMix for every output, with delay and Crossfeed, plus a room calibration wizard that supports measurement microphone calibration files.
+- **Headphone presets** — a built-in library of EQ curves for 80 headphone models across 25 popular brands.
+- **Inputs** — quick access to +48V phantom power, Instrument mode (Inst), EQ and compressor on input channels.
+- **More** — always-on-top level meters, custom presets, customizable keyboard shortcuts and web-based remote control from a phone.
 
 ## Requirements
 
