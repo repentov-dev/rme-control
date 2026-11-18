@@ -149,7 +149,13 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
   max-width: 44ch;
 }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
-.hero__note { margin-top: 24px; font-size: 14px; line-height: 1.45; color: var(--text-2); max-width: 46ch; }
+.hero__alt { margin-top: 16px; font-size: 14px; line-height: 1.45; color: var(--text-2); max-width: 46ch; }
+.hero__alt a {
+  color: var(--text); text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-color: var(--line-strong); transition: color 140ms linear;
+}
+.hero__alt a:hover { color: var(--accent); }
+.hero__note { margin-top: 18px; font-size: 14px; line-height: 1.45; color: var(--text-2); max-width: 46ch; }
 
 .hero__stage {
   position: relative; display: grid; justify-items: center; min-width: 0;
