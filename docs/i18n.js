@@ -18,12 +18,12 @@
       "new.eq.text": "Nine bands on every output, with Mix and Crossfeed right inside the Room EQ window.",
       "new.hp.kicker": "Headphones",
       "new.hp.title": "Presets for popular headphones",
-      "new.hp.text": "A large library of presets for the most popular models, built from AutoEQ and independent measurements.",
+      "new.hp.text": "A large library of presets for the most popular headphones. Pick a model and the curve lands in Room EQ.",
       "new.stat.brands": "brands",
       "new.stat.models": "models",
       "new.engine.kicker": "Correction engine",
-      "new.engine.title": "Powered by roomeq",
-      "new.engine.text": "Sweeps are captured by sotf-capture and the correction is calculated by roomeq — both by Pierre Aubert and contributors; roomeq continues the AutoEQ project by Jaakko Pasanen. Save your own calibration presets; microphone calibration files are supported.",
+      "new.engine.title": "Correction system",
+      "new.engine.text": "Measure both speakers, get left, right and stereo corrections and apply them to Room EQ. Save your own calibration presets; microphone calibration files are supported.",
       "screens.eyebrow": "Screens", "screens.title": "What the app looks like",
       "shot.app.name": "RME Control",
       "shot.app": "The mixer in the menu bar, the channel EQ, the compressor and the level window.",
@@ -64,7 +64,6 @@
       "foot.note": "A menu bar controller for TotalMix FX, written in Swift and shipped as source.",
       "foot.repo": "Repository", "foot.releases": "Releases", "foot.license": "MIT license",
       "foot.legal": "RME, TotalMix and the RME logo are trademarks of RME Audio AG. This is an independent tool, not affiliated with or endorsed by RME Audio.",
-      "foot.credits": "Measurement: sotf-capture. Correction: roomeq, continuing AutoEQ by Jaakko Pasanen. Both by Pierre Aubert and contributors, GPL-3.0."
     },
     ru: {
       "meta.title": "RME Control — TotalMix в строке меню",
@@ -82,12 +81,12 @@
       "new.eq.text": "Девять полос на каждый выход, а ручки Mix и Crossfeed теперь прямо в окне Room EQ.",
       "new.hp.kicker": "Наушники",
       "new.hp.title": "Пресеты для популярных наушников",
-      "new.hp.text": "Большая библиотека пресетов для самых популярных моделей — на основе AutoEQ и независимых измерений.",
+      "new.hp.text": "Большая библиотека пресетов для самых популярных наушников. Выбрал модель — кривая уже в Room EQ.",
       "new.stat.brands": "брендов",
       "new.stat.models": "моделей",
       "new.engine.kicker": "Движок коррекции",
-      "new.engine.title": "На движке roomeq",
-      "new.engine.text": "Замер выполняет sotf-capture, коррекцию считает roomeq — оба от Pierre Aubert и участников проекта; roomeq продолжает AutoEQ Яакко Пасанена. Свои пресеты калибровки сохраняются, калибровочные файлы микрофонов поддерживаются.",
+      "new.engine.title": "Система коррекции",
+      "new.engine.text": "Измерьте обе колонки, получите коррекцию для левого, правого и стерео и примените её к Room EQ. Свои пресеты калибровки сохраняются, калибровочные файлы микрофонов поддерживаются.",
       "screens.eyebrow": "Экраны", "screens.title": "Как это выглядит",
       "shot.app.name": "RME Control",
       "shot.app": "Пульт в строке меню, канальный EQ, компрессор и окно уровней.",
@@ -128,7 +127,6 @@
       "foot.note": "Пульт для TotalMix FX в строке меню, на Swift и с открытым исходным кодом.",
       "foot.repo": "Репозиторий", "foot.releases": "Релизы", "foot.license": "Лицензия MIT",
       "foot.legal": "RME, TotalMix и логотип RME — товарные знаки RME Audio AG. Это независимый инструмент, не связанный с RME Audio.",
-      "foot.credits": "Замер: sotf-capture. Коррекция: roomeq, продолжение AutoEQ Яакко Пасанена. Авторы — Pierre Aubert и участники, GPL-3.0."
     },
     de: {
       "meta.title": "RME Control — TotalMix in der Menüleiste",
@@ -146,12 +144,12 @@
       "new.eq.text": "Neun Bänder an jedem Ausgang, mit Mix und Crossfeed direkt im Room-EQ-Fenster.",
       "new.hp.kicker": "Kopfhörer",
       "new.hp.title": "Presets für beliebte Kopfhörer",
-      "new.hp.text": "Eine große Preset-Bibliothek für die beliebtesten Modelle, auf Basis von AutoEQ und unabhängigen Messungen.",
+      "new.hp.text": "Eine große Preset-Bibliothek für die beliebtesten Kopfhörer. Modell wählen — die Kurve liegt in Room EQ.",
       "new.stat.brands": "Marken",
       "new.stat.models": "Modelle",
       "new.engine.kicker": "Korrektur-Engine",
-      "new.engine.title": "Angetrieben von roomeq",
-      "new.engine.text": "Die Sweeps nimmt sotf-capture auf, die Korrektur berechnet roomeq — beide von Pierre Aubert und Mitwirkenden; roomeq führt das AutoEQ-Projekt von Jaakko Pasanen fort. Eigene Kalibrier-Presets und Mikrofon-Kalibrierdateien werden unterstützt.",
+      "new.engine.title": "Korrektursystem",
+      "new.engine.text": "Beide Lautsprecher messen, Korrekturen für links, rechts und Stereo erhalten und auf Room EQ anwenden. Eigene Kalibrier-Presets und Mikrofon-Kalibrierdateien werden unterstützt.",
       "screens.eyebrow": "Bildschirme", "screens.title": "So sieht die App aus",
       "shot.app.name": "RME Control",
       "shot.app": "Der Mixer in der Menüleiste, der Kanal-EQ, der Kompressor und das Pegelfenster.",
@@ -192,7 +190,6 @@
       "foot.note": "Ein Menüleisten-Controller für TotalMix FX, in Swift geschrieben und als Quellcode veröffentlicht.",
       "foot.repo": "Repository", "foot.releases": "Releases", "foot.license": "MIT-Lizenz",
       "foot.legal": "RME, TotalMix und das RME-Logo sind Marken der RME Audio AG. Dies ist ein unabhängiges Werkzeug, nicht mit RME Audio verbunden.",
-      "foot.credits": "Messung: sotf-capture. Korrektur: roomeq, Fortführung von AutoEQ von Jaakko Pasanen. Beides von Pierre Aubert und Mitwirkenden, GPL-3.0."
     }
   };
 

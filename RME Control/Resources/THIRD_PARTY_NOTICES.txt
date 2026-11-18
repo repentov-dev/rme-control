@@ -24,3 +24,6 @@ License: GNU General Public License v3.0 or later (GPL-3.0-or-later)
 
 The sotf-capture binary is included unmodified, built from the source above.
 It is invoked as an external process for sweep capture and analysis.
+
+Headphone correction presets are derived from AutoEQ (MIT, Jaakko Pasanen)
+and measurements by oratory1990, Crinacle, Rtings and others.

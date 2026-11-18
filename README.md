@@ -18,8 +18,8 @@ Works via Global OSC only with TotalMix 2.1+.
 ## What's new in 4.0
 
 1. **Room EQ fully carried over from TotalMix.** Nine bands per output, and the **Mix** and **Crossfeed** controls now live right inside the Room EQ window.
-2. **A large library of presets for the most popular headphones.** 25 brands, 80 models, based on AutoEQ and independent measurements.
-3. **Correction powered by roomeq (AutoEQ).** Sweeps are captured by `sotf-capture`; the correction is calculated by `roomeq` from the [AutoEQ](https://github.com/pierreaubert/autoeq) project. Both engines are by Pierre Aubert and contributors; `roomeq` continues the AutoEQ project by Jaakko Pasanen. Save your own calibration presets; microphone calibration files are supported.
+2. **A large library of presets for the most popular headphones.** 25 brands, 80 models.
+3. **Correction system.** Measure both speakers, get left, right and stereo corrections and apply them to Room EQ. Save your own calibration presets; microphone calibration files are supported.
 
 Beta: the calibrator was tested on the Fireface 802 FS and may behave differently on other interfaces.
 
@@ -203,9 +203,6 @@ warning-free distribution requires a paid Apple Developer ID (see the comments i
 ## License
 
 [MIT](LICENSE).
-
-Headphone correction presets are derived from [AutoEQ](https://github.com/jaakkopasanen/AutoEq)
-(MIT) and measurements by oratory1990, Crinacle, Rtings and others.
 
 RME, TotalMix and the RME logo are trademarks of RME Audio AG. This project is an independent
 tool and is not affiliated with, endorsed by, or supported by RME Audio.
