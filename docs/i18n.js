@@ -50,6 +50,7 @@
       "install.one": "Download", "install.one.b": "and open it.",
       "install.two": "Not notarized: allow it once under Privacy and Security. The installer clears the quarantine flag.",
       "install.three": "If macOS still refuses to open it, take the app out of quarantine:",
+      "install.cmd.copy": "Copy", "install.cmd.copied": "Copied",
       "install.four": "Grant Accessibility in the same pane so the volume keys reach TotalMix.",
       "install.download": "Download the installer", "install.build": "Build it yourself",
       "tm.eyebrow": "TotalMix", "tm.title": "Set up TotalMix",
@@ -119,6 +120,7 @@
       "install.one": "Скачайте", "install.one.b": "и откройте.",
       "install.two": "Приложение не нотаризовано: разрешите его один раз в «Конфиденциальность и безопасность». Установщик снимает карантин.",
       "install.three": "Если macOS всё равно не открывает, снимите карантин вручную:",
+      "install.cmd.copy": "Скопировать", "install.cmd.copied": "Скопировано",
       "install.four": "Разрешите Accessibility в том же разделе, чтобы клавиши громкости доходили до TotalMix.",
       "install.download": "Скачать установщик", "install.build": "Собрать самому",
       "tm.eyebrow": "TotalMix", "tm.title": "Настройка TotalMix",
@@ -188,6 +190,7 @@
       "install.one": "Laden Sie", "install.one.b": "herunter und öffnen Sie es.",
       "install.two": "Nicht notarisiert: einmal unter Datenschutz und Sicherheit erlauben. Der Installer entfernt das Quarantäne-Flag.",
       "install.three": "Wenn macOS es weiterhin blockiert, die App aus der Quarantäne nehmen:",
+      "install.cmd.copy": "Kopieren", "install.cmd.copied": "Kopiert",
       "install.four": "Accessibility im selben Bereich erlauben, damit die Lautstärketasten TotalMix erreichen.",
       "install.download": "Installer laden", "install.build": "Selbst bauen",
       "tm.eyebrow": "TotalMix", "tm.title": "TotalMix einrichten",
@@ -230,6 +233,9 @@
 
   function apply(lang) {
     var d = dict[lang] || dict.en;
+    // Other scripts need the words of the active language to repaint state
+    // ("Copied") without keeping their own copy of the dictionary.
+    window.rmeI18n = { lang: lang, t: function (key) { return d[key] || ""; } };
     document.documentElement.lang = lang;
     document.title = d["meta.title"];
     var meta = document.querySelector('meta[name="description"]');

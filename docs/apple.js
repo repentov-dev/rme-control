@@ -87,6 +87,60 @@
     }
   }
 
+  /* Commands: one tap puts the line on the clipboard, so nobody retypes it. */
+  document.querySelectorAll('.cmd-block').forEach(function (block) {
+    var cmd = block.querySelector('.cmd');
+    var btn = block.querySelector('[data-copy-command]');
+    if (!cmd || !btn) return;
+
+    var label = btn.querySelector('[data-i18n]') || btn;
+    var timer = null;
+
+    function word(key, fallback) {
+      var i18n = window.rmeI18n;
+      var value = i18n ? i18n.t(key) : '';
+      return value || fallback;
+    }
+
+    function paint(copied) {
+      btn.classList.toggle('is-copied', copied);
+      label.textContent = copied ? word('install.cmd.copied', 'Copied') : word('install.cmd.copy', 'Copy');
+    }
+
+    // Older browsers and plain http need the selection path: the Clipboard API
+    // only exists in a secure context.
+    function copyBySelection() {
+      var selection = window.getSelection();
+      var range = document.createRange();
+      range.selectNodeContents(cmd);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      selection.removeAllRanges();
+      return ok;
+    }
+
+    function settle(ok) {
+      if (!ok) return;
+      paint(true);
+      window.clearTimeout(timer);
+      timer = window.setTimeout(function () { paint(false); }, 1800);
+    }
+
+    btn.addEventListener('click', function () {
+      var text = cmd.textContent;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(
+          function () { settle(true); },
+          function () { settle(copyBySelection()); }
+        );
+      } else {
+        settle(copyBySelection());
+      }
+    });
+  });
+
   if (reduced.matches) return;
 
   /* The product leans towards the pointer, then settles back on its own. */
