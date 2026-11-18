@@ -35,12 +35,6 @@ Beta: the calibrator was tested on the Fireface 802 FS and may behave differentl
   <img src="docs/screenshots/measure-setup.png" width="660" alt="Measure setup">
 </p>
 
-## Screenshots
-
-<p align="center">
-  <img src="docs/screenshots/hero.png" width="900" alt="The popover beside the level window, the compressor and the equalizer.">
-</p>
-
 ## Features
 
 ### Audio outputs — control and monitoring
