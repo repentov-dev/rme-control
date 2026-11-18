@@ -577,3 +577,23 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
 }
 
 .shot--levels img { width: 188px; max-width: 100%; height: auto; }
+
+.new__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(24px, 4vw, 48px);
+}
+.new__row { border-top: 1px solid var(--line); padding-top: 22px; }
+.new__row h3 {
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  max-width: 14ch;
+  margin-bottom: 10px;
+}
+.new__row p:not(.chapter__kicker):not(.new__stat) { color: var(--text-2); font-size: 15px; line-height: 1.55; }
+.new__stat { margin-top: 16px; font-size: 14px; color: var(--text-2); }
+.new__stat strong { color: var(--text); font-size: 26px; letter-spacing: -0.03em; }
+@media (max-width: 860px) {
+  .new__list { grid-template-columns: 1fr; }
+}

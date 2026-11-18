@@ -23,7 +23,6 @@
     <nav class="nav__links" aria-label="Sections">
       <a href="#new" data-i18n="nav.new">What's new</a>
       <a href="#screens" data-i18n="nav.screens">Screens</a>
-      <a href="#calibration" data-i18n="nav.calibration">Calibration</a>
       <a href="#features" data-i18n="nav.features">Features</a>
       <a href="#install" data-i18n="nav.install">Install</a>
       <span class="lang" role="group" aria-label="Language">
@@ -60,46 +59,24 @@
       <p class="eyebrow" data-i18n="new.eyebrow">Version 4.0</p>
       <h2 data-i18n="new.title">New in version 4.0</h2>
     </div>
-
-    <article class="chapter" data-reveal>
-      <div class="chapter__copy">
+    <div class="new__list">
+      <article class="new__row" data-reveal style="--i:0">
         <p class="chapter__kicker" data-i18n="new.eq.kicker">Room EQ</p>
         <h3 data-i18n="new.eq.title">Fully carried over from TotalMix</h3>
         <p data-i18n="new.eq.text">Nine bands on every output, with Mix and Crossfeed right inside the Room EQ window.</p>
-      </div>
-      <figure class="chapter__media">
-        <img src="./screenshots/room-eq.png" width="1120" height="1120" alt="Room EQ window with Mix and Crossfeed">
-      </figure>
-    </article>
-
-    <article class="chapter chapter--reverse" data-reveal>
-      <div class="chapter__copy">
+      </article>
+      <article class="new__row" data-reveal style="--i:1">
         <p class="chapter__kicker" data-i18n="new.hp.kicker">Headphones</p>
         <h3 data-i18n="new.hp.title">Presets for popular headphones</h3>
         <p data-i18n="new.hp.text">A large library of presets for the most popular models, built from AutoEQ and independent measurements.</p>
-        <p class="chapter__stat"><strong>25</strong> <span data-i18n="new.stat.brands">brands</span> <strong>80</strong> <span data-i18n="new.stat.models">models</span></p>
-      </div>
-      <figure class="chapter__media chapter__media--stat">
-        <div class="stat-plate">
-          <span class="stat-plate__num">25</span>
-          <span class="stat-plate__label" data-i18n="new.stat.brands">brands</span>
-          <span class="stat-plate__divider"></span>
-          <span class="stat-plate__num">80</span>
-          <span class="stat-plate__label" data-i18n="new.stat.models">models</span>
-        </div>
-      </figure>
-    </article>
-
-    <article class="chapter" data-reveal>
-      <div class="chapter__copy">
+        <p class="new__stat"><strong>25</strong> <span data-i18n="new.stat.brands">brands</span> · <strong>80</strong> <span data-i18n="new.stat.models">models</span></p>
+      </article>
+      <article class="new__row" data-reveal style="--i:2">
         <p class="chapter__kicker" data-i18n="new.engine.kicker">Correction engine</p>
         <h3 data-i18n="new.engine.title">Powered by roomeq</h3>
         <p data-i18n="new.engine.text">Sweeps are captured by sotf-capture and the correction is calculated by roomeq from the AutoEQ project. Save your own calibration presets; microphone calibration files are supported.</p>
-      </div>
-      <figure class="chapter__media">
-        <img src="./screenshots/measure-result.png" width="1320" height="1662" alt="Measure result with measured and corrected curves">
-      </figure>
-    </article>
+      </article>
+    </div>
   </section>
 
   <section class="gallery" id="screens">
@@ -157,30 +134,7 @@
     </div>
   </section>
 
-  <section class="calibration" id="calibration">
-    <div class="section-head" data-reveal>
-      <p class="eyebrow" data-i18n="cal.eyebrow">Calibration</p>
-      <h2 data-i18n="cal.title">Three steps to a corrected room</h2>
-      <p class="lead" data-i18n="cal.lead">The wizard talks to the interface, plays the sweeps and writes the result into Room EQ. Beta: tested on the Fireface 802 FS.</p>
-    </div>
-    <ol class="cal__steps">
-      <li data-reveal style="--i:0">
-        <span class="cal__num">1</span>
-        <h3 data-i18n="cal.one.title">Connect</h3>
-        <p data-i18n="cal.one.text">Choose the interface, the output and the microphone. Load the mic's calibration file if you have one.</p>
-      </li>
-      <li data-reveal style="--i:1">
-        <span class="cal__num">2</span>
-        <h3 data-i18n="cal.two.title">Measure</h3>
-        <p data-i18n="cal.two.text">Four sweeps per speaker. Only the selected output plays; every other output is muted and restored afterwards.</p>
-      </li>
-      <li data-reveal style="--i:2">
-        <span class="cal__num">3</span>
-        <h3 data-i18n="cal.three.title">Apply</h3>
-        <p data-i18n="cal.three.text">Review the curves, then apply the nine bands and the headroom to Room EQ. Save it as a preset.</p>
-      </li>
-    </ol>
-  </section>
+  
 
   <section class="features" id="features">
     <div class="section-head" data-reveal>
