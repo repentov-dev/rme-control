@@ -17,18 +17,11 @@ Works via Global OSC only with TotalMix 2.1+.
 
 ## What's new in 4.0
 
-Room EQ, headphone presets and a room calibration wizard.
+1. **Room EQ fully carried over from TotalMix.** Nine bands per output, and the **Mix** and **Crossfeed** controls now live right inside the Room EQ window.
+2. **A large library of presets for the most popular headphones.** 25 brands, 80 models, based on AutoEQ and independent measurements.
+3. **Correction powered by roomeq (AutoEQ).** Sweeps are captured by `sotf-capture`; the correction is calculated by `roomeq` from the [AutoEQ](https://github.com/pierreaubert/autoeq) project. Save your own calibration presets; microphone calibration files are supported.
 
-- **Room EQ on every output** — nine bands, filter types on bands 1, 8 and 9, delay,
-  crossfeed, volume calibration and a Mix control.
-- **80 headphone presets** — 25 brands, based on AutoEQ and independent measurements.
-- **Room calibration** — measure both speakers with a microphone, get left, right and
-  stereo corrections and apply them to Room EQ. Beta: tested on the Fireface 802 FS.
-- **Calibration travels with presets** — Room EQ bands, measurement presets and the
-  wizard's settings are saved together with the app's own presets.
-- **Routing setting** — route the selected output through OSC and mute the rest, or send
-  the wizard directly to a software playback pair.
-- **14 languages** in the interface.
+Beta: the calibrator was tested on the Fireface 802 FS and may behave differently on other interfaces.
 
 <p align="center">
   <img src="docs/screenshots/measure-result.png" width="420" alt="Measure result with measured and corrected curves">

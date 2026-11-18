@@ -492,3 +492,83 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
   .nav__links { gap: 10px; }
   .lang { order: 3; }
 }
+
+/* ---- 4.0: Apple-style feature chapters --------------------------------- */
+
+.chapter {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: center;
+  padding-block: clamp(28px, 5vh, 56px);
+}
+.chapter + .chapter { border-top: 1px solid var(--line); }
+.chapter--reverse .chapter__copy { order: 2; }
+.chapter--reverse .chapter__media { order: 1; }
+.chapter__kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.chapter__copy h3 {
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  max-width: 16ch;
+}
+.chapter__copy p:not(.chapter__kicker):not(.chapter__stat) {
+  margin-top: 14px;
+  color: var(--text-2);
+  font-size: clamp(15px, 1.4vw, 17px);
+  line-height: 1.55;
+  max-width: 46ch;
+}
+.chapter__media { margin: 0; }
+.chapter__media img {
+  width: 100%;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background: #111;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+.chapter__media--stat { display: flex; justify-content: center; }
+.stat-plate {
+  width: min(100%, 420px);
+  aspect-ratio: 1;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 4px;
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(234, 151, 55, 0.16), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+.stat-plate__num {
+  font-size: clamp(64px, 9vw, 104px);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+}
+.stat-plate__label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.stat-plate__divider { width: 1px; height: 28px; background: var(--line); margin-block: 10px; }
+.chapter__stat { margin-top: 18px; font-size: 14px; color: var(--text-2); }
+.chapter__stat strong { color: var(--text); font-size: 20px; letter-spacing: -0.02em; }
+
+@media (max-width: 860px) {
+  .chapter { grid-template-columns: 1fr; }
+  .chapter--reverse .chapter__copy,
+  .chapter--reverse .chapter__media { order: 0; }
+  .chapter__media--stat { justify-content: flex-start; }
+}

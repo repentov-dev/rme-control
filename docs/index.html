@@ -58,27 +58,48 @@
   <section class="new" id="new">
     <div class="section-head" data-reveal>
       <p class="eyebrow" data-i18n="new.eyebrow">Version 4.0</p>
-      <h2 data-i18n="new.title">Room EQ, headphone presets and calibration</h2>
-      <p class="lead" data-i18n="new.lead">The mixer in the menu bar now tunes the room and the headphones — measured, corrected and saved with the rest of the setup.</p>
+      <h2 data-i18n="new.title">New in version 4.0</h2>
     </div>
-    <div class="new__grid">
-      <article class="new__card" data-reveal style="--i:0">
-        <h3 data-i18n="new.eq.title">Room EQ on every output</h3>
-        <p data-i18n="new.eq.text">Nine bands per output, with delay, crossfeed, volume calibration and a Mix control to hear the correction against the original.</p>
-      </article>
-      <article class="new__card" data-reveal style="--i:1">
-        <h3 data-i18n="new.hp.title">80 headphone presets</h3>
-        <p data-i18n="new.hp.text">25 brands, built from AutoEQ and independent measurements. Pick a model and the curve lands in Room EQ.</p>
-      </article>
-      <article class="new__card" data-reveal style="--i:2">
-        <h3 data-i18n="new.cal.title">Room calibration</h3>
-        <p data-i18n="new.cal.text">Measure both speakers with a microphone, get left, right and stereo corrections, and apply them to the output.</p>
-      </article>
-      <article class="new__card" data-reveal style="--i:3">
-        <h3 data-i18n="new.save.title">Saved with presets</h3>
-        <p data-i18n="new.save.text">Room EQ bands, calibration and measurement presets travel together with the app's own presets.</p>
-      </article>
-    </div>
+
+    <article class="chapter" data-reveal>
+      <div class="chapter__copy">
+        <p class="chapter__kicker" data-i18n="new.eq.kicker">Room EQ</p>
+        <h3 data-i18n="new.eq.title">Fully carried over from TotalMix</h3>
+        <p data-i18n="new.eq.text">Nine bands on every output, with Mix and Crossfeed right inside the Room EQ window.</p>
+      </div>
+      <figure class="chapter__media">
+        <img src="./screenshots/room-eq.png" width="1120" height="1120" alt="Room EQ window with Mix and Crossfeed">
+      </figure>
+    </article>
+
+    <article class="chapter chapter--reverse" data-reveal>
+      <div class="chapter__copy">
+        <p class="chapter__kicker" data-i18n="new.hp.kicker">Headphones</p>
+        <h3 data-i18n="new.hp.title">Presets for popular headphones</h3>
+        <p data-i18n="new.hp.text">A large library of presets for the most popular models, built from AutoEQ and independent measurements.</p>
+        <p class="chapter__stat"><strong>25</strong> <span data-i18n="new.stat.brands">brands</span> <strong>80</strong> <span data-i18n="new.stat.models">models</span></p>
+      </div>
+      <figure class="chapter__media chapter__media--stat">
+        <div class="stat-plate">
+          <span class="stat-plate__num">25</span>
+          <span class="stat-plate__label" data-i18n="new.stat.brands">brands</span>
+          <span class="stat-plate__divider"></span>
+          <span class="stat-plate__num">80</span>
+          <span class="stat-plate__label" data-i18n="new.stat.models">models</span>
+        </div>
+      </figure>
+    </article>
+
+    <article class="chapter" data-reveal>
+      <div class="chapter__copy">
+        <p class="chapter__kicker" data-i18n="new.engine.kicker">Correction engine</p>
+        <h3 data-i18n="new.engine.title">Powered by roomeq</h3>
+        <p data-i18n="new.engine.text">Sweeps are captured by sotf-capture and the correction is calculated by roomeq from the AutoEQ project. Save your own calibration presets; microphone calibration files are supported.</p>
+      </div>
+      <figure class="chapter__media">
+        <img src="./screenshots/measure-result.png" width="1320" height="1662" alt="Measure result with measured and corrected curves">
+      </figure>
+    </article>
   </section>
 
   <section class="gallery" id="screens">
