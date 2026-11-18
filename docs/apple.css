@@ -21,15 +21,17 @@
   --radius-pill: 980px;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --nav-h: 48px;
   color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 html, body { overflow-x: clip; }
-html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 24px); }
 
 body {
   margin: 0;
+  padding-top: var(--nav-h);
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
@@ -68,16 +70,17 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
 
 /* Chrome: a translucent bar, content scrolling underneath. */
 .nav {
-  position: sticky; top: 0; z-index: 100;
-  transition: background-color 220ms linear, border-color 220ms linear;
-  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  transition: background-color 220ms linear, border-color 220ms linear, box-shadow 220ms linear;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid var(--line);
 }
 .nav.is-scrolled {
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
   border-bottom-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 .nav__inner {
   max-width: var(--measure); margin-inline: auto;
@@ -638,6 +641,7 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
 .nav.is-open .nav__burger span:last-child { transform: translateY(-3.25px) rotate(-45deg); }
 
 @media (max-width: 860px) {
+  :root { --nav-h: 52px; }
   .nav__inner { min-height: 52px; gap: 12px; }
   .nav__brand { font-size: 14px; }
   .nav__burger { display: flex; }
