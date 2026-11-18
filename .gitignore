@@ -30,3 +30,7 @@ xcuserdata/
 
 # Hallmark skill metadata (local)
 .hallmark/
+
+# Local research and dev scratch (moved out of build/ to keep it build-only).
+# Delete this line if any of it should be committed.
+/notes/
