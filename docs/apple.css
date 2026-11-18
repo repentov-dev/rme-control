@@ -642,10 +642,11 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
 
 @media (max-width: 860px) {
   :root { --nav-h: 52px; }
+  body { padding-top: 0; }
+  .nav { position: relative; top: auto; left: auto; right: auto; }
   .nav__inner { min-height: 52px; gap: 12px; }
   .nav__brand { font-size: 14px; }
   .nav__burger { display: flex; }
-  .nav.is-hidden { transform: translateY(-100%); }
 
   .nav__links {
     position: absolute; top: 100%; left: 0; right: 0;
