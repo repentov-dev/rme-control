@@ -15,6 +15,26 @@ Works via Global OSC only with TotalMix 2.1+.
 ![Universal](https://img.shields.io/badge/arch-arm64%20%7C%20x86__64-blue)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
+## What's new in 4.0
+
+Room EQ, headphone presets and a room calibration wizard.
+
+- **Room EQ on every output** — nine bands, filter types on bands 1, 8 and 9, delay,
+  crossfeed, volume calibration and a Mix control.
+- **80 headphone presets** — 25 brands, based on AutoEQ and independent measurements.
+- **Room calibration** — measure both speakers with a microphone, get left, right and
+  stereo corrections and apply them to Room EQ. Beta: tested on the Fireface 802 FS.
+- **Calibration travels with presets** — Room EQ bands, measurement presets and the
+  wizard's settings are saved together with the app's own presets.
+- **Routing setting** — route the selected output through OSC and mute the rest, or send
+  the wizard directly to a software playback pair.
+- **14 languages**, Russian included.
+
+<p align="center">
+  <img src="docs/screenshots/measure-result.png" width="420" alt="Measure result with measured and corrected curves">
+  <img src="docs/screenshots/room-eq.png" width="360" alt="Room EQ with nine bands, delay, volume calibration and Mix">
+</p>
+
 ## Screenshots
 
 <p align="center">
@@ -197,6 +217,9 @@ warning-free distribution requires a paid Apple Developer ID (see the comments i
 ## License
 
 [MIT](LICENSE).
+
+Headphone correction presets are derived from [AutoEQ](https://github.com/jaakkopasanen/AutoEq)
+(MIT) and measurements by oratory1990, Crinacle, Rtings and others.
 
 RME, TotalMix and the RME logo are trademarks of RME Audio AG. This project is an independent
 tool and is not affiliated with, endorsed by, or supported by RME Audio.

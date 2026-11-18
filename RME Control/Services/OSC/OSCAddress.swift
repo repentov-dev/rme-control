@@ -52,6 +52,22 @@ enum OSCAddress {
         static let lowCutFreq = "/lowcut/freq"
     }
 
+    /// Room EQ — отдельный девятиполосный эквалайзер выхода со своей задержкой
+    /// и crossfeed. Живёт по адресу канала: `/output/0/roomeq/…`, `/output/0/delay`.
+    enum RoomEQ {
+        static let enable = "/roomeq/enable"
+        static let delay = "/delay"
+        static let crossfeed = "/crossfeed"
+        /// Volume Calibration самой Room EQ. Это отдельный gain, а не фейдер:
+        /// TotalMix присылает его как `/output/N/gain`.
+        static let gain = "/gain"
+
+        static func suffix(_ parameter: String, band: Int? = nil) -> String {
+            guard let band else { return "/roomeq/\(parameter)" }
+            return "/roomeq/band\(band)\(parameter)"
+        }
+    }
+
     /// Адреса кнопок Control Room по умолчанию.
     enum Defaults {
         static let speakerB = "/controlroom/speakerb"

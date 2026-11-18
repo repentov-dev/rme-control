@@ -91,6 +91,24 @@ final class MixerState {
         inputs[id] = state
     }
 
+    // MARK: - Room EQ
+
+    /// Room EQ по OSC-адресу выхода: у каждого адреса свой набор из девяти полос.
+    /// Ключ — нормализованный адрес, потому что LEFT и RIGHT в TotalMix это два
+    /// разных `/output/N`.
+    private(set) var roomEQs: [String: RoomEQState] = [:]
+
+    func roomEQ(_ address: String) -> RoomEQState {
+        roomEQs[OSCAddress.normalized(address)] ?? RoomEQState()
+    }
+
+    func updateRoomEQ(_ address: String, _ mutate: (inout RoomEQState) -> Void) {
+        let key = OSCAddress.normalized(address)
+        var value = roomEQs[key] ?? RoomEQState()
+        mutate(&value)
+        roomEQs[key] = value
+    }
+
     // MARK: - Посылы
 
     func send(_ id: UUID) -> SendState {

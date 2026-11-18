@@ -51,6 +51,15 @@ final class AppSettings {
     var showOutputCompressor: Bool { didSet { storage.set(showOutputCompressor, for: .showOutputCompressor) } }
     /// Показывать кнопку EQ у выходов.
     var showOutputEQ: Bool { didSet { storage.set(showOutputEQ, for: .showOutputEQ) } }
+    var showOutputRoomEQ: Bool { didSet { storage.set(showOutputRoomEQ, for: .showOutputRoomEQ) } }
+    /// Маршрутизация калибровщика: через OSC/TotalMix или прямой software playback.
+    var calibrationRouting: CalibrationRoutingMode {
+        didSet { storage.set(calibrationRouting.rawValue, for: .calibrationRouting) }
+    }
+    /// Левая пара software playback для калибровщика (0 = 1/2).
+    var calibrationPlaybackPair: Int {
+        didSet { storage.set(calibrationPlaybackPair, for: .calibrationPlaybackPair) }
+    }
 
     // MARK: - Аппаратные клавиши
 
@@ -90,6 +99,18 @@ final class AppSettings {
 
     private(set) var presets: [SettingsPreset] { didSet { storage.setEncodable(presets, for: .settingsPresets) } }
 
+    // MARK: - Пользовательские пресеты Room EQ
+
+    /// Пресеты, сохранённые из измерений Room EQ.
+    private(set) var roomEQUserPresets: [RoomEQUserPreset] {
+        didSet { storage.setEncodable(roomEQUserPresets, for: .roomEQUserPresets) }
+    }
+
+    /// Последние выбранные устройство, выход, микрофон и калибровка мастера замера.
+    var roomCorrectionPreferences: RoomCorrectionPreferences {
+        didSet { storage.setEncodable(roomCorrectionPreferences, for: .roomCorrectionPreferences) }
+    }
+
     // MARK: - Веб-пульт
 
     var webServerEnabled: Bool { didSet { storage.set(webServerEnabled, for: .webServerEnabled) } }
@@ -117,6 +138,9 @@ final class AppSettings {
         showInputEQ = storage.value(.showInputEQ, default: true)
         showOutputCompressor = storage.value(.showOutputCompressor, default: true)
         showOutputEQ = storage.value(.showOutputEQ, default: true)
+        showOutputRoomEQ = storage.value(.showOutputRoomEQ, default: true)
+        calibrationRouting = CalibrationRoutingMode(rawValue: storage.string(for: .calibrationRouting) ?? "") ?? .osc
+        calibrationPlaybackPair = storage.value(.calibrationPlaybackPair, default: 0)
         muteKeyAction = MuteKeyAction(rawValue: storage.string(for: .muteKeyAction) ?? "") ?? .dim
         volumeStepDB = storage.value(.volumeStepDB, default: DefaultConfig.volumeStepDB)
         volumeKeyOutputID = storage.string(for: .volumeKeyOutputID).flatMap(UUID.init)
@@ -132,6 +156,9 @@ final class AppSettings {
         webShowInputs = storage.value(.webShowInputs, default: true)
         webShowLevels = storage.value(.webShowLevels, default: true)
         presets = storage.decodable([SettingsPreset].self, for: .settingsPresets) ?? []
+        roomEQUserPresets = storage.decodable([RoomEQUserPreset].self, for: .roomEQUserPresets) ?? []
+        roomCorrectionPreferences = storage.decodable(RoomCorrectionPreferences.self,
+                                                      for: .roomCorrectionPreferences) ?? RoomCorrectionPreferences()
         setupCompleted = storage.bool(for: .setupCompleted)
 
         // Каналов больше нет «по умолчанию»: на свежей установке их ноль и
@@ -367,10 +394,10 @@ final class AppSettings {
     // MARK: - Пресеты
 
     /// Сохраняет текущие настройки под именем; пресет с таким же именем обновляется.
-    func savePreset(named name: String) {
+    func savePreset(named name: String, roomEQs: [String: RoomEQState] = [:]) {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-        let snapshot = makeSnapshot()
+        let snapshot = makeSnapshot(roomEQs: roomEQs)
         if let index = presets.firstIndex(where: { $0.name.caseInsensitiveCompare(trimmed) == .orderedSame }) {
             presets[index].snapshot = snapshot
         } else {
@@ -395,6 +422,7 @@ final class AppSettings {
         showInputEQ = s.showInputEQ
         showOutputCompressor = s.showOutputCompressor
         showOutputEQ = s.showOutputEQ
+        showOutputRoomEQ = s.showOutputRoomEQ ?? true
         muteKeyAction = s.muteKeyAction
         volumeStepDB = s.volumeStepDB
         volumeKeyOutputID = s.volumeKeyOutputID
@@ -412,13 +440,44 @@ final class AppSettings {
         if let hotkeys = s.hotkeys {
             self.hotkeys = hotkeys
         }
+        if let userPresets = s.roomEQUserPresets {
+            roomEQUserPresets = userPresets
+        }
+        if let preferences = s.roomCorrectionPreferences {
+            roomCorrectionPreferences = preferences
+        }
+        if let routing = s.calibrationRouting {
+            calibrationRouting = routing
+        }
+        if let pair = s.calibrationPlaybackPair {
+            calibrationPlaybackPair = pair
+        }
     }
 
     func removePreset(id: UUID) {
         presets.removeAll { $0.id == id }
     }
 
-    private func makeSnapshot() -> SettingsPreset.Snapshot {
+    func replaceRoomEQUserPresets(_ presets: [RoomEQUserPreset]) {
+        roomEQUserPresets = presets
+    }
+
+    func addRoomEQUserPreset(_ preset: RoomEQUserPreset) {
+        roomEQUserPresets.insert(preset, at: 0)
+    }
+
+    func removeRoomEQUserPreset(id: UUID) {
+        roomEQUserPresets.removeAll { $0.id == id }
+    }
+
+    func renameRoomEQUserPreset(id: UUID, name: String) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty,
+              let index = roomEQUserPresets.firstIndex(where: { $0.id == id }) else { return }
+        roomEQUserPresets[index].name = trimmed
+    }
+
+    private func makeSnapshot(roomEQs: [String: RoomEQState]) -> SettingsPreset.Snapshot {
         SettingsPreset.Snapshot(
             speakerBAddress: speakerBAddress,
             dimAddress: dimAddress,
@@ -435,6 +494,7 @@ final class AppSettings {
             showInputEQ: showInputEQ,
             showOutputCompressor: showOutputCompressor,
             showOutputEQ: showOutputEQ,
+            showOutputRoomEQ: showOutputRoomEQ,
             muteKeyAction: muteKeyAction,
             volumeStepDB: volumeStepDB,
             volumeKeyOutputID: volumeKeyOutputID,
@@ -447,7 +507,12 @@ final class AppSettings {
             webShowButtons: webShowButtons,
             webShowInputs: webShowInputs,
             webShowLevels: webShowLevels,
-            hotkeys: hotkeys
+            hotkeys: hotkeys,
+            calibrationRouting: calibrationRouting,
+            calibrationPlaybackPair: calibrationPlaybackPair,
+            roomEQs: roomEQs.isEmpty ? nil : roomEQs,
+            roomEQUserPresets: roomEQUserPresets,
+            roomCorrectionPreferences: roomCorrectionPreferences
         )
     }
 
@@ -467,6 +532,9 @@ final class AppSettings {
         showInputEQ = true
         showOutputCompressor = true
         showOutputEQ = true
+        showOutputRoomEQ = true
+        calibrationRouting = .osc
+        calibrationPlaybackPair = 0
         muteKeyAction = .dim
         volumeStepDB = DefaultConfig.volumeStepDB
         volumeKeyOutputID = outputs.first?.id

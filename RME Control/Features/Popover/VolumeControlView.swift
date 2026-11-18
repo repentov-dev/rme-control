@@ -18,6 +18,7 @@ struct VolumeControlView: View {
     var onOpenSettings: (() -> Void)? = nil
     var onOpenCompressor: ((CompressorTarget) -> Void)? = nil
     var onOpenEQ: ((EQTarget) -> Void)? = nil
+    var onOpenRoomEQ: ((RoomEQTarget) -> Void)? = nil
 
     var body: some View {
         if scrollable {
@@ -96,6 +97,12 @@ struct VolumeControlView: View {
                     } : nil,
                     onOpenCompressor: viewModel.showOutputCompressor ? onOpenCompressor.map { open in
                         { open(CompressorTarget(bus: .output, id: output.id)) }
+                    } : nil,
+                    onOpenRoomEQ: viewModel.showOutputRoomEQ ? onOpenRoomEQ.map { open in
+                        {
+                            guard let target = viewModel.roomEQTarget(for: output.id) else { return }
+                            open(target)
+                        }
                     } : nil
                 )
             }

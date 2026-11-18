@@ -59,6 +59,12 @@ step 3 "Copying resources and translations"
 
 cp "RME Control/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 cp "RME Control/Resources/RME_Control_Tray.png" "$APP/Contents/Resources/RME_Control_Tray.png"
+cp "RME Control/Resources/roomeq" "$APP/Contents/Resources/roomeq"
+chmod +x "$APP/Contents/Resources/roomeq"
+cp "RME Control/Resources/sotf-capture" "$APP/Contents/Resources/sotf-capture"
+chmod +x "$APP/Contents/Resources/sotf-capture"
+cp "RME Control/Resources/THIRD_PARTY_NOTICES.txt" "$APP/Contents/Resources/THIRD_PARTY_NOTICES.txt"
+cp "RME Control/Resources/GPL-3.0.txt" "$APP/Contents/Resources/GPL-3.0.txt"
 cp "RME Control/Resources/Web/remote.html" "$APP/Contents/Resources/remote.html"
 cp "RME Control/Resources/Web/compressor.html" "$APP/Contents/Resources/compressor.html"
 cp "RME Control/Resources/Web/compressor.js" "$APP/Contents/Resources/compressor.js"
@@ -138,6 +144,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 	<string>$VERSION</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>RME Control records a test sweep from the selected microphone to correct Room EQ.</string>
 </dict>
 </plist>
 PLIST

@@ -6,6 +6,17 @@ import Combine
 /// а входящие OSC-сообщения TotalMix — в изменения `MixerState`.
 /// Также добавляет и удаляет каналы, потому что это меняет одновременно
 /// `AppSettings` и `MixerState`.
+struct CalibrationRoutingState: Sendable {
+    var mutes: [Int: Bool]
+    /// playback -> submix -> уровень посыла в dB.
+    var sends: [Int: [Int: Double]]
+}
+
+struct CalibrationSend: Hashable, Sendable {
+    let playback: Int
+    let submix: Int
+}
+
 @MainActor
 final class MixerService {
     /// Аудиоинтерфейс подключился (передаётся имя устройства).
@@ -25,6 +36,9 @@ final class MixerService {
     private static let volumeChangeThreshold: Double = 0.05
 
     private let osc: OSCSending
+    private var outputMutes: [Int: Bool] = [:]
+    private var playbackSendLevels: [Int: [Int: Double]] = [:]
+    private var touchedCalibrationSends: Set<CalibrationSend> = []
     private let settings: AppSettings
     private let state: MixerState
     private var lastStateRequest = Date.distantPast
@@ -286,6 +300,237 @@ final class MixerService {
         osc.send(address + parameter.oscSuffix, Float(clamped))
     }
 
+    // MARK: - Room EQ
+
+    func setRoomEQEnabled(_ target: RoomEQTarget, channel: RoomEQChannel, enabled: Bool) {
+        for address in target.addresses(for: channel) {
+            if enabled {
+                var restore: Double?
+                state.updateRoomEQ(address) { room in
+                    room.enabled = true
+                    if let saved = room.calibrationBeforeBypass {
+                        room.volumeCalibration = saved
+                        room.calibrationBeforeBypass = nil
+                        restore = saved
+                    }
+                }
+                osc.send(address + OSCAddress.RoomEQ.enable, 1.0)
+                if let restore {
+                    osc.send(address + OSCAddress.RoomEQ.gain, Float(restore))
+                }
+            } else {
+                state.updateRoomEQ(address) { room in
+                    if room.enabled, room.calibrationBeforeBypass == nil {
+                        room.calibrationBeforeBypass = room.volumeCalibration
+                    }
+                    room.enabled = false
+                    room.volumeCalibration = 0
+                }
+                osc.send(address + OSCAddress.RoomEQ.enable, 0.0)
+                osc.send(address + OSCAddress.RoomEQ.gain, 0.0)
+            }
+        }
+    }
+
+    private func handlePlaybackMatrix(_ address: String, _ value: Float) -> Bool {
+        let lower = address.lowercased()
+        guard lower.hasPrefix("/mix/pb/") else { return false }
+        let parts = address.split(separator: "/")
+        guard parts.count == 5,
+              let playback = Int(parts[2]),
+              let submix = Int(parts[3]) else { return true }
+        switch parts[4].lowercased() {
+        case "fader":
+            playbackSendLevels[playback, default: [:]][submix] = Double(value)
+        case "faderlin":
+            // Если пришёл только линейный уровень, переводим его в dB.
+            playbackSendLevels[playback, default: [:]][submix] = FaderMath.db(for: Double(value))
+        default:
+            break
+        }
+        return true
+    }
+
+    func requestCalibrationState() {
+        osc.send(OSCAddress.requestAll, 1.0)
+    }
+
+    func calibrationRoutingState() -> CalibrationRoutingState {
+        CalibrationRoutingState(mutes: outputMutes, sends: playbackSendLevels)
+    }
+
+    /// На время замера: звук идёт в playback 1/2, посыл 0 дБ на выбранный
+    /// выход, остальные выходы замьючены. Громкости и mute playback не трогаем.
+    func applyCalibrationRouting(outputLeft: Int, outputRight: Int, channelCount: Int) {
+        for channel in 0..<max(channelCount, 0) {
+            setCalibrationMute(channel, muted: !(channel == outputLeft || channel == outputRight))
+        }
+        for (playback, submix) in [(0, outputLeft), (1, outputRight)] {
+            osc.send("/mix/pb/\(playback)/\(submix)/fader", 0.0)
+            touchedCalibrationSends.insert(CalibrationSend(playback: playback, submix: submix))
+        }
+    }
+
+    func restoreCalibrationRouting(_ state: CalibrationRoutingState, channelCount: Int) {
+        for channel in 0..<max(channelCount, 0) {
+            setCalibrationMute(channel, muted: state.mutes[channel] ?? false)
+        }
+        for send in touchedCalibrationSends {
+            // Если состояние не пришло, возвращаем типичные 0 дБ, а не минимум.
+            let level = state.sends[send.playback]?[send.submix] ?? 0
+            osc.send("/mix/pb/\(send.playback)/\(send.submix)/fader", Float(level))
+            playbackSendLevels[send.playback, default: [:]][send.submix] = level
+        }
+        touchedCalibrationSends.removeAll()
+    }
+
+    /// mute — это set: 1 мьютит, 0 снимает. Никаких toggle-сравнений:
+    /// иначе при смене выхода «лишние» каналы мьютились повторно.
+    private func setCalibrationMute(_ channel: Int, muted: Bool) {
+        osc.send("/output/\(channel)/mute", muted ? 1.0 : 0.0)
+        outputMutes[channel] = muted
+    }
+
+    var roomEQStates: [String: RoomEQState] { state.roomEQs }
+
+    /// Восстанавливает полное состояние Room EQ по OSC-адресам (из пресета).
+    func applyRoomEQStates(_ states: [String: RoomEQState]) {
+        for (address, roomState) in states {
+            let base = OSCAddress.normalized(address)
+            osc.send(base + OSCAddress.RoomEQ.enable, roomState.enabled ? 1.0 : 0.0)
+            osc.send(base + OSCAddress.RoomEQ.delay, Float(roomState.delay))
+            osc.send(base + OSCAddress.RoomEQ.crossfeed, Float(roomState.crossfeed))
+            osc.send(base + OSCAddress.RoomEQ.gain, Float(roomState.volumeCalibration))
+            for number in 1...RoomEQState.bandCount {
+                let band = roomState.band(number)
+                osc.send(base + RoomEQParameter.bandFrequency(number).oscSuffix, Float(band.frequency))
+                osc.send(base + RoomEQParameter.bandGain(number).oscSuffix, Float(band.gain))
+                osc.send(base + RoomEQParameter.bandQ(number).oscSuffix, Float(band.q))
+                osc.send(base + RoomEQParameter.bandType(number).oscSuffix, Float(band.type))
+            }
+            state.updateRoomEQ(base) { $0 = roomState }
+        }
+    }
+
+    func setRoomEQParameter(_ target: RoomEQTarget, channel: RoomEQChannel,
+                            parameter: RoomEQParameter, value: Double) {
+        for address in target.addresses(for: channel) {
+            var room = state.roomEQ(address)
+            room.set(parameter, value: value)
+            let clamped = room.value(for: parameter)
+            state.updateRoomEQ(address) { stored in
+                if case .bandGain(let number) = parameter {
+                    stored.setBandGainFromUser(number, value: clamped)
+                } else {
+                    stored.set(parameter, value: clamped)
+                }
+            }
+            osc.send(address + parameter.oscSuffix, Float(clamped))
+        }
+    }
+
+    /// Меняет Mix: 0 — обход коррекции, 1 — полное действие. Масштабируются
+    /// только усиления полос; частоты, Q и типы не трогаются.
+    func setRoomEQMix(_ target: RoomEQTarget, channel: RoomEQChannel, mix: Double) {
+        let clamped = min(max(mix, 0), 1)
+        for address in target.addresses(for: channel) {
+            state.updateRoomEQ(address) { $0.setMix(clamped) }
+            let room = state.roomEQ(address)
+            for number in 1...RoomEQState.bandCount {
+                osc.send(address + RoomEQParameter.bandGain(number).oscSuffix,
+                         Float(room.band(number).gain))
+            }
+        }
+    }
+
+    /// Ставит полный набор девяти полос (пресет или измерение) и Mix = 100%.
+    func applyRoomEQBands(_ target: RoomEQTarget, channel: RoomEQChannel,
+                          bands: [RoomEQBand], preamp: Double) {
+        guard bands.count == RoomEQState.bandCount else { return }
+        let clampedPreamp = min(max(preamp, -24), 3)
+        for address in target.addresses(for: channel) {
+            state.updateRoomEQ(address) { room in
+                room.applyBands(bands)
+                room.volumeCalibration = clampedPreamp
+            }
+            let room = state.roomEQ(address)
+            for number in 1...RoomEQState.bandCount {
+                let band = room.band(number)
+                osc.send(address + RoomEQParameter.bandFrequency(number).oscSuffix, Float(band.frequency))
+                osc.send(address + RoomEQParameter.bandGain(number).oscSuffix, Float(band.gain))
+                osc.send(address + RoomEQParameter.bandQ(number).oscSuffix, Float(band.q))
+                osc.send(address + RoomEQParameter.bandType(number).oscSuffix, Float(band.type))
+            }
+            osc.send(address + OSCAddress.RoomEQ.gain, Float(clampedPreamp))
+        }
+        // Mix общий для окна: после применения пресета он снова 100% у обоих каналов.
+        setRoomEQMix(target, channel: .both, mix: 1)
+    }
+
+    /// Копирует Room EQ одного канала стереопары в другой. Вызывается, когда
+    /// пользователь связывает каналы кнопкой link: у пары становится один Room EQ.
+    func syncRoomEQ(from source: String, to destination: String) {
+        let from = OSCAddress.normalized(source)
+        let to = OSCAddress.normalized(destination)
+        guard from != to else { return }
+
+        let room = state.roomEQ(from)
+        state.updateRoomEQ(to) { $0 = room }
+
+        osc.send(to + OSCAddress.RoomEQ.enable, room.enabled ? 1.0 : 0.0)
+        osc.send(to + OSCAddress.RoomEQ.delay, Float(room.delay))
+        osc.send(to + OSCAddress.RoomEQ.crossfeed, Float(room.crossfeed))
+        osc.send(to + OSCAddress.RoomEQ.gain, Float(room.volumeCalibration))
+
+        for number in 1...RoomEQState.bandCount {
+            let band = room.band(number)
+            osc.send(to + RoomEQParameter.bandFrequency(number).oscSuffix, Float(band.frequency))
+            osc.send(to + RoomEQParameter.bandGain(number).oscSuffix, Float(band.gain))
+            osc.send(to + RoomEQParameter.bandQ(number).oscSuffix, Float(band.q))
+            osc.send(to + RoomEQParameter.bandType(number).oscSuffix, Float(band.type))
+        }
+    }
+
+    private func handleRoomEQ(_ address: String, base: String, value: Float) -> Bool {
+        guard !base.isEmpty else { return false }
+        let normalizedBase = OSCAddress.normalized(base)
+        let normalizedAddress = OSCAddress.normalized(address)
+        guard normalizedAddress.hasPrefix(normalizedBase + "/") else { return false }
+        let rest = String(normalizedAddress.dropFirst(normalizedBase.count))
+
+        switch rest {
+        case OSCAddress.RoomEQ.enable:
+            state.updateRoomEQ(base) { $0.enabled = value > 0.5 }
+            return true
+        case OSCAddress.RoomEQ.delay:
+            state.updateRoomEQ(base) { $0.set(.delay, value: Double(value)) }
+            return true
+        case OSCAddress.RoomEQ.crossfeed:
+            state.updateRoomEQ(base) { $0.set(.crossfeed, value: Double(value)) }
+            return true
+        case OSCAddress.RoomEQ.gain:
+            state.updateRoomEQ(base) { $0.set(.volumeCalibration, value: Double(value)) }
+            return true
+        default:
+            break
+        }
+
+        guard rest.hasPrefix("/roomeq/band") else { return false }
+        let numbers = rest.dropFirst("/roomeq/band".count)
+        guard let band = Int(numbers.prefix(while: \.isNumber)) else { return false }
+        let parameter: RoomEQParameter?
+        switch String(numbers.drop(while: \.isNumber)) {
+        case "freq": parameter = .bandFrequency(band)
+        case "gain": parameter = .bandGain(band)
+        case "q": parameter = .bandQ(band)
+        case "type": parameter = .bandType(band)
+        default: parameter = nil
+        }
+        guard let parameter else { return false }
+        state.updateRoomEQ(base) { $0.set(parameter, value: Double(value)) }
+        return true
+    }
+
     private func channelAddress(for target: EQTarget) -> String? {
         let address: String?
         switch target.bus {
@@ -429,6 +674,13 @@ final class MixerService {
     }
 
     func handleOSCFloat(_ address: String, _ value: Float) {
+        if address.lowercased().hasPrefix("/output/"), address.lowercased().hasSuffix("/mute") {
+            let parts = address.split(separator: "/")
+            if parts.count == 3, let channel = Int(parts[1]) {
+                outputMutes[channel] = value > 0.5
+            }
+        }
+        if handlePlaybackMatrix(address, value) { return }
         let on = value > 0.5
         if address == OSCAddress.connectionStatus {
             let wasPresent = state.devicePresent
@@ -481,6 +733,18 @@ final class MixerService {
         }
         for output in settings.outputs {
             if handleEQ(address, base: output.oscAddress, value: value, target: EQTarget(bus: .output, id: output.id)) {
+                return
+            }
+        }
+        // Room EQ приходит и на парный канал пары, которого может не быть
+        // в списке выходов (например, `/output/9` для DT990 на `/output/8`).
+        var roomAddresses: [String] = []
+        for output in settings.outputs {
+            if !output.oscAddress.isEmpty { roomAddresses.append(output.oscAddress) }
+            if let partner = output.resolvedPartnerAddress { roomAddresses.append(partner) }
+        }
+        for base in Set(roomAddresses) {
+            if handleRoomEQ(address, base: base, value: value) {
                 return
             }
         }

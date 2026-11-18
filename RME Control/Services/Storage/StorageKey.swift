@@ -31,6 +31,7 @@ enum StorageKey: String, CaseIterable {
     case showInputEQ = "showInputEQ"
     case showOutputCompressor = "showOutputCompressor"
     case showOutputEQ = "showOutputEQ"
+    case showOutputRoomEQ = "showOutputRoomEQ"
 
     // MARK: Аппаратные клавиши
     case muteKeyAction = "muteKeyAction"
@@ -52,6 +53,16 @@ enum StorageKey: String, CaseIterable {
 
     // MARK: Пресеты настроек (JSON)
     case settingsPresets = "settingsPresets"
+
+    // MARK: Пользовательские пресеты Room EQ (JSON)
+    case roomEQUserPresets = "roomEQUserPresets"
+
+    // MARK: Настройки мастера замера Room EQ (JSON)
+    case roomCorrectionPreferences = "roomCorrectionPreferences"
+
+    // MARK: Маршрутизация калибровщика
+    case calibrationRouting = "calibrationRouting"
+    case calibrationPlaybackPair = "calibrationPlaybackPair"
 
     // MARK: Язык интерфейса
     case language = "appLanguage"

@@ -356,6 +356,167 @@ final class ObservationTests: XCTestCase {
         XCTAssertFalse(buttonsChanged.value)
     }
 
+    /// Оптимизатор укладывает коррекцию в девять полос и снижает ошибку.
+
+    func testRoomEQPresetsApplyToNineBands() {
+        XCTAssertFalse(RoomEQPresets.all.isEmpty)
+        XCTAssertFalse(RoomEQPresets.groups.isEmpty)
+        for preset in RoomEQPresets.all {
+            XCTAssertEqual(preset.bands.count, 9, preset.id)
+            var state = RoomEQState()
+            for (index, band) in preset.bands.enumerated() {
+                let number = index + 1
+                state.set(.bandFrequency(number), value: band.frequency)
+                state.set(.bandGain(number), value: band.gain)
+                state.set(.bandQ(number), value: band.q)
+                if RoomEQBand.typedBands.contains(number) {
+                    state.set(.bandType(number), value: Double(band.type))
+                }
+            }
+            XCTAssertTrue(preset.matches(state), preset.id)
+            XCTAssertEqual(state.band(1).type, 1, preset.id)
+            XCTAssertEqual(state.band(9).type, 1, preset.id)
+        }
+    }
+
+    /// Без явно заданного парного канала Room EQ берёт соседний выход стереопары.
+    func testRoomEQPartnerIsInferredFromOutputAddress() {
+        XCTAssertEqual(OutputConfig(oscAddress: "/output/0").resolvedPartnerAddress, "/output/1")
+        XCTAssertEqual(OutputConfig(oscAddress: "/output/1").resolvedPartnerAddress, "/output/0")
+        XCTAssertEqual(OutputConfig(oscAddress: "/output/8").resolvedPartnerAddress, "/output/9")
+        XCTAssertEqual(OutputConfig(oscAddress: "/output/10").resolvedPartnerAddress, "/output/11")
+        XCTAssertEqual(
+            OutputConfig(oscAddress: "/output/0", partnerAddress: "/output/3").resolvedPartnerAddress,
+            "/output/3"
+        )
+        XCTAssertNil(OutputConfig(oscAddress: "custom").resolvedPartnerAddress)
+    }
+
+    /// Включатель Room EQ в окне действует на всю пару, а не на выбранный канал.
+    func testRoomEQEnableAffectsBothChannels() {
+        let f = MixerFixture()
+        let target = RoomEQTarget(address: "/output/0", partner: "/output/1", label: "Main")
+
+        f.mixer.setRoomEQEnabled(target, channel: .both, enabled: true)
+        XCTAssertTrue(f.state.roomEQ("/output/0").enabled)
+        XCTAssertTrue(f.state.roomEQ("/output/1").enabled)
+        XCTAssertEqual(f.osc.sent.filter { $0.address.hasSuffix("/roomeq/enable") }.count, 2)
+
+        f.mixer.setRoomEQEnabled(target, channel: .both, enabled: false)
+        XCTAssertFalse(f.state.roomEQ("/output/0").enabled)
+        XCTAssertFalse(f.state.roomEQ("/output/1").enabled)
+    }
+
+    /// Кнопка link копирует Room EQ выбранного канала во второй канал пары.
+    func testLinkRoomEQCopiesSettingsToPartner() {
+        let f = MixerFixture()
+        let source = "/output/0"
+        let destination = "/output/1"
+
+        f.state.updateRoomEQ(source) { room in
+            room.enabled = true
+            room.delay = 12.5
+            room.crossfeed = 3
+            room.volumeCalibration = -4.5
+            room.set(.bandFrequency(2), value: 120)
+            room.set(.bandGain(2), value: 5)
+            room.set(.bandQ(2), value: 2)
+            room.set(.bandType(1), value: 2)
+        }
+
+        f.mixer.syncRoomEQ(from: source, to: destination)
+
+        let copy = f.state.roomEQ(destination)
+        XCTAssertTrue(copy.enabled)
+        XCTAssertEqual(copy.delay, 12.5, accuracy: 0.001)
+        XCTAssertEqual(copy.crossfeed, 3, accuracy: 0.001)
+        XCTAssertEqual(copy.volumeCalibration, -4.5, accuracy: 0.001)
+        XCTAssertEqual(copy.band(2).frequency, 120, accuracy: 0.001)
+        XCTAssertEqual(copy.band(2).gain, 5, accuracy: 0.001)
+        XCTAssertEqual(copy.band(2).q, 2, accuracy: 0.001)
+        XCTAssertEqual(copy.band(1).type, 2)
+        XCTAssertTrue(f.osc.sent.contains { $0.address == destination + "/roomeq/band2gain" && $0.value == 5 })
+        XCTAssertTrue(f.osc.sent.contains { $0.address == destination + "/gain" && $0.value == -4.5 })
+        XCTAssertFalse(f.osc.sent.contains { $0.address == destination + "/volume" })
+    }
+
+    /// Выключение Room EQ обнуляет Vol.Cal, включение возвращает прежний.
+    func testRoomEQBypassClearsAndRestoresCalibration() {
+        let f = MixerFixture()
+        let target = RoomEQTarget(address: "/output/0", partner: "/output/1", label: "Main")
+        f.state.updateRoomEQ("/output/0") { room in
+            room.enabled = true
+            room.volumeCalibration = -6
+        }
+        f.mixer.setRoomEQEnabled(target, channel: .both, enabled: false)
+        XCTAssertEqual(f.state.roomEQ("/output/0").enabled, false)
+        XCTAssertEqual(f.state.roomEQ("/output/0").volumeCalibration, 0, accuracy: 0.001)
+        XCTAssertEqual(f.state.roomEQ("/output/0").calibrationBeforeBypass ?? 0, -6, accuracy: 0.001)
+        XCTAssertTrue(f.osc.sent.contains { $0.address == "/output/0/gain" && $0.value == 0 })
+
+        f.mixer.setRoomEQEnabled(target, channel: .both, enabled: true)
+        XCTAssertEqual(f.state.roomEQ("/output/0").volumeCalibration, -6, accuracy: 0.001)
+        XCTAssertNil(f.state.roomEQ("/output/0").calibrationBeforeBypass)
+        XCTAssertTrue(f.osc.sent.contains { $0.address == "/output/0/gain" && $0.value == -6 })
+    }
+
+    /// Mix масштабирует усиления полос, сохраняя полный набор для возврата.
+    func testRoomEQMixScalesBandGains() {
+        var state = RoomEQState()
+        state.set(.bandGain(1), value: 6)
+        state.setMix(0.5)
+        XCTAssertEqual(state.band(1).gain, 3, accuracy: 0.001)
+        XCTAssertEqual(state.baseBands[0].gain, 6, accuracy: 0.001)
+        state.setMix(1)
+        XCTAssertEqual(state.band(1).gain, 6, accuracy: 0.001)
+
+        // Эхо TotalMix с округлением не должно портить базу: 100% возвращает 6.
+        state.setMix(0.5)
+        state.set(.bandGain(1), value: 3.3)
+        state.setMix(1)
+        XCTAssertEqual(state.band(1).gain, 6, accuracy: 0.001)
+
+        // Правка из приложения при Mix 50% сохраняет полный gain.
+        state.setMix(0.5)
+        state.setBandGainFromUser(1, value: 4)
+        state.setMix(1)
+        XCTAssertEqual(state.band(1).gain, 8, accuracy: 0.001)
+    }
+
+    /// Применение полного набора сбрасывает Mix на 100% и ставит preamp.
+    func testApplyRoomEQBandsResetsMix() {
+        let f = MixerFixture()
+        let target = RoomEQTarget(address: "/output/0", partner: "/output/1", label: "Main")
+        let bands = (1...9).map {
+            RoomEQBand(frequency: $0 == 1 ? 100 : ($0 == 9 ? 10_000 : Double($0) * 200),
+                       gain: $0 == 2 ? 6 : 0, q: 1, type: $0 == 1 || $0 == 9 ? 1 : 0)
+        }
+        f.state.updateRoomEQ("/output/0") { $0.setMix(0.5) }
+        f.mixer.applyRoomEQBands(target, channel: .both, bands: bands, preamp: -3)
+        XCTAssertEqual(f.state.roomEQ("/output/0").mix, 1, accuracy: 0.001)
+        XCTAssertEqual(f.state.roomEQ("/output/0").band(2).gain, 6, accuracy: 0.001)
+        XCTAssertEqual(f.state.roomEQ("/output/1").band(2).gain, 6, accuracy: 0.001)
+        XCTAssertEqual(f.state.roomEQ("/output/0").volumeCalibration, -3, accuracy: 0.001)
+    }
+
+    /// Vol.Cal Room EQ — это /gain, а не фейдер /volume.
+    func testRoomEQCalibrationUsesGainAddress() {
+        let f = MixerFixture()
+        f.mixer.handleOSCFloat("/output/0/gain", -4.4)
+        XCTAssertEqual(f.state.roomEQ("/output/0").volumeCalibration, -4.4, accuracy: 0.001)
+        // Парный канал DT990 не входит в список выходов, но его /gain и /delay тоже нужны.
+        f.mixer.handleOSCFloat("/output/9/gain", -3.6)
+        f.mixer.handleOSCFloat("/output/9/delay", 0.38)
+        XCTAssertEqual(f.state.roomEQ("/output/9").volumeCalibration, -3.6, accuracy: 0.001)
+        XCTAssertEqual(f.state.roomEQ("/output/9").delay, 0.38, accuracy: 0.001)
+
+        let target = RoomEQTarget(address: "/output/0", partner: "/output/1", label: "Main")
+        f.mixer.setRoomEQParameter(target, channel: .both, parameter: .volumeCalibration, value: -3.6)
+        XCTAssertTrue(f.osc.sent.contains { $0.address == "/output/0/gain" && $0.value == -3.6 })
+        XCTAssertTrue(f.osc.sent.contains { $0.address == "/output/1/gain" && $0.value == -3.6 })
+        XCTAssertFalse(f.osc.sent.contains { $0.address == "/output/0/volume" })
+    }
+
     func testObserveHelperDeliversInitialAndChanges() {
         let f = MixerFixture()
         let values = Recorder()

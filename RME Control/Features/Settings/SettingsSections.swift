@@ -201,6 +201,11 @@ struct MenuBarSettingsSection: View {
                     description: "Show the EQ button on outputs.",
                     isOn: viewModel.binding(\.showOutputEQ)
                 )
+                SettingsToggleRow(
+                    title: "Outputs: Room EQ",
+                    description: "Show the Room EQ button on outputs. It opens the nine-band Room EQ of that output.",
+                    isOn: viewModel.binding(\.showOutputRoomEQ)
+                )
             }
         }
     }
@@ -309,6 +314,21 @@ struct OutputSettingsCard: View {
                 title: "Show in menu bar",
                 isOn: viewModel.outputShowBinding(outputID)
             )
+
+            Divider()
+
+            LabeledTextField(
+                caption: "Partner channel for Room EQ",
+                text: viewModel.outputPartnerBinding(outputID)
+            )
+            LabeledValue(caption: "Room EQ address", value: viewModel.partnerLevelHint(outputID))
+
+            Button {
+                viewModel.openRoomEQ(outputID)
+            } label: {
+                Label("Room EQ", systemImage: "waveform.path")
+            }
+            .disabled(viewModel.roomEQTarget(for: outputID) == nil)
         }
     }
 }
@@ -647,13 +667,28 @@ struct AboutSettingsSection: View {
                             Text("Developed by")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Link("Egor Repentov", destination: URL(string: "https://www.instagram.com/repentov")!)
+                            Link("Egor Repentov",
+                                 destination: URL(string: "https://repentov-dev.github.io/repentov-site/")!)
                                 .font(.caption)
                         }
+                        Link("Project website",
+                             destination: URL(string: "https://repentov-dev.github.io/rme-control/")!)
+                            .font(.caption)
+                        Link("Room EQ engine: roomeq / AutoEQ (GPL-3.0)",
+                             destination: URL(string: "https://github.com/pierreaubert/autoeq")!)
+                            .font(.caption)
+                        Link("Measurement engine: sotf-capture (GPL-3.0)",
+                             destination: URL(string: "https://github.com/pierreaubert/sotf-capture")!)
+                            .font(.caption)
                     }
                 }
             }
 
+            Text("RME, TotalMix and the RME logo are trademarks of RME Audio AG. This project is an independent tool and is not affiliated with, endorsed by, or supported by RME Audio.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
@@ -673,5 +708,56 @@ private extension Binding where Value == Set<UUID> {
                 }
             }
         )
+    }
+}
+
+// MARK: - Calibration
+
+/// Маршрутизация мастера замера: через матрицу TotalMix или напрямую
+/// в software playback-пару.
+struct CalibrationSettingsSection: View {
+    let viewModel: SettingsViewModel
+
+    var body: some View {
+        VStack(spacing: 16) {
+            SettingsCard("Routing", subtitle: "How the measurement wizard sends sound to the interface. OSC routes the playback pair and mutes other outputs in TotalMix; software playback sends audio directly and leaves the matrix untouched.") {
+                HStack {
+                    Text("Mode")
+                        .font(.callout)
+                    Spacer(minLength: 12)
+                    Picker("", selection: viewModel.binding(\.calibrationRouting)) {
+                        Text("OSC (TotalMix)").tag(CalibrationRoutingMode.osc)
+                        Text("Software playback").tag(CalibrationRoutingMode.softwarePlayback)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .frame(width: 220)
+                }
+
+                Divider().opacity(0.5)
+
+                HStack {
+                    Text("Software playback output")
+                        .font(.callout)
+                    Spacer(minLength: 12)
+                    Picker("", selection: viewModel.binding(\.calibrationPlaybackPair)) {
+                        ForEach(0..<16, id: \.self) { left in
+                            Text(verbatim: "\(left * 2 + 1)/\(left * 2 + 2)").tag(left)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .frame(width: 220)
+                    .disabled(viewModel.calibrationRouting == .osc)
+                }
+
+                Text(viewModel.calibrationRouting == .osc
+                     ? "Default: the wizard routes the selected output through OSC and restores TotalMix when the measurement finishes."
+                     : "The wizard plays into the chosen playback pair only. Make sure TotalMix routes it to the speakers you are measuring.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }

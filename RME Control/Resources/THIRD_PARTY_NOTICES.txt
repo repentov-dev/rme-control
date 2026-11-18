@@ -1,0 +1,26 @@
+RME Control includes the roomeq command-line optimizer from AutoEQ.
+
+Project: AutoEQ / RoomEQ
+Source: https://github.com/pierreaubert/autoeq
+Commit: a4d21cc6b2ed831d2ccc8155d1df7fb3f902b499
+Copyright (C) 2025-2026 Pierre Aubert and contributors
+License: GNU General Public License v3.0 or later (GPL-3.0-or-later)
+
+The roomeq binary is included unmodified, built from the source above.
+The full license text is in GPL-3.0.txt next to this file.
+roomeq is a separate executable; RME Control invokes it as an external process.
+
+RME, TotalMix and the RME logo are trademarks of RME Audio AG.
+RME Control is an independent tool and is not affiliated with, endorsed by,
+or supported by RME Audio.
+
+RME Control includes the sotf-capture measurement engine.
+
+Project: sotf-capture
+Source: https://github.com/pierreaubert/sotf-capture
+Commit: e351e7fab13e1ced3ca132d2668d23fce563f0cb
+Copyright (C) 2025-2026 Pierre Aubert and contributors
+License: GNU General Public License v3.0 or later (GPL-3.0-or-later)
+
+The sotf-capture binary is included unmodified, built from the source above.
+It is invoked as an external process for sweep capture and analysis.

@@ -71,6 +71,8 @@ struct SettingsView: View {
                 expandedInputs: $expandedInputs,
                 expandedSends: $expandedSends
             )
+        case .calibration:
+            CalibrationSettingsSection(viewModel: viewModel)
         case .connection:
             ConnectionSettingsSection(viewModel: viewModel)
         case .remote:
@@ -87,6 +89,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
     case menuBar
     case keyboard
     case channels
+    case calibration
     case connection
     case remote
     case about
@@ -99,6 +102,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .menuBar: return "Menu Bar Panel"
         case .keyboard: return "Hotkeys"
         case .channels: return "Routing"
+        case .calibration: return "Calibration"
         case .connection: return "Connection"
         case .remote: return "Web Remote"
         case .about: return "About"
@@ -115,6 +119,8 @@ enum SettingsPage: String, CaseIterable, Identifiable {
             return "Global keyboard shortcuts and the behaviour of the hardware keys."
         case .channels:
             return "Inputs, outputs and sends, their OSC addresses and routing."
+        case .calibration:
+            return "How the measurement wizard sends sound and restores TotalMix."
         case .connection:
             return "How RME Control talks to TotalMix FX."
         case .remote:
@@ -130,6 +136,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .menuBar: return "menubar.rectangle"
         case .keyboard: return "keyboard"
         case .channels: return "slider.horizontal.3"
+        case .calibration: return "waveform"
         case .connection: return "network"
         case .remote: return "wifi"
         case .about: return "info.circle"

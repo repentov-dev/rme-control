@@ -37,6 +37,8 @@ struct OutputConfig: Codable, Identifiable, Equatable {
     var oscAddress: String = ""
     var icon: OutputIcon = .speaker
     var showInMain: Bool = true
+    /// Парный канал стереопары (LEFT/RIGHT в Room EQ TotalMix), например `/output/1`.
+    var partnerAddress: String = ""
 
     /// Адрес уровня выводится из номера канала в OSC-адресе
     /// (`/output/8` → `/level/out/8`, `/output/21` → `/level/out/21`).
@@ -44,16 +46,35 @@ struct OutputConfig: Codable, Identifiable, Equatable {
         OSCAddress.levelAddress(forChannelAddress: oscAddress, prefix: OSCAddress.levelOutputPrefix)
     }
 
-    init(id: UUID = UUID(), name: String = "", oscAddress: String = "", icon: OutputIcon = .speaker, showInMain: Bool = true) {
+    /// Парный канал стереопары для Room EQ. Если адрес не задан вручную,
+    /// берётся соседний выход: `/output/0` → `/output/1`, `/output/8` → `/output/9`.
+    /// Так LEFT/RIGHT и link работают сразу, без настройки парного канала.
+    var resolvedPartnerAddress: String? {
+        let explicit = partnerAddress.trimmingCharacters(in: .whitespaces)
+        if !explicit.isEmpty { return explicit }
+
+        let normalized = OSCAddress.normalized(oscAddress)
+        guard normalized.hasPrefix("/output/"),
+              let channel = Int(normalized.dropFirst("/output/".count)) else {
+            return nil
+        }
+        let partner = channel.isMultiple(of: 2) ? channel + 1 : channel - 1
+        guard partner >= 0 else { return nil }
+        return OSCAddress.output(partner)
+    }
+
+    init(id: UUID = UUID(), name: String = "", oscAddress: String = "", icon: OutputIcon = .speaker,
+         showInMain: Bool = true, partnerAddress: String = "") {
         self.id = id
         self.name = name
         self.oscAddress = oscAddress
         self.icon = icon
         self.showInMain = showInMain
+        self.partnerAddress = partnerAddress
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, oscAddress, icon, showInMain
+        case id, name, oscAddress, icon, showInMain, partnerAddress
     }
 
     init(from decoder: Decoder) throws {
@@ -63,6 +84,7 @@ struct OutputConfig: Codable, Identifiable, Equatable {
         oscAddress = try c.decodeIfPresent(String.self, forKey: .oscAddress) ?? ""
         icon = (try? c.decode(OutputIcon.self, forKey: .icon)) ?? .speaker
         showInMain = try c.decodeIfPresent(Bool.self, forKey: .showInMain) ?? true
+        partnerAddress = try c.decodeIfPresent(String.self, forKey: .partnerAddress) ?? ""
     }
 
     func encode(to encoder: Encoder) throws {
@@ -72,5 +94,6 @@ struct OutputConfig: Codable, Identifiable, Equatable {
         try c.encode(oscAddress, forKey: .oscAddress)
         try c.encode(icon, forKey: .icon)
         try c.encode(showInMain, forKey: .showInMain)
+        try c.encode(partnerAddress, forKey: .partnerAddress)
     }
 }

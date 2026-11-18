@@ -21,10 +21,13 @@ final class MixerViewModel {
 
     var isConnected: Bool { state.isConnected }
     var deviceOffline: Bool { state.deviceOffline }
+    var deviceName: String { state.deviceName }
 
     // MARK: - Выходы
 
     var outputs: [OutputConfig] { settings.outputs }
+    var calibrationRouting: CalibrationRoutingMode { settings.calibrationRouting }
+    var calibrationPlaybackPair: Int { settings.calibrationPlaybackPair }
     var showMuteButtons: Bool { settings.showMuteButtons }
 
     func outputName(for id: UUID) -> String {
@@ -167,6 +170,30 @@ final class MixerViewModel {
     var showInputEQ: Bool { settings.showInputEQ }
     var showOutputCompressor: Bool { settings.showOutputCompressor }
     var showOutputEQ: Bool { settings.showOutputEQ }
+    var showOutputRoomEQ: Bool { settings.showOutputRoomEQ }
+
+    /// Адресат Room EQ для выхода: его адрес, парный канал и подпись.
+    func roomEQTarget(for id: UUID) -> RoomEQTarget? {
+        guard let output = outputs.first(where: { $0.id == id }), !output.oscAddress.isEmpty else {
+            return nil
+        }
+        return RoomEQTarget(
+            address: output.oscAddress,
+            partner: output.resolvedPartnerAddress,
+            label: output.name.isEmpty ? output.oscAddress : output.name,
+            isHeadphone: output.icon == .headphones
+        )
+    }
+
+    /// Состояние Room EQ по конкретному OSC-адресу (для правого канала пары).
+    func roomEQState(at address: String) -> RoomEQState {
+        state.roomEQ(address)
+    }
+
+    /// Включён ли Room EQ у выхода — для подсветки кнопки в поповере.
+    func isRoomEQOn(_ target: RoomEQTarget) -> Bool {
+        state.roomEQ(target.address).enabled
+    }
 
     /// Есть ли у канала компрессор: у входов — только комбо-входы, у выходов — все.
     func hasCompressor(_ target: CompressorTarget) -> Bool {
@@ -249,6 +276,102 @@ final class MixerViewModel {
 
     func setEQParameter(_ target: EQTarget, _ parameter: EQParameter, _ value: Double) {
         mixer.setEQParameter(target, parameter, value: value)
+    }
+
+    // MARK: - Room EQ
+
+    /// Состояние Room EQ того канала, который сейчас показан в окне.
+    func roomEQ(_ target: RoomEQTarget, channel: RoomEQChannel) -> RoomEQState {
+        state.roomEQ(target.shownAddress(for: channel))
+    }
+
+    /// Есть ли у выхода парный адрес: без него выбор LEFT/RIGHT не имеет смысла.
+    func hasPartner(_ target: RoomEQTarget) -> Bool {
+        target.hasPartner
+    }
+
+    var roomCorrectionPreferences: RoomCorrectionPreferences { settings.roomCorrectionPreferences }
+
+    func saveRoomCorrectionPreferences(_ preferences: RoomCorrectionPreferences) {
+        settings.roomCorrectionPreferences = preferences
+    }
+
+    var roomEQUserPresets: [RoomEQUserPreset] { settings.roomEQUserPresets }
+
+    func saveRoomEQUserPreset(name: String, bands: [RoomEQPresetBand],
+                              preamp: Double, mode: RoomCorrectionChannel,
+                              delayLeft: Double? = nil, delayRight: Double? = nil,
+                              calibrationLeft: Double? = nil, calibrationRight: Double? = nil) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        settings.addRoomEQUserPreset(RoomEQUserPreset(
+            name: trimmed,
+            mode: mode.rawValue,
+            bands: bands,
+            preamp: preamp,
+            delayLeft: delayLeft,
+            delayRight: delayRight,
+            calibrationLeft: calibrationLeft,
+            calibrationRight: calibrationRight
+        ))
+    }
+
+    func deleteRoomEQUserPreset(id: UUID) {
+        settings.removeRoomEQUserPreset(id: id)
+    }
+
+    func renameRoomEQUserPreset(id: UUID, name: String) {
+        settings.renameRoomEQUserPreset(id: id, name: name)
+    }
+
+    /// Связывает Room EQ стереопары: копирует настройки выбранного канала
+    /// во второй. Дальше правки уходят в оба, пока связь включена.
+    func linkRoomEQ(_ target: RoomEQTarget, from channel: RoomEQChannel) {
+        guard let partner = target.partner else { return }
+        let source = target.shownAddress(for: channel)
+        let destination = source == target.address ? partner : target.address
+        mixer.syncRoomEQ(from: source, to: destination)
+    }
+
+    var roomEQStates: [String: RoomEQState] { state.roomEQs }
+
+    func applyRoomEQStates(_ states: [String: RoomEQState]) {
+        mixer.applyRoomEQStates(states)
+    }
+
+    func setRoomEQEnabled(_ target: RoomEQTarget, channel: RoomEQChannel, _ enabled: Bool) {
+        mixer.setRoomEQEnabled(target, channel: channel, enabled: enabled)
+    }
+
+    func requestCalibrationState() {
+        mixer.requestCalibrationState()
+    }
+
+    func calibrationRoutingState() -> CalibrationRoutingState {
+        mixer.calibrationRoutingState()
+    }
+
+    func applyCalibrationRouting(outputLeft: Int, outputRight: Int, channelCount: Int) {
+        mixer.applyCalibrationRouting(outputLeft: outputLeft, outputRight: outputRight,
+                                      channelCount: channelCount)
+    }
+
+    func restoreCalibrationRouting(_ state: CalibrationRoutingState, channelCount: Int) {
+        mixer.restoreCalibrationRouting(state, channelCount: channelCount)
+    }
+
+    func setRoomEQParameter(_ target: RoomEQTarget, channel: RoomEQChannel,
+                            _ parameter: RoomEQParameter, _ value: Double) {
+        mixer.setRoomEQParameter(target, channel: channel, parameter: parameter, value: value)
+    }
+
+    func setRoomEQMix(_ target: RoomEQTarget, channel: RoomEQChannel, _ mix: Double) {
+        mixer.setRoomEQMix(target, channel: channel, mix: mix)
+    }
+
+    func applyRoomEQBands(_ target: RoomEQTarget, channel: RoomEQChannel,
+                          _ bands: [RoomEQBand], preamp: Double) {
+        mixer.applyRoomEQBands(target, channel: channel, bands: bands, preamp: preamp)
     }
 
     /// Входы с +48V/Inst для поповера: сгруппированы по типу, по 4 в строке.

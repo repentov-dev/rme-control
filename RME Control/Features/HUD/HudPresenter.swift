@@ -29,6 +29,7 @@ final class HudPresenter {
     private var mainOnOpenSettings: (() -> Void)?
     private var mainOnOpenCompressor: ((CompressorTarget) -> Void)?
     private var mainOnOpenEQ: ((EQTarget) -> Void)?
+    private var mainOnOpenRoomEQ: ((RoomEQTarget) -> Void)?
 
     private static let hudDuration: TimeInterval = 1.5
     private static let clipHUDDuration: TimeInterval = 5.0
@@ -41,12 +42,13 @@ final class HudPresenter {
     }
 
     /// Создаёт главный поповер и привязывает все HUD к кнопке статус-бара.
-    func attach(statusItem: NSStatusItem, onToggleMeters: @escaping () -> Void, onOpenSettings: @escaping () -> Void, onOpenCompressor: @escaping (CompressorTarget) -> Void, onOpenEQ: @escaping (EQTarget) -> Void) {
+    func attach(statusItem: NSStatusItem, onToggleMeters: @escaping () -> Void, onOpenSettings: @escaping () -> Void, onOpenCompressor: @escaping (CompressorTarget) -> Void, onOpenEQ: @escaping (EQTarget) -> Void, onOpenRoomEQ: @escaping (RoomEQTarget) -> Void) {
         self.statusItem = statusItem
         mainOnToggleMeters = onToggleMeters
         mainOnOpenSettings = onOpenSettings
         mainOnOpenCompressor = onOpenCompressor
         mainOnOpenEQ = onOpenEQ
+        mainOnOpenRoomEQ = onOpenRoomEQ
         // Высота поповера не должна выходить за видимую область экрана.
         let screen = statusItem.button?.window?.screen ?? NSScreen.main ?? NSScreen.screens.first
         mainMaxContentHeight = max(280, (screen?.visibleFrame.height ?? 700) - 48)
@@ -79,7 +81,8 @@ final class HudPresenter {
             onToggleMeters: mainOnToggleMeters,
             onOpenSettings: mainOnOpenSettings,
             onOpenCompressor: mainOnOpenCompressor,
-            onOpenEQ: mainOnOpenEQ
+            onOpenEQ: mainOnOpenEQ,
+            onOpenRoomEQ: mainOnOpenRoomEQ
         )
         return makePopover(view, behavior: .transient)
     }

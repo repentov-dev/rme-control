@@ -1,0 +1,278 @@
+// RME Control — language switching. English is the source; Russian and German
+// are chosen automatically from the browser and can be switched by hand.
+(function () {
+  var dict = {
+    en: {
+      "meta.title": "RME Control — TotalMix in the menu bar",
+      "meta.desc": "Open-source menu bar app for RME audio interfaces: TotalMix control, Room EQ, headphone presets and a room calibration wizard.",
+      "nav.new": "What's new", "nav.screens": "Screens", "nav.calibration": "Calibration",
+      "nav.features": "Features", "nav.install": "Install", "nav.download": "Download 4.0",
+      "hero.title": "TotalMix in the menu bar",
+      "hero.sub": "Open-source control for RME interfaces — now with Room EQ, headphone presets and a room calibration wizard.",
+      "hero.download": "Download 4.0", "hero.source": "Read the source",
+      "hero.note": "Global OSC, TotalMix 2.1 or newer. macOS 14+, Apple Silicon and Intel.",
+      "new.eyebrow": "Version 4.0",
+      "new.title": "Room EQ, headphone presets and calibration",
+      "new.lead": "The mixer in the menu bar now tunes the room and the headphones — measured, corrected and saved with the rest of the setup.",
+      "new.eq.title": "Room EQ on every output",
+      "new.eq.text": "Nine bands per output, with delay, crossfeed, volume calibration and a Mix control to hear the correction against the original.",
+      "new.hp.title": "80 headphone presets",
+      "new.hp.text": "25 brands, built from AutoEQ and independent measurements. Pick a model and the curve lands in Room EQ.",
+      "new.cal.title": "Room calibration",
+      "new.cal.text": "Measure both speakers with a microphone, get left, right and stereo corrections, and apply them to the output.",
+      "new.save.title": "Saved with presets",
+      "new.save.text": "Room EQ bands, calibration and measurement presets travel together with the app's own presets.",
+      "screens.eyebrow": "Screens", "screens.title": "What the app looks like",
+      "screens.lead": "Room EQ and the calibration wizard, next to the windows that were already there.",
+      "shot.roomEq": "Room EQ: nine bands, LEFT/RIGHT, delay, volume calibration, Mix and crossfeed.",
+      "shot.result": "Measure: the measured and corrected response, the residual, the headroom and the nine bands that will be applied.",
+      "shot.setup": "Setup: interface, output, microphone, mic calibration and a level test.",
+      "shot.ready": "Ready: both speakers, four sweeps each, mic in one position.",
+      "shot.countdown": "The countdown gives you time to step away from the microphone.",
+      "shot.measuring": "Progress: left, then right, then the correction is calculated.",
+      "shot.eq": "The channel EQ TotalMix draws — low cut, bells and a shelf.",
+      "shot.comp": "The compressor, with input, gain reduction and output meters.",
+      "shot.levels": "The level window, always on top.",
+      "cal.eyebrow": "Calibration",
+      "cal.title": "Three steps to a corrected room",
+      "cal.lead": "The wizard talks to the interface, plays the sweeps and writes the result into Room EQ. Beta: tested on the Fireface 802 FS.",
+      "cal.one.title": "Connect", "cal.one.text": "Choose the interface, the output and the microphone. Load the mic's calibration file if you have one.",
+      "cal.two.title": "Measure", "cal.two.text": "Four sweeps per speaker. Only the selected output plays; every other output is muted and restored afterwards.",
+      "cal.three.title": "Apply", "cal.three.text": "Review the curves, then apply the nine bands and the headroom to Room EQ. Save it as a preset.",
+      "features.eyebrow": "Features", "features.title": "Everything in the app",
+      "feat.out.title": "Outputs",
+      "feat.out.volume": "Volume keys", "feat.out.volume.v": "Any output, 1–10 dB a step",
+      "feat.out.dim": "Dim and mute", "feat.out.dim.v": "On the Mac mute key, either one",
+      "feat.out.mono": "Mono", "feat.out.mono.v": "Shift Cmd M",
+      "feat.out.speaker": "Speaker B", "feat.out.speaker.v": "The second pair of monitors",
+      "feat.out.room": "Room EQ", "feat.out.room.v": "Nine bands, delay, crossfeed and Mix",
+      "feat.in.title": "Inputs",
+      "feat.in.phantom": "Phantom power", "feat.in.phantom.v": "+48V on any number of channels",
+      "feat.in.inst": "Instrument mode", "feat.in.inst.v": "Inst per channel",
+      "feat.in.eq": "EQ", "feat.in.eq.v": "Four bands a channel",
+      "feat.in.comp": "Compressor", "feat.in.comp.v": "Threshold, ratio, attack, release, gain",
+      "feat.in.meters": "Meters", "feat.in.meters.v": "Input, gain reduction and output",
+      "feat.app.title": "The app",
+      "feat.app.levels": "Levels", "feat.app.levels.v": "Always on top, clipping in red",
+      "feat.app.presets": "Presets", "feat.app.presets.v": "Channels, Room EQ and calibration",
+      "feat.app.shortcuts": "Shortcuts", "feat.app.shortcuts.v": "Every one can be reassigned",
+      "feat.app.languages": "Languages", "feat.app.languages.v": "14",
+      "feat.app.remote": "Remote", "feat.app.remote.v": "Web control from a phone",
+      "install.title": "Install in four steps",
+      "install.one": "Download", "install.one.b": "and open it.",
+      "install.two": "Not notarized: allow it once under Privacy and Security. The installer clears the quarantine flag.",
+      "install.three": "If macOS still refuses to open it, take the app out of quarantine:",
+      "install.four": "Grant Accessibility in the same pane so the volume keys reach TotalMix.",
+      "install.download": "Download the installer", "install.build": "Build it yourself",
+      "tm.eyebrow": "TotalMix", "tm.title": "Set up TotalMix",
+      "tm.lead": "The app speaks Global OSC. Switch it on in TotalMix FX 2.1 or newer:",
+      "tm.one": "Set the OSC host to 127.0.0.1 and the ports to 7001 and 9001.",
+      "tm.two": "Options → Mixer Settings → OSC, then Compatibility (Mode): Global OSC.",
+      "tm.three": "Turn on Send Status.", "tm.four": "Turn on Send level data.",
+      "tm.five": "Turn on Peak hold.", "tm.six": "Turn on Send all data on start.",
+      "specs.eyebrow": "Specs", "specs.title": "On the label",
+      "specs.version": "Version", "specs.system": "System", "specs.system.v": "macOS 14 Sonoma or newer",
+      "specs.arch": "Architecture", "specs.arch.v": "arm64 and x86_64, one universal build",
+      "specs.languages": "Interface", "specs.languages.v": "14 languages",
+      "specs.license": "License", "specs.source": "Source",
+      "foot.note": "A menu bar controller for TotalMix FX, written in Swift and shipped as source.",
+      "foot.repo": "Repository", "foot.releases": "Releases", "foot.license": "MIT license",
+      "foot.legal": "RME, TotalMix and the RME logo are trademarks of RME Audio AG. This is an independent tool, not affiliated with or endorsed by RME Audio."
+    },
+    ru: {
+      "meta.title": "RME Control — TotalMix в строке меню",
+      "meta.desc": "Открытое приложение в строке меню для интерфейсов RME: управление TotalMix, Room EQ, пресеты наушников и мастер калибровки комнаты.",
+      "nav.new": "Что нового", "nav.screens": "Экраны", "nav.calibration": "Калибровка",
+      "nav.features": "Возможности", "nav.install": "Установка", "nav.download": "Скачать 4.0",
+      "hero.title": "TotalMix в строке меню",
+      "hero.sub": "Открытое управление интерфейсами RME — теперь с Room EQ, пресетами наушников и мастером калибровки комнаты.",
+      "hero.download": "Скачать 4.0", "hero.source": "Исходный код",
+      "hero.note": "Global OSC, TotalMix 2.1 или новее. macOS 14+, Apple Silicon и Intel.",
+      "new.eyebrow": "Версия 4.0",
+      "new.title": "Room EQ, пресеты наушников и калибровка",
+      "new.lead": "Пульт в строке меню теперь настраивает комнату и наушники — измеряет, корректирует и сохраняет вместе с остальными настройками.",
+      "new.eq.title": "Room EQ на каждом выходе",
+      "new.eq.text": "Девять полос на выход, задержка, crossfeed, калибровка громкости и Mix, чтобы сравнить коррекцию с оригиналом.",
+      "new.hp.title": "80 пресетов наушников",
+      "new.hp.text": "25 брендов по данным AutoEQ и независимых измерений. Выбрал модель — кривая уже в Room EQ.",
+      "new.cal.title": "Калибровка комнаты",
+      "new.cal.text": "Измерьте обе колонки микрофоном, получите коррекцию для левого, правого и стерео и примените её к выходу.",
+      "new.save.title": "Сохраняется в пресетах",
+      "new.save.text": "Полосы Room EQ, калибровка и пресеты замеров сохраняются вместе с пресетами приложения.",
+      "screens.eyebrow": "Экраны", "screens.title": "Как это выглядит",
+      "screens.lead": "Room EQ и мастер калибровки рядом с окнами, которые были раньше.",
+      "shot.roomEq": "Room EQ: девять полос, LEFT/RIGHT, задержка, калибровка громкости, Mix и crossfeed.",
+      "shot.result": "Результат: измеренная и исправленная АЧХ, остаточная ошибка, запас и девять полос, которые будут применены.",
+      "shot.setup": "Настройка: интерфейс, выход, микрофон, калибровка микрофона и тест уровня.",
+      "shot.ready": "Готово: обе колонки, по четыре свипа, микрофон в одной точке.",
+      "shot.countdown": "Отсчёт даёт время отойти от микрофона.",
+      "shot.measuring": "Процесс: сначала левая, потом правая, затем расчёт коррекции.",
+      "shot.eq": "Канальный EQ как в TotalMix — срез, колокола и полка.",
+      "shot.comp": "Компрессор с индикаторами входа, снижения усиления и выхода.",
+      "shot.levels": "Окно уровней всегда сверху.",
+      "cal.eyebrow": "Калибровка",
+      "cal.title": "Три шага до исправленной комнаты",
+      "cal.lead": "Мастер сам общается с интерфейсом, играет свипы и записывает результат в Room EQ. Бета: проверено на Fireface 802 FS.",
+      "cal.one.title": "Подключить", "cal.one.text": "Выберите интерфейс, выход и микрофон. Загрузите файл калибровки микрофона, если он есть.",
+      "cal.two.title": "Измерить", "cal.two.text": "По четыре свипа на колонку. Играет только выбранный выход, остальные мьютируются и возвращаются после замера.",
+      "cal.three.title": "Применить", "cal.three.text": "Посмотрите кривые, примените девять полос и запас к Room EQ и сохраните пресет.",
+      "features.eyebrow": "Возможности", "features.title": "Всё в приложении",
+      "feat.out.title": "Выходы",
+      "feat.out.volume": "Клавиши громкости", "feat.out.volume.v": "Любой выход, шаг 1–10 дБ",
+      "feat.out.dim": "Dim и mute", "feat.out.dim.v": "На клавише mute Mac, любой из них",
+      "feat.out.mono": "Mono", "feat.out.mono.v": "Shift Cmd M",
+      "feat.out.speaker": "Speaker B", "feat.out.speaker.v": "Вторая пара мониторов",
+      "feat.out.room": "Room EQ", "feat.out.room.v": "Девять полос, задержка, crossfeed и Mix",
+      "feat.in.title": "Входы",
+      "feat.in.phantom": "Фантомное питание", "feat.in.phantom.v": "+48V на любом числе каналов",
+      "feat.in.inst": "Режим инструмента", "feat.in.inst.v": "Inst на канал",
+      "feat.in.eq": "EQ", "feat.in.eq.v": "Четыре полосы на канал",
+      "feat.in.comp": "Компрессор", "feat.in.comp.v": "Порог, ratio, атака, release, gain",
+      "feat.in.meters": "Индикаторы", "feat.in.meters.v": "Вход, снижение усиления и выход",
+      "feat.app.title": "Приложение",
+      "feat.app.levels": "Уровни", "feat.app.levels.v": "Всегда сверху, клиппинг красным",
+      "feat.app.presets": "Пресеты", "feat.app.presets.v": "Каналы, Room EQ и калибровка",
+      "feat.app.shortcuts": "Горячие клавиши", "feat.app.shortcuts.v": "Любую можно переназначить",
+      "feat.app.languages": "Языки", "feat.app.languages.v": "14",
+      "feat.app.remote": "Пульт", "feat.app.remote.v": "Управление с телефона",
+      "install.title": "Установка за четыре шага",
+      "install.one": "Скачайте", "install.one.b": "и откройте.",
+      "install.two": "Приложение не нотаризовано: разрешите его один раз в «Конфиденциальность и безопасность». Установщик снимает карантин.",
+      "install.three": "Если macOS всё равно не открывает, снимите карантин вручную:",
+      "install.four": "Разрешите Accessibility в том же разделе, чтобы клавиши громкости доходили до TotalMix.",
+      "install.download": "Скачать установщик", "install.build": "Собрать самому",
+      "tm.eyebrow": "TotalMix", "tm.title": "Настройка TotalMix",
+      "tm.lead": "Приложение говорит по Global OSC. Включите его в TotalMix FX 2.1 или новее:",
+      "tm.one": "Укажите OSC host 127.0.0.1 и порты 7001 и 9001.",
+      "tm.two": "Options → Mixer Settings → OSC, затем Compatibility (Mode): Global OSC.",
+      "tm.three": "Включите Send Status.", "tm.four": "Включите Send level data.",
+      "tm.five": "Включите Peak hold.", "tm.six": "Включите Send all data on start.",
+      "specs.eyebrow": "Характеристики", "specs.title": "На этикетке",
+      "specs.version": "Версия", "specs.system": "Система", "specs.system.v": "macOS 14 Sonoma или новее",
+      "specs.arch": "Архитектура", "specs.arch.v": "arm64 и x86_64, одна универсальная сборка",
+      "specs.languages": "Интерфейс", "specs.languages.v": "14 языков",
+      "specs.license": "Лицензия", "specs.source": "Исходники",
+      "foot.note": "Пульт для TotalMix FX в строке меню, на Swift и с открытым исходным кодом.",
+      "foot.repo": "Репозиторий", "foot.releases": "Релизы", "foot.license": "Лицензия MIT",
+      "foot.legal": "RME, TotalMix и логотип RME — товарные знаки RME Audio AG. Это независимый инструмент, не связанный с RME Audio."
+    },
+    de: {
+      "meta.title": "RME Control — TotalMix in der Menüleiste",
+      "meta.desc": "Open-Source-Menüleisten-App für RME-Interfaces: TotalMix-Steuerung, Room EQ, Kopfhörer-Presets und ein Raumkalibrierungs-Assistent.",
+      "nav.new": "Neu", "nav.screens": "Bildschirme", "nav.calibration": "Kalibrierung",
+      "nav.features": "Funktionen", "nav.install": "Installation", "nav.download": "Laden 4.0",
+      "hero.title": "TotalMix in der Menüleiste",
+      "hero.sub": "Open-Source-Steuerung für RME-Interfaces — jetzt mit Room EQ, Kopfhörer-Presets und Raumkalibrierung.",
+      "hero.download": "Laden 4.0", "hero.source": "Quellcode",
+      "hero.note": "Global OSC, TotalMix 2.1 oder neuer. macOS 14+, Apple Silicon und Intel.",
+      "new.eyebrow": "Version 4.0",
+      "new.title": "Room EQ, Kopfhörer-Presets und Kalibrierung",
+      "new.lead": "Der Mixer in der Menüleiste stimmt jetzt Raum und Kopfhörer ab — gemessen, korrigiert und mit den übrigen Einstellungen gespeichert.",
+      "new.eq.title": "Room EQ an jedem Ausgang",
+      "new.eq.text": "Neun Bänder pro Ausgang, mit Delay, Crossfeed, Pegelkalibrierung und Mix, um die Korrektur mit dem Original zu vergleichen.",
+      "new.hp.title": "80 Kopfhörer-Presets",
+      "new.hp.text": "25 Marken, auf Basis von AutoEQ und unabhängigen Messungen. Modell wählen — die Kurve liegt in Room EQ.",
+      "new.cal.title": "Raumkalibrierung",
+      "new.cal.text": "Beide Lautsprecher mit einem Mikrofon messen, Korrekturen für links, rechts und Stereo erhalten und auf den Ausgang anwenden.",
+      "new.save.title": "In Presets gespeichert",
+      "new.save.text": "Room-EQ-Bänder, Kalibrierung und Mess-Presets reisen mit den Presets der App.",
+      "screens.eyebrow": "Bildschirme", "screens.title": "So sieht die App aus",
+      "screens.lead": "Room EQ und der Kalibrierungs-Assistent neben den Fenstern, die es schon gab.",
+      "shot.roomEq": "Room EQ: neun Bänder, LEFT/RIGHT, Delay, Pegelkalibrierung, Mix und Crossfeed.",
+      "shot.result": "Ergebnis: gemessener und korrigierter Frequenzgang, Restfehler, Headroom und die neun Bänder.",
+      "shot.setup": "Setup: Interface, Ausgang, Mikrofon, Mikrofonkalibrierung und Pegeltest.",
+      "shot.ready": "Bereit: beide Lautsprecher, je vier Sweeps, Mikrofon an einer Position.",
+      "shot.countdown": "Der Countdown gibt Zeit, vom Mikrofon wegzutreten.",
+      "shot.measuring": "Fortschritt: links, dann rechts, dann wird die Korrektur berechnet.",
+      "shot.eq": "Der Kanal-EQ wie in TotalMix — Low Cut, Bells und ein Shelf.",
+      "shot.comp": "Der Kompressor mit Ein-/Ausgangs- und Gain-Reduction-Anzeige.",
+      "shot.levels": "Das Pegelfenster, immer im Vordergrund.",
+      "cal.eyebrow": "Kalibrierung",
+      "cal.title": "Drei Schritte zum korrigierten Raum",
+      "cal.lead": "Der Assistent spricht mit dem Interface, spielt die Sweeps und schreibt das Ergebnis in Room EQ. Beta: getestet mit dem Fireface 802 FS.",
+      "cal.one.title": "Verbinden", "cal.one.text": "Interface, Ausgang und Mikrofon wählen. Die Kalibrierdatei des Mikrofons laden, falls vorhanden.",
+      "cal.two.title": "Messen", "cal.two.text": "Vier Sweeps pro Lautsprecher. Nur der gewählte Ausgang spielt; alle anderen werden stummgeschaltet und danach zurückgesetzt.",
+      "cal.three.title": "Anwenden", "cal.three.text": "Kurven prüfen, dann neun Bänder und Headroom auf Room EQ anwenden und als Preset speichern.",
+      "features.eyebrow": "Funktionen", "features.title": "Alles in der App",
+      "feat.out.title": "Ausgänge",
+      "feat.out.volume": "Lautstärketasten", "feat.out.volume.v": "Jeder Ausgang, 1–10 dB pro Schritt",
+      "feat.out.dim": "Dim und Mute", "feat.out.dim.v": "Auf der Mute-Taste, beides",
+      "feat.out.mono": "Mono", "feat.out.mono.v": "Shift Cmd M",
+      "feat.out.speaker": "Speaker B", "feat.out.speaker.v": "Das zweite Monitorpaar",
+      "feat.out.room": "Room EQ", "feat.out.room.v": "Neun Bänder, Delay, Crossfeed und Mix",
+      "feat.in.title": "Eingänge",
+      "feat.in.phantom": "Phantomspeisung", "feat.in.phantom.v": "+48V auf beliebig vielen Kanälen",
+      "feat.in.inst": "Instrumentenmodus", "feat.in.inst.v": "Inst pro Kanal",
+      "feat.in.eq": "EQ", "feat.in.eq.v": "Vier Bänder pro Kanal",
+      "feat.in.comp": "Kompressor", "feat.in.comp.v": "Threshold, Ratio, Attack, Release, Gain",
+      "feat.in.meters": "Pegelanzeigen", "feat.in.meters.v": "Eingang, Gain Reduction und Ausgang",
+      "feat.app.title": "Die App",
+      "feat.app.levels": "Pegel", "feat.app.levels.v": "Immer im Vordergrund, Clipping rot",
+      "feat.app.presets": "Presets", "feat.app.presets.v": "Kanäle, Room EQ und Kalibrierung",
+      "feat.app.shortcuts": "Tastenkürzel", "feat.app.shortcuts.v": "Alle neu belegbar",
+      "feat.app.languages": "Sprachen", "feat.app.languages.v": "14",
+      "feat.app.remote": "Fernsteuerung", "feat.app.remote.v": "Web-Steuerung vom Telefon",
+      "install.title": "Installation in vier Schritten",
+      "install.one": "Laden Sie", "install.one.b": "herunter und öffnen Sie es.",
+      "install.two": "Nicht notarisiert: einmal unter Datenschutz und Sicherheit erlauben. Der Installer entfernt das Quarantäne-Flag.",
+      "install.three": "Wenn macOS es weiterhin blockiert, die App aus der Quarantäne nehmen:",
+      "install.four": "Accessibility im selben Bereich erlauben, damit die Lautstärketasten TotalMix erreichen.",
+      "install.download": "Installer laden", "install.build": "Selbst bauen",
+      "tm.eyebrow": "TotalMix", "tm.title": "TotalMix einrichten",
+      "tm.lead": "Die App spricht Global OSC. Einschalten in TotalMix FX 2.1 oder neuer:",
+      "tm.one": "OSC-Host auf 127.0.0.1 und die Ports auf 7001 und 9001 setzen.",
+      "tm.two": "Options → Mixer Settings → OSC, dann Compatibility (Mode): Global OSC.",
+      "tm.three": "Send Status einschalten.", "tm.four": "Send level data einschalten.",
+      "tm.five": "Peak hold einschalten.", "tm.six": "Send all data on start einschalten.",
+      "specs.eyebrow": "Daten", "specs.title": "Auf dem Etikett",
+      "specs.version": "Version", "specs.system": "System", "specs.system.v": "macOS 14 Sonoma oder neuer",
+      "specs.arch": "Architektur", "specs.arch.v": "arm64 und x86_64, ein Universal-Build",
+      "specs.languages": "Oberfläche", "specs.languages.v": "14 Sprachen",
+      "specs.license": "Lizenz", "specs.source": "Quellcode",
+      "foot.note": "Ein Menüleisten-Controller für TotalMix FX, in Swift geschrieben und als Quellcode veröffentlicht.",
+      "foot.repo": "Repository", "foot.releases": "Releases", "foot.license": "MIT-Lizenz",
+      "foot.legal": "RME, TotalMix und das RME-Logo sind Marken der RME Audio AG. Dies ist ein unabhängiges Werkzeug, nicht mit RME Audio verbunden."
+    }
+  };
+
+  function pick() {
+    try {
+      var forced = new URLSearchParams(window.location.search).get("lang");
+      if (forced && dict[forced]) return forced;
+    } catch (e) {}
+    var stored = null;
+    try { stored = localStorage.getItem("rme-lang"); } catch (e) {}
+    if (stored && dict[stored]) return stored;
+    var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"];
+    for (var i = 0; i < list.length; i++) {
+      var tag = String(list[i]).toLowerCase();
+      if (tag.indexOf("ru") === 0) return "ru";
+      if (tag.indexOf("de") === 0) return "de";
+    }
+    return "en";
+  }
+
+  function apply(lang) {
+    var d = dict[lang] || dict.en;
+    document.documentElement.lang = lang;
+    document.title = d["meta.title"];
+    var meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute("content", d["meta.desc"]);
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var key = el.getAttribute("data-i18n");
+      if (d[key]) el.textContent = d[key];
+    });
+    document.querySelectorAll(".lang button").forEach(function (b) {
+      var on = b.getAttribute("data-lang") === lang;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    try { localStorage.setItem("rme-lang", lang); } catch (e) {}
+  }
+
+  document.querySelectorAll(".lang button").forEach(function (b) {
+    b.addEventListener("click", function () { apply(b.getAttribute("data-lang")); });
+  });
+
+  apply(pick());
+})();

@@ -4,17 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RME Control — TotalMix in the menu bar</title>
-<meta name="description" content="Menu bar open-source application for controlling RME audio interfaces via TotalMix FX. Works via Global OSC only with TotalMix 2.1+.">
+<meta name="description" content="Open-source menu bar app for RME audio interfaces: TotalMix control, Room EQ, headphone presets and a room calibration wizard. Global OSC, TotalMix 2.1+, macOS 14+.">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="./icon.png">
 <script>
   document.documentElement.classList.add("js");
-  // if the motion file never loads, never leave the page hidden
   setTimeout(function () {
     document.querySelectorAll("[data-reveal]").forEach(function (el) { el.classList.add("is-in"); });
   }, 3500);
 </script>
-<link rel="stylesheet" href="./apple.css?v=4">
+<link rel="stylesheet" href="./apple.css?v=5">
 </head>
 <body>
 
@@ -22,12 +21,17 @@
   <div class="nav__inner">
     <a class="nav__brand" href="#top">RME Control</a>
     <nav class="nav__links" aria-label="Sections">
-      <a href="#features">Features</a>
-      <a href="#panels">Panels</a>
-      <a href="#install">Install</a>
-      <a href="#totalmix">TotalMix</a>
-      <a href="#specs">Specs</a>
-      <a class="nav__cta" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download</a>
+      <a href="#new" data-i18n="nav.new">What's new</a>
+      <a href="#screens" data-i18n="nav.screens">Screens</a>
+      <a href="#calibration" data-i18n="nav.calibration">Calibration</a>
+      <a href="#features" data-i18n="nav.features">Features</a>
+      <a href="#install" data-i18n="nav.install">Install</a>
+      <span class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="ru">RU</button>
+        <button type="button" data-lang="de">DE</button>
+      </span>
+      <a class="nav__cta" href="https://github.com/repentov-dev/rme-control/releases/download/v4.0/RME-Control-4.0.pkg" data-i18n="nav.download">Download 4.0</a>
     </nav>
   </div>
 </header>
@@ -36,93 +40,155 @@
 
   <section class="hero">
     <div class="hero__copy">
-      <h1>TotalMix in the menu bar</h1>
-      <p class="hero__sub">Menu bar open-source application for controlling RME audio interfaces via TotalMix FX.</p>
+      <h1 data-i18n="hero.title">TotalMix in the menu bar</h1>
+      <p class="hero__sub" data-i18n="hero.sub">Open-source control for RME interfaces — now with Room EQ, headphone presets and a room calibration wizard.</p>
       <div class="hero__actions">
-        <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download 3.8</a>
-        <a class="btn btn--tint" href="https://github.com/repentov-dev/rme-control">Read the source</a>
+        <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v4.0/RME-Control-4.0.pkg" data-i18n="hero.download">Download 4.0</a>
+        <a class="btn btn--tint" href="https://github.com/repentov-dev/rme-control" data-i18n="hero.source">Read the source</a>
       </div>
-      <p class="hero__note">Works via Global OSC only with TotalMix 2.1+. Runs on macOS 14 or newer, Apple Silicon and Intel.</p>
+      <p class="hero__note" data-i18n="hero.note">Global OSC, TotalMix 2.1 or newer. macOS 14+, Apple Silicon and Intel.</p>
     </div>
     <div class="hero__stage">
       <div class="hero__tilt">
-        <img class="hero__shot" src="./screenshots/popover-window.png" width="560" height="993" alt="The RME Control popover: output faders for Main, DT990 and FT1, a send, the Speaker B, Dim and Mono buttons, and the input switches.">
+        <img class="hero__shot" src="./screenshots/popover-window.png" width="560" height="993" alt="RME Control popover">
       </div>
     </div>
   </section>
 
-  <section class="panels" id="panels">
-    <h2 data-reveal>What the popover opens</h2>
-    <div class="panels__grid">
+  <section class="new" id="new">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow" data-i18n="new.eyebrow">Version 4.0</p>
+      <h2 data-i18n="new.title">Room EQ, headphone presets and calibration</h2>
+      <p class="lead" data-i18n="new.lead">The mixer in the menu bar now tunes the room and the headphones — measured, corrected and saved with the rest of the setup.</p>
+    </div>
+    <div class="new__grid">
+      <article class="new__card" data-reveal style="--i:0">
+        <h3 data-i18n="new.eq.title">Room EQ on every output</h3>
+        <p data-i18n="new.eq.text">Nine bands per output, with delay, crossfeed, volume calibration and a Mix control to hear the correction against the original.</p>
+      </article>
+      <article class="new__card" data-reveal style="--i:1">
+        <h3 data-i18n="new.hp.title">80 headphone presets</h3>
+        <p data-i18n="new.hp.text">25 brands, built from AutoEQ and independent measurements. Pick a model and the curve lands in Room EQ.</p>
+      </article>
+      <article class="new__card" data-reveal style="--i:2">
+        <h3 data-i18n="new.cal.title">Room calibration</h3>
+        <p data-i18n="new.cal.text">Measure both speakers with a microphone, get left, right and stereo corrections, and apply them to the output.</p>
+      </article>
+      <article class="new__card" data-reveal style="--i:3">
+        <h3 data-i18n="new.save.title">Saved with presets</h3>
+        <p data-i18n="new.save.text">Room EQ bands, calibration and measurement presets travel together with the app's own presets.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="gallery" id="screens">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow" data-i18n="screens.eyebrow">Screens</p>
+      <h2 data-i18n="screens.title">What the app looks like</h2>
+      <p class="lead" data-i18n="screens.lead">Room EQ and the calibration wizard, next to the windows that were already there.</p>
+    </div>
+
+    <figure class="shot shot--wide" data-reveal>
+      <img src="./screenshots/room-eq.png" width="1120" height="1120" alt="Room EQ window">
+      <figcaption data-i18n="shot.roomEq">Room EQ: nine bands, LEFT/RIGHT, delay, volume calibration, Mix and crossfeed.</figcaption>
+    </figure>
+
+    <figure class="shot shot--wide shot--result" data-reveal>
+      <img src="./screenshots/measure-result.png" width="1320" height="1662" alt="Measure result with measured and corrected curves">
+      <figcaption data-i18n="shot.result">Measure: the measured and corrected response, the residual, the headroom and the nine bands that will be applied.</figcaption>
+    </figure>
+
+    <div class="gallery__grid">
       <figure class="shot" data-reveal style="--i:0">
-        <img src="./screenshots/eq.png" width="440" height="330" alt="Equalizer window for the GTR input with four bands, a low cut at 94 Hz and a 4.2 kHz bell at plus 5 dB.">
-        <figcaption>Low cut, two bells and a shelf, drawn as TotalMix draws them.</figcaption>
+        <img src="./screenshots/measure-setup.png" width="1320" height="1178" alt="Measure setup">
+        <figcaption data-i18n="shot.setup">Setup: interface, output, microphone, mic calibration and a level test.</figcaption>
       </figure>
       <figure class="shot" data-reveal style="--i:1">
-        <img src="./screenshots/compressor.png" width="380" height="280" alt="Compressor window for the MIC2 input: threshold, ratio, attack, release and gain, with input, gain reduction and output meters.">
-        <figcaption>The compressor TotalMix runs, with meters beside it.</figcaption>
+        <img src="./screenshots/measure-ready.png" width="1320" height="1122" alt="Measure ready">
+        <figcaption data-i18n="shot.ready">Ready: both speakers, four sweeps each, mic in one position.</figcaption>
       </figure>
-      <figure class="shot shot--strip" data-reveal style="--i:2">
-        <img src="./screenshots/levels.png" width="188" height="80" alt="The level window: MIC1, MIC2, MIC3 and GTR meters showing minus 19.0, minus 22.2, minus 29.6 and minus 12.7 dB.">
-        <figcaption>Always on top: four inputs, a value beside each bar.</figcaption>
+      <figure class="shot" data-reveal style="--i:2">
+        <img src="./screenshots/measure-countdown.png" width="1320" height="1122" alt="Measure countdown">
+        <figcaption data-i18n="shot.countdown">The countdown gives you time to step away from the microphone.</figcaption>
       </figure>
-      <div class="panels__note" data-reveal style="--i:3">
-        <h3>Above every window</h3>
-        <p>Every input gets a bar, its value in dB, and red when it clips.</p>
-        <p class="panels__more">Everything else the app does is <a href="#features">listed below</a>.</p>
-      </div>
+      <figure class="shot" data-reveal style="--i:3">
+        <img src="./screenshots/measure-measuring.png" width="1320" height="1122" alt="Measure progress">
+        <figcaption data-i18n="shot.measuring">Progress: left, then right, then the correction is calculated.</figcaption>
+      </figure>
+      <figure class="shot" data-reveal style="--i:4">
+        <img src="./screenshots/eq.png" width="440" height="330" alt="Channel equalizer">
+        <figcaption data-i18n="shot.eq">The channel EQ TotalMix draws — low cut, bells and a shelf.</figcaption>
+      </figure>
+      <figure class="shot" data-reveal style="--i:5">
+        <img src="./screenshots/compressor.png" width="380" height="280" alt="Compressor">
+        <figcaption data-i18n="shot.comp">The compressor, with input, gain reduction and output meters.</figcaption>
+      </figure>
+      <figure class="shot" data-reveal style="--i:6">
+        <img src="./screenshots/levels.png" width="188" height="80" alt="Levels">
+        <figcaption data-i18n="shot.levels">The level window, always on top.</figcaption>
+      </figure>
     </div>
+  </section>
+
+  <section class="calibration" id="calibration">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow" data-i18n="cal.eyebrow">Calibration</p>
+      <h2 data-i18n="cal.title">Three steps to a corrected room</h2>
+      <p class="lead" data-i18n="cal.lead">The wizard talks to the interface, plays the sweeps and writes the result into Room EQ. Beta: tested on the Fireface 802 FS.</p>
+    </div>
+    <ol class="cal__steps">
+      <li data-reveal style="--i:0">
+        <span class="cal__num">1</span>
+        <h3 data-i18n="cal.one.title">Connect</h3>
+        <p data-i18n="cal.one.text">Choose the interface, the output and the microphone. Load the mic's calibration file if you have one.</p>
+      </li>
+      <li data-reveal style="--i:1">
+        <span class="cal__num">2</span>
+        <h3 data-i18n="cal.two.title">Measure</h3>
+        <p data-i18n="cal.two.text">Four sweeps per speaker. Only the selected output plays; every other output is muted and restored afterwards.</p>
+      </li>
+      <li data-reveal style="--i:2">
+        <span class="cal__num">3</span>
+        <h3 data-i18n="cal.three.title">Apply</h3>
+        <p data-i18n="cal.three.text">Review the curves, then apply the nine bands and the headroom to Room EQ. Save it as a preset.</p>
+      </li>
+    </ol>
   </section>
 
   <section class="features" id="features">
-    <h2 data-reveal>Everything in the app</h2>
+    <div class="section-head" data-reveal>
+      <p class="eyebrow" data-i18n="features.eyebrow">Features</p>
+      <h2 data-i18n="features.title">Everything in the app</h2>
+    </div>
     <div class="features__grid">
       <div class="group" data-reveal style="--i:0">
-        <h3>Outputs</h3>
+        <h3 data-i18n="feat.out.title">Outputs</h3>
         <dl class="sheet">
-          <div class="row"><dt>Volume keys</dt><dd>Any output, 1 to 10 dB a step</dd></div>
-          <div class="row"><dt>Dim and mute</dt><dd>On the Mac mute key, either one</dd></div>
-          <div class="row"><dt>Mono</dt><dd>Shift Cmd M</dd></div>
-          <div class="row"><dt>Speaker B</dt><dd>The second pair of monitors</dd></div>
-          <div class="row"><dt>Output switch</dt><dd>Option Up or Down, optionally muting the rest</dd></div>
-          <div class="row"><dt>Channels</dt><dd>Edit, rename, add and remove</dd></div>
-          <div class="row"><dt>Sends</dt><dd>From any input to any output</dd></div>
+          <div class="row"><dt data-i18n="feat.out.volume">Volume keys</dt><dd data-i18n="feat.out.volume.v">Any output, 1–10 dB a step</dd></div>
+          <div class="row"><dt data-i18n="feat.out.dim">Dim and mute</dt><dd data-i18n="feat.out.dim.v">On the Mac mute key, either one</dd></div>
+          <div class="row"><dt data-i18n="feat.out.mono">Mono</dt><dd data-i18n="feat.out.mono.v">Shift Cmd M</dd></div>
+          <div class="row"><dt data-i18n="feat.out.speaker">Speaker B</dt><dd data-i18n="feat.out.speaker.v">The second pair of monitors</dd></div>
+          <div class="row"><dt data-i18n="feat.out.room">Room EQ</dt><dd data-i18n="feat.out.room.v">Nine bands, delay, crossfeed and Mix</dd></div>
         </dl>
       </div>
       <div class="group" data-reveal style="--i:1">
-        <h3>Inputs</h3>
+        <h3 data-i18n="feat.in.title">Inputs</h3>
         <dl class="sheet">
-          <div class="row"><dt>Phantom power</dt><dd>+48V on any number of channels</dd></div>
-          <div class="row"><dt>Instrument mode</dt><dd>Inst per channel</dd></div>
-          <div class="row"><dt>EQ</dt><dd>Four bands a channel</dd></div>
-          <div class="row"><dt>Compressor</dt><dd>Threshold, ratio, attack, release, gain</dd></div>
-          <div class="row"><dt>Meters</dt><dd>Input, gain reduction and output</dd></div>
+          <div class="row"><dt data-i18n="feat.in.phantom">Phantom power</dt><dd data-i18n="feat.in.phantom.v">+48V on any number of channels</dd></div>
+          <div class="row"><dt data-i18n="feat.in.inst">Instrument mode</dt><dd data-i18n="feat.in.inst.v">Inst per channel</dd></div>
+          <div class="row"><dt data-i18n="feat.in.eq">EQ</dt><dd data-i18n="feat.in.eq.v">Four bands a channel</dd></div>
+          <div class="row"><dt data-i18n="feat.in.comp">Compressor</dt><dd data-i18n="feat.in.comp.v">Threshold, ratio, attack, release, gain</dd></div>
+          <div class="row"><dt data-i18n="feat.in.meters">Meters</dt><dd data-i18n="feat.in.meters.v">Input, gain reduction and output</dd></div>
         </dl>
       </div>
       <div class="group" data-reveal style="--i:2">
-        <h3>Interface</h3>
+        <h3 data-i18n="feat.app.title">The app</h3>
         <dl class="sheet">
-          <div class="row"><dt>Levels window</dt><dd>Always on top</dd></div>
-          <div class="row"><dt>Clipping</dt><dd>Flagged in red</dd></div>
-          <div class="row"><dt>Notifications</dt><dd>Volume, Dim, Mono, Mute, also from TotalMix</dd></div>
-          <div class="row"><dt>Mute notice</dt><dd>Names the silent output</dd></div>
-          <div class="row"><dt>Menu</dt><dd>Customizable</dd></div>
-          <div class="row"><dt>Presets</dt><dd>Save and restore every setting</dd></div>
-          <div class="row"><dt>Shortcuts</dt><dd>Every one can be reassigned</dd></div>
-          <div class="row"><dt>Languages</dt><dd>14</dd></div>
-        </dl>
-      </div>
-      <div class="group" data-reveal style="--i:3">
-        <h3>TotalMix</h3>
-        <dl class="sheet">
-          <div class="row"><dt>Synchronization</dt><dd>Two-way, read at launch</dd></div>
-          <div class="row"><dt>Fail-safe</dt><dd>Values freeze, keys return to macOS</dd></div>
-          <div class="row"><dt>OSC monitor</dt><dd>Watch the network commands in Connection</dd></div>
-        </dl>
-        <h3 class="group__second">Remote control</h3>
-        <dl class="sheet">
-          <div class="row"><dt>Web server</dt><dd>One toggle in Settings</dd></div>
-          <div class="row"><dt>QR code</dt><dd>Opens the remote on a phone in the same Wi-Fi</dd></div>
+          <div class="row"><dt data-i18n="feat.app.levels">Levels</dt><dd data-i18n="feat.app.levels.v">Always on top, clipping in red</dd></div>
+          <div class="row"><dt data-i18n="feat.app.presets">Presets</dt><dd data-i18n="feat.app.presets.v">Channels, Room EQ and calibration</dd></div>
+          <div class="row"><dt data-i18n="feat.app.shortcuts">Shortcuts</dt><dd data-i18n="feat.app.shortcuts.v">Every one can be reassigned</dd></div>
+          <div class="row"><dt data-i18n="feat.app.languages">Languages</dt><dd data-i18n="feat.app.languages.v">14</dd></div>
+          <div class="row"><dt data-i18n="feat.app.remote">Remote</dt><dd data-i18n="feat.app.remote.v">Web control from a phone</dd></div>
         </dl>
       </div>
     </div>
@@ -130,75 +196,62 @@
 
   <section class="install" id="install">
     <div class="install__card" data-reveal>
-      <h2>Install in four steps</h2>
+      <h2 data-i18n="install.title">Install in four steps</h2>
       <ol class="steps">
         <li class="step">
           <span class="step__num">01</span>
-          <p>Download <span class="nowrap">RME-Control-3.8.pkg</span> and open it.</p>
+          <p><span data-i18n="install.one">Download</span> <span class="nowrap">RME-Control-4.0.pkg</span> <span data-i18n="install.one.b">and open it.</span></p>
         </li>
         <li class="step">
           <span class="step__num">02</span>
-          <p>Not notarized: allow it once under Privacy and Security. The installer clears the quarantine flag.</p>
+          <p data-i18n="install.two">Not notarized: allow it once under Privacy and Security. The installer clears the quarantine flag.</p>
         </li>
         <li class="step">
           <span class="step__num">03</span>
-          <p>If macOS still refuses to open it, take the app out of quarantine:</p>
+          <p data-i18n="install.three">If macOS still refuses to open it, take the app out of quarantine:</p>
           <pre class="cmd">xattr -dr com.apple.quarantine \
   "/Applications/RME Control.app"</pre>
         </li>
         <li class="step">
           <span class="step__num">04</span>
-          <p>Grant Accessibility in the same pane so the volume keys reach TotalMix.</p>
+          <p data-i18n="install.four">Grant Accessibility in the same pane so the volume keys reach TotalMix.</p>
         </li>
       </ol>
       <div class="install__actions">
-        <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v3.8/RME-Control-3.8.pkg">Download the installer</a>
-        <a class="btn btn--tint" href="https://github.com/repentov-dev/rme-control#build-and-install">Build it yourself</a>
+        <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v4.0/RME-Control-4.0.pkg" data-i18n="install.download">Download the installer</a>
+        <a class="btn btn--tint" href="https://github.com/repentov-dev/rme-control#build-and-install" data-i18n="install.build">Build it yourself</a>
       </div>
     </div>
   </section>
 
-
   <section class="setup" id="totalmix">
-    <h2 data-reveal>Set up TotalMix</h2>
-    <p class="setup__lead" data-reveal>The app speaks Global OSC. Switch it on in TotalMix FX 2.1 or newer:</p>
+    <div class="section-head" data-reveal>
+      <p class="eyebrow" data-i18n="tm.eyebrow">TotalMix</p>
+      <h2 data-i18n="tm.title">Set up TotalMix</h2>
+      <p class="lead" data-i18n="tm.lead">The app speaks Global OSC. Switch it on in TotalMix FX 2.1 or newer:</p>
+    </div>
     <ol class="steps" data-reveal>
-      <li class="step">
-        <span class="step__num">01</span>
-        <p>Set the OSC host to <span class="nowrap">127.0.0.1</span> and the ports to 7001 and 9001.</p>
-      </li>
-      <li class="step">
-        <span class="step__num">02</span>
-        <p>Options → Mixer Settings → OSC, then Compatibility (Mode): Global OSC.</p>
-      </li>
-      <li class="step">
-        <span class="step__num">03</span>
-        <p>Turn on Send Status.</p>
-      </li>
-      <li class="step">
-        <span class="step__num">04</span>
-        <p>Turn on Send level data.</p>
-      </li>
-      <li class="step">
-        <span class="step__num">05</span>
-        <p>Turn on Peak hold.</p>
-      </li>
-      <li class="step">
-        <span class="step__num">06</span>
-        <p>Turn on Send all data on start.</p>
-      </li>
+      <li class="step"><span class="step__num">01</span><p data-i18n="tm.one">Set the OSC host to 127.0.0.1 and the ports to 7001 and 9001.</p></li>
+      <li class="step"><span class="step__num">02</span><p data-i18n="tm.two">Options → Mixer Settings → OSC, then Compatibility (Mode): Global OSC.</p></li>
+      <li class="step"><span class="step__num">03</span><p data-i18n="tm.three">Turn on Send Status.</p></li>
+      <li class="step"><span class="step__num">04</span><p data-i18n="tm.four">Turn on Send level data.</p></li>
+      <li class="step"><span class="step__num">05</span><p data-i18n="tm.five">Turn on Peak hold.</p></li>
+      <li class="step"><span class="step__num">06</span><p data-i18n="tm.six">Turn on Send all data on start.</p></li>
     </ol>
   </section>
 
   <section class="specs" id="specs">
-    <h2 data-reveal>On the label</h2>
-    <dl class="sheet sheet--specs" data-reveal style="--i:1">
-      <div class="row"><dt>Version</dt><dd>3.8</dd></div>
-      <div class="row"><dt>System</dt><dd>macOS 14 Sonoma or newer</dd></div>
-      <div class="row"><dt>Architecture</dt><dd>arm64 and x86_64, one universal build</dd></div>
-      <div class="row"><dt>Interface</dt><dd>14 languages</dd></div>
-      <div class="row"><dt>License</dt><dd>MIT</dd></div>
-      <div class="row"><dt>Source</dt><dd><a href="https://github.com/repentov-dev/rme-control">github.com/repentov-dev/rme-control</a></dd></div>
+    <div class="section-head" data-reveal>
+      <p class="eyebrow" data-i18n="specs.eyebrow">Specs</p>
+      <h2 data-i18n="specs.title">On the label</h2>
+    </div>
+    <dl class="sheet sheet--specs" data-reveal>
+      <div class="row"><dt data-i18n="specs.version">Version</dt><dd>4.0</dd></div>
+      <div class="row"><dt data-i18n="specs.system">System</dt><dd data-i18n="specs.system.v">macOS 14 Sonoma or newer</dd></div>
+      <div class="row"><dt data-i18n="specs.arch">Architecture</dt><dd data-i18n="specs.arch.v">arm64 and x86_64, one universal build</dd></div>
+      <div class="row"><dt data-i18n="specs.languages">Interface</dt><dd data-i18n="specs.languages.v">14 languages</dd></div>
+      <div class="row"><dt data-i18n="specs.license">License</dt><dd>MIT</dd></div>
+      <div class="row"><dt data-i18n="specs.source">Source</dt><dd><a href="https://github.com/repentov-dev/rme-control">github.com/repentov-dev/rme-control</a></dd></div>
     </dl>
   </section>
 
@@ -208,20 +261,21 @@
   <div class="foot__inner">
     <div class="foot__mast">
       <p class="foot__mark">RME Control</p>
-      <p class="foot__note">A menu bar controller for TotalMix FX, written in Swift and shipped as source.</p>
+      <p class="foot__note" data-i18n="foot.note">A menu bar controller for TotalMix FX, written in Swift and shipped as source.</p>
     </div>
     <nav class="foot__links" aria-label="Elsewhere">
-      <a href="https://github.com/repentov-dev/rme-control">Repository</a>
-      <a href="https://github.com/repentov-dev/rme-control/releases">Releases</a>
-      <a href="https://github.com/repentov-dev/rme-control/blob/main/LICENSE">MIT license</a>
+      <a href="https://github.com/repentov-dev/rme-control" data-i18n="foot.repo">Repository</a>
+      <a href="https://github.com/repentov-dev/rme-control/releases" data-i18n="foot.releases">Releases</a>
+      <a href="https://github.com/repentov-dev/rme-control/blob/main/LICENSE" data-i18n="foot.license">MIT license</a>
       <a href="https://www.instagram.com/repentov">Instagram</a>
     </nav>
   </div>
   <div class="foot__legal">
-    <p>RME, TotalMix and the RME logo are trademarks of RME Audio AG. This is an independent tool, not affiliated with or endorsed by RME Audio.</p>
+    <p data-i18n="foot.legal">RME, TotalMix and the RME logo are trademarks of RME Audio AG. This is an independent tool, not affiliated with or endorsed by RME Audio.</p>
   </div>
 </footer>
 
-<script src="./apple.js?v=2" defer></script>
+<script src="./i18n.js?v=1" defer></script>
+<script src="./apple.js?v=3" defer></script>
 </body>
 </html>

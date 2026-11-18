@@ -21,6 +21,8 @@ final class SettingsViewModel {
     @ObservationIgnored private let webServer: WebServer
     @ObservationIgnored var onOpenOSCMonitor: (() -> Void)?
     @ObservationIgnored var onOpenChannelDiscovery: (() -> Void)?
+    /// Открывает окно Room EQ для выхода (окно создаёт WindowManager).
+    @ObservationIgnored var onOpenRoomEQ: ((RoomEQTarget) -> Void)?
 
     init(settings: AppSettings, mixer: MixerService, osc: OSCClient, webServer: WebServer) {
         self.settings = settings
@@ -82,6 +84,37 @@ final class SettingsViewModel {
     /// Адрес индикатора уровня, выведенный из номера канала в OSC-адресе.
     func outputLevelAddress(for id: UUID) -> String {
         settings.output(id: id)?.resolvedLevelAddress ?? ""
+    }
+
+    func outputPartnerBinding(_ id: UUID) -> Binding<String> {
+        outputBinding(id, \.partnerAddress, default: "") { $0.trimmingCharacters(in: .whitespaces) }
+    }
+
+    /// Подсказка под полем парного канала: что попадёт в RIGHT.
+    func partnerLevelHint(_ id: UUID) -> String {
+        guard let target = roomEQTarget(for: id) else { return String(localized: "Set the channel address first") }
+        guard let partner = target.partner else { return String(localized: "No partner: edits one channel") }
+        let explicit = settings.output(id: id)?.partnerAddress.trimmingCharacters(in: .whitespaces) ?? ""
+        if explicit.isEmpty {
+            return String(format: String(localized: "%@ (automatic)"), partner)
+        }
+        return partner
+    }
+
+    /// Адресат Room EQ для выхода: его адрес, парный канал (если задан) и имя.
+    func roomEQTarget(for id: UUID) -> RoomEQTarget? {
+        guard let output = settings.output(id: id), !output.oscAddress.isEmpty else { return nil }
+        return RoomEQTarget(
+            address: output.oscAddress,
+            partner: output.resolvedPartnerAddress,
+            label: output.name.isEmpty ? output.oscAddress : output.name,
+            isHeadphone: output.icon == .headphones
+        )
+    }
+
+    func openRoomEQ(_ id: UUID) {
+        guard let target = roomEQTarget(for: id) else { return }
+        onOpenRoomEQ?(target)
     }
 
     func outputIconBinding(_ id: UUID) -> Binding<OutputIcon> {
@@ -217,13 +250,17 @@ final class SettingsViewModel {
     // MARK: - Пресеты настроек
 
     var presets: [SettingsPreset] { settings.presets }
+    var calibrationRouting: CalibrationRoutingMode { settings.calibrationRouting }
 
     func savePreset(named name: String) {
-        settings.savePreset(named: name)
+        settings.savePreset(named: name, roomEQs: mixer.roomEQStates)
     }
 
     func applyPreset(_ preset: SettingsPreset) {
         mixer.applyConfiguration { settings.apply(preset) }
+        if let roomEQs = preset.snapshot.roomEQs {
+            mixer.applyRoomEQStates(roomEQs)
+        }
     }
 
     func removePreset(_ preset: SettingsPreset) {

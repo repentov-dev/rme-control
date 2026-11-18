@@ -4,5 +4,7 @@
 <dict>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>RME Control records a test sweep from the selected microphone to correct Room EQ.</string>
 </dict>
 </plist>

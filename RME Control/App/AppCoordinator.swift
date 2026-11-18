@@ -124,6 +124,9 @@ final class AppCoordinator {
             },
             onOpenEQ: { [weak self] target in
                 self?.windows.openEQ(target)
+            },
+            onOpenRoomEQ: { [weak self] target in
+                self?.windows.openRoomEQ(target)
             }
         )
 

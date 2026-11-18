@@ -9,11 +9,15 @@ struct DeviceRow: View {
     var showMute: Bool = true
     var onOpenEQ: (() -> Void)? = nil
     var onOpenCompressor: (() -> Void)? = nil
+    var onOpenRoomEQ: (() -> Void)? = nil
 
     @State private var isEditing = false
 
     private var value: Double { viewModel.outputValue(outputID) }
     private var muted: Bool { viewModel.isOutputMuted(outputID) }
+    private var roomEQEnabled: Bool {
+        viewModel.roomEQTarget(for: outputID).map { viewModel.isRoomEQOn($0) } ?? false
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
@@ -57,6 +61,16 @@ struct DeviceRow: View {
                             .foregroundStyle(
                                 viewModel.isEQOn(EQTarget(bus: .output, id: outputID)) ? Color.green : Color.secondary
                             )
+                    }
+                    .buttonStyle(.borderless)
+                    .disabled(!viewModel.isConnected)
+                }
+
+                if let onOpenRoomEQ {
+                    Button(action: onOpenRoomEQ) {
+                        Text("Room")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(roomEQEnabled ? Color.green : Color.secondary)
                     }
                     .buttonStyle(.borderless)
                     .disabled(!viewModel.isConnected)

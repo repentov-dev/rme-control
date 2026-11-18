@@ -25,6 +25,8 @@ struct SettingsPreset: Codable, Identifiable, Equatable {
         var showInputEQ: Bool
         var showOutputCompressor: Bool
         var showOutputEQ: Bool
+        /// Появилось вместе с Room EQ: в старых пресетах поля нет.
+        var showOutputRoomEQ: Bool?
 
         var muteKeyAction: MuteKeyAction
         var volumeStepDB: Double
@@ -43,5 +45,15 @@ struct SettingsPreset: Codable, Identifiable, Equatable {
         /// Необязательное поле: пресеты, сохранённые до появления горячих клавиш,
         /// остаются читаемыми и просто не меняют комбинации.
         var hotkeys: [String: Hotkey]?
+
+        /// Маршрутизация калибровщика.
+        var calibrationRouting: CalibrationRoutingMode?
+        var calibrationPlaybackPair: Int?
+        /// Room EQ по OSC-адресам выходов: полосы, калибровка и служебные поля.
+        var roomEQs: [String: RoomEQState]?
+        /// Пресеты, сохранённые из замеров Room EQ.
+        var roomEQUserPresets: [RoomEQUserPreset]?
+        /// Настройки мастера замера.
+        var roomCorrectionPreferences: RoomCorrectionPreferences?
     }
 }

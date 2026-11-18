@@ -10,6 +10,11 @@ final class WindowManager {
     private var compressorTarget: CompressorTarget?
     private var eqPanel: NSPanel?
     private var eqTarget: EQTarget?
+    private var roomEQPanel: NSPanel?
+    private var roomEQTarget: RoomEQTarget?
+    private var roomCorrectionPanel: NSPanel?
+    private var roomEQLoweredForMeasure = false
+    private var roomCorrectionTarget: RoomEQTarget?
     private var dimIndicatorPanel: NSPanel?
     private var settingsWindow: NSWindow?
     private var oscMonitorWindow: OSCMonitorWindow?
@@ -39,6 +44,8 @@ final class WindowManager {
 
     private static let compressorFrameName = "CompressorPanelFrame"
     private static let eqFrameName = "EQPanelFrame"
+    private static let roomEQFrameName = "RoomEQPanelFrame"
+    private static let roomCorrectionFrameName = "RoomCorrectionPanelFrame"
     private static let metersFrameName = "MetersPanelFrame"
 
     /// Восстанавливает сохранённое положение окна. Если сохранённого положения
@@ -219,6 +226,120 @@ final class WindowManager {
         eqTarget = nil
     }
 
+    // MARK: - Room EQ
+
+    /// Открывает окно Room EQ выхода (переиспользует открытое для того же адреса).
+    func openRoomEQ(_ target: RoomEQTarget) {
+        if let panel = roomEQPanel, roomEQTarget == target, panel.isVisible {
+            panel.orderFrontRegardless()
+            if panel.alphaValue < 1 {
+                NSAnimationContext.runAnimationGroup { context in
+                    context.duration = 0.14
+                    panel.animator().alphaValue = 1
+                }
+            }
+            return
+        }
+        if let panel = roomEQPanel {
+            saveFrame(of: panel, named: Self.roomEQFrameName)
+            hidePanel(panel)
+        }
+        let size = RoomEQView.contentSize
+        let hosting = FirstMouseHostingView(rootView: RoomEQView(
+            viewModel: mixerViewModel,
+            target: target,
+            onClose: { [weak self] in self?.closeRoomEQ() },
+            onMeasure: { [weak self] in self?.openRoomCorrection(for: target) }
+        ))
+        hosting.frame = NSRect(origin: .zero, size: size)
+        hosting.sizingOptions = []
+        let panel = PanelFactory.makeOverlayPanel(EQPanel.self, contentView: hosting, size: size)
+        panel.hasShadow = true
+        panel.hidesOnDeactivate = false
+
+        let screen = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 800, height: 600)
+        restoreFrame(
+            of: panel,
+            named: Self.roomEQFrameName,
+            fallback: NSRect(x: screen.minX + 40, y: screen.maxY - size.height - 60,
+                             width: size.width, height: size.height)
+        )
+        panel.setContentSize(size)
+        showPanel(panel)
+        roomEQPanel = panel
+        roomEQTarget = target
+    }
+
+    func closeRoomEQ() {
+        if let panel = roomEQPanel {
+            saveFrame(of: panel, named: Self.roomEQFrameName)
+            hidePanel(panel)
+        }
+        roomEQPanel = nil
+        roomEQTarget = nil
+    }
+
+    // MARK: - Room correction
+
+    /// Открывает мастер замера и коррекции для того же выхода.
+    func openRoomCorrection(for target: RoomEQTarget) {
+        if let panel = roomCorrectionPanel, roomCorrectionTarget == target, panel.isVisible {
+            panel.orderFrontRegardless()
+            return
+        }
+        if let panel = roomCorrectionPanel {
+            saveFrame(of: panel, named: Self.roomCorrectionFrameName)
+            hidePanel(panel)
+        }
+        let size = RoomCorrectionView.contentSize
+        let hosting = FirstMouseHostingView(rootView: RoomCorrectionView(
+            mixer: mixerViewModel,
+            target: target,
+            onClose: { [weak self] in self?.closeRoomCorrection() }
+        ))
+        hosting.frame = NSRect(origin: .zero, size: size)
+        hosting.sizingOptions = []
+        // Пока открыт мастер, Room EQ не должен висеть над ним.
+        if let roomEQ = roomEQPanel {
+            roomEQ.level = .normal
+            roomEQ.collectionBehavior = [.managed]
+            roomEQLoweredForMeasure = true
+        }
+        let panel = PanelFactory.makeOverlayPanel(EQPanel.self, contentView: hosting, size: size)
+        panel.hasShadow = true
+        panel.hidesOnDeactivate = false
+        // Мастер замера — обычное окно, а не панель поверх всех приложений.
+        panel.level = .normal
+        panel.collectionBehavior = [.managed]
+        panel.isFloatingPanel = false
+
+        let screen = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 800, height: 600)
+        restoreFrame(
+            of: panel,
+            named: Self.roomCorrectionFrameName,
+            fallback: NSRect(x: screen.midX - size.width / 2, y: screen.midY - size.height / 2,
+                             width: size.width, height: size.height)
+        )
+        panel.setContentSize(size)
+        showPanel(panel)
+        roomCorrectionPanel = panel
+        roomCorrectionTarget = target
+    }
+
+    func closeRoomCorrection() {
+        if let panel = roomCorrectionPanel {
+            saveFrame(of: panel, named: Self.roomCorrectionFrameName)
+            hidePanel(panel)
+        }
+        roomCorrectionPanel = nil
+        roomCorrectionTarget = nil
+        if roomEQLoweredForMeasure, let roomEQ = roomEQPanel {
+            roomEQ.level = .screenSaver
+            roomEQ.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        }
+        roomEQLoweredForMeasure = false
+    }
+
     // MARK: - Индикатор DIM
 
     func updateDimIndicator(isOn: Bool) {
@@ -374,6 +495,9 @@ final class WindowManager {
         }
         viewModel.onOpenChannelDiscovery = { [weak self] in
             self?.openChannelDiscovery()
+        }
+        viewModel.onOpenRoomEQ = { [weak self] target in
+            self?.openRoomEQ(target)
         }
         let hosting = NSHostingController(rootView: SettingsView(viewModel: viewModel))
         hosting.sizingOptions = []
