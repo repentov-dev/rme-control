@@ -28,7 +28,7 @@ Room EQ, headphone presets and a room calibration wizard.
   wizard's settings are saved together with the app's own presets.
 - **Routing setting** — route the selected output through OSC and mute the rest, or send
   the wizard directly to a software playback pair.
-- **14 languages**, Russian included.
+- **14 languages** in the interface.
 
 <p align="center">
   <img src="docs/screenshots/measure-result.png" width="420" alt="Measure result with measured and corrected curves">
@@ -140,8 +140,8 @@ To make the volume keys work, allow the app in **System Settings → Privacy & S
 Accessibility**. The permission is tied to the code signature, so after rebuilding it has to be
 revoked and granted again.
 
-The interface language is chosen in **Settings → General → Interface**; the app has to be
-restarted afterwards.
+The interface is available in 14 languages and is chosen in **Settings → General → Interface**;
+the app has to be restarted afterwards.
 
 ## Troubleshooting
 
