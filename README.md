@@ -15,6 +15,14 @@ Works via Global OSC only with TotalMix 2.1+.
 ![Universal](https://img.shields.io/badge/arch-arm64%20%7C%20x86__64-blue)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
+## Key features
+
+- **Outputs and processing** — volume and quick output switching from the Mac keyboard, Mute, Dim and Mono, plus the compressor and 3-band EQ on output channels.
+- **Room EQ and room calibration** — a full port of Room EQ from TotalMix for every output, with delay and Crossfeed, plus a room calibration wizard that supports measurement microphone calibration files.
+- **Headphone presets** — a built-in library of EQ curves for 80 headphone models across 25 popular brands.
+- **Inputs** — quick access to +48V phantom power, Instrument mode (Inst), EQ and compressor on input channels.
+- **More** — always-on-top level meters, custom presets, customizable keyboard shortcuts and web-based remote control from a phone.
+
 ## What's new in 4.0
 
 1. **Room EQ fully carried over from TotalMix.** Nine bands per output, and the **Mix** and **Crossfeed** controls now live right inside the Room EQ window.
@@ -26,14 +34,6 @@ Beta: the calibrator was tested on the Fireface 802 FS and may behave differentl
 <p align="center">
   <img src="docs/screenshots/measure.png" width="760" alt="Measure setup, Room EQ and the measurement result">
 </p>
-
-## Key features
-
-- **Outputs and processing** — volume and quick output switching from the Mac keyboard, Mute, Dim and Mono, plus the compressor and 3-band EQ on output channels.
-- **Room EQ and room calibration** — a full port of Room EQ from TotalMix for every output, with delay and Crossfeed, plus a room calibration wizard that supports measurement microphone calibration files.
-- **Headphone presets** — a built-in library of EQ curves for 80 headphone models across 25 popular brands.
-- **Inputs** — quick access to +48V phantom power, Instrument mode (Inst), EQ and compressor on input channels.
-- **More** — always-on-top level meters, custom presets, customizable keyboard shortcuts and web-based remote control from a phone.
 
 ## Requirements
 
@@ -163,6 +163,12 @@ xattr -dr com.apple.quarantine "/Applications/RME Control.app"
 
 A `.pkg` built by `make-installer.sh` clears the quarantine in its postinstall script; a fully
 warning-free distribution requires a paid Apple Developer ID (see the comments in that script).
+
+## Acknowledgements
+
+- Room EQ optimisation: [roomeq](https://github.com/pierreaubert/autoeq) (GPL-3.0), continuing [AutoEQ](https://github.com/jaakkopasanen/AutoEq) by Jaakko Pasanen.
+- Sweep measurement: [sotf-capture](https://github.com/pierreaubert/sotf-capture) (GPL-3.0).
+- Headphone presets: based on [AutoEQ](https://github.com/jaakkopasanen/AutoEq) data (MIT) and measurements by oratory1990, Crinacle and Rtings.
 
 ## License
 
