@@ -612,3 +612,7 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
 @media (max-width: 860px) { .keys { grid-template-columns: 1fr; } }
 
 .setup__after { margin-top: 18px; font-size: 14px; color: var(--text-2); }
+
+.foot__credits { margin-top: 8px; font-size: 12px; color: var(--text-2); }
+.foot__credits a { color: var(--text); border-bottom: 1px solid var(--line); }
+.foot__credits a:hover { border-color: var(--accent); }

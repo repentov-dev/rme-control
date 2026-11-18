@@ -26,4 +26,5 @@ The sotf-capture binary is included unmodified, built from the source above.
 It is invoked as an external process for sweep capture and analysis.
 
 Headphone correction presets are derived from AutoEQ (MIT, Jaakko Pasanen)
+https://github.com/jaakkopasanen/AutoEq
 and measurements by oratory1990, Crinacle, Rtings and others.

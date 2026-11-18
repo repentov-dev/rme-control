@@ -69,6 +69,7 @@
       "foot.note": "A free, open-source menu bar controller for TotalMix FX, written in Swift.",
       "foot.repo": "Repository", "foot.releases": "Releases", "foot.license": "MIT license",
       "foot.legal": "RME, TotalMix and the RME logo are trademarks of RME Audio AG. This is an independent tool, not affiliated with or endorsed by RME Audio.",
+      "foot.credits": "Calibration engines and headphone data:",
     },
     ru: {
       "meta.title": "RME Control — TotalMix в строке меню",
@@ -137,6 +138,7 @@
       "foot.note": "Бесплатный открытый пульт для TotalMix FX в строке меню, на Swift.",
       "foot.repo": "Репозиторий", "foot.releases": "Релизы", "foot.license": "Лицензия MIT",
       "foot.legal": "RME, TotalMix и логотип RME — товарные знаки RME Audio AG. Это независимый инструмент, не связанный с RME Audio.",
+      "foot.credits": "Движки калибровки и база наушников:",
     },
     de: {
       "meta.title": "RME Control — TotalMix in der Menüleiste",
@@ -205,6 +207,7 @@
       "foot.note": "Ein kostenloser Open-Source-Menüleisten-Controller für TotalMix FX, in Swift geschrieben.",
       "foot.repo": "Repository", "foot.releases": "Releases", "foot.license": "MIT-Lizenz",
       "foot.legal": "RME, TotalMix und das RME-Logo sind Marken der RME Audio AG. Dies ist ein unabhängiges Werkzeug, nicht mit RME Audio verbunden.",
+      "foot.credits": "Kalibrierungs-Engines und Kopfhörer-Datenbank:",
     }
   };
 
