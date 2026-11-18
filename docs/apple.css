@@ -422,6 +422,15 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
 .new__card p { color: var(--text-2); font-size: 15px; line-height: 1.5; }
 
 .gallery .shot { margin-bottom: 0; }
+.shot__name {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.shot__text { display: block; color: var(--text-2); }
 .shot--wide {
   max-width: 560px;
   margin: 0 auto clamp(24px, 4vh, 40px);
