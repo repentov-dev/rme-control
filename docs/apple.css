@@ -598,5 +598,5 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
   .new__list { grid-template-columns: 1fr; }
 }
 
-.shot--product { max-width: 760px; }
+.shot--product { max-width: 980px; }
 .shot--product img { border: 0; background: transparent; border-radius: 0; box-shadow: none; }
