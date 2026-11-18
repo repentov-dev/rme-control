@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/screenshots/banner.png" width="100%" alt="RME Control — a menu bar controller for TotalMix FX">
+  <img src="docs/screenshots/app.png" width="100%" alt="RME Control — a menu bar controller for TotalMix FX">
 </p>
 
 # RME Control
@@ -24,15 +24,7 @@ Works via Global OSC only with TotalMix 2.1+.
 Beta: the calibrator was tested on the Fireface 802 FS and may behave differently on other interfaces.
 
 <p align="center">
-  <img src="docs/screenshots/room-eq.png" width="560" alt="Room EQ">
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/measure-result.png" width="660" alt="Measure result">
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/measure-setup.png" width="660" alt="Measure setup">
+  <img src="docs/screenshots/measure.png" width="760" alt="Measure setup, Room EQ and the measurement result">
 </p>
 
 ## Features
