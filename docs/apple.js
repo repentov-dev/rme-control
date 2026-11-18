@@ -19,6 +19,49 @@
   if (nav) {
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    // On phones the bar slides away while reading and comes back on an upward scroll.
+    var lastY = window.scrollY;
+    var barTicking = false;
+    function onBarScroll() {
+      if (barTicking) return;
+      barTicking = true;
+      requestAnimationFrame(function () {
+        barTicking = false;
+        var y = window.scrollY;
+        var down = y > lastY + 4;
+        var up = y < lastY - 4;
+        if (y < 80) {
+          nav.classList.remove('is-hidden');
+        } else if (down && !nav.classList.contains('is-open')) {
+          nav.classList.add('is-hidden');
+        } else if (up) {
+          nav.classList.remove('is-hidden');
+        }
+        lastY = y;
+      });
+    }
+    window.addEventListener('scroll', onBarScroll, { passive: true });
+
+    // Burger: opens the sheet, closes it on a link tap or on resize.
+    var burger = nav.querySelector('.nav__burger');
+    function closeMenu() {
+      nav.classList.remove('is-open');
+      if (burger) burger.setAttribute('aria-expanded', 'false');
+    }
+    if (burger) {
+      burger.addEventListener('click', function () {
+        var open = nav.classList.toggle('is-open');
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) nav.classList.remove('is-hidden');
+      });
+    }
+    nav.querySelectorAll('.nav__links a').forEach(function (link) {
+      link.addEventListener('click', closeMenu);
+    });
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 860) closeMenu();
+    });
   }
 
   /* Reveal: each block rises into place once it is on screen. */
