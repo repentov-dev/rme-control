@@ -22,6 +22,8 @@ xcuserdata/
 *.pkg
 *.dmg
 *.zip
+# ...except the older build the website serves itself
+!docs/downloads/*.pkg
 
 # Working copies of the app icon — the icon used by the app is
 # "RME Control/Resources/AppIcon.icns"
