@@ -610,3 +610,5 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
 .key h3 { font-size: clamp(1.3rem, 2.2vw, 1.8rem); letter-spacing: -0.02em; margin-bottom: 8px; }
 .key p:not(.chapter__kicker) { color: var(--text-2); font-size: 15px; line-height: 1.55; max-width: 46ch; }
 @media (max-width: 860px) { .keys { grid-template-columns: 1fr; } }
+
+.setup__after { margin-top: 18px; font-size: 14px; color: var(--text-2); }

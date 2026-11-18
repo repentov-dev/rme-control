@@ -13,7 +13,7 @@
     document.querySelectorAll("[data-reveal]").forEach(function (el) { el.classList.add("is-in"); });
   }, 3500);
 </script>
-<link rel="stylesheet" href="./apple.css?v=7">
+<link rel="stylesheet" href="./apple.css?v=8">
 </head>
 <body>
 
@@ -174,8 +174,17 @@
     <div class="section-head" data-reveal>
       <p class="eyebrow" data-i18n="tm.eyebrow">TotalMix</p>
       <h2 data-i18n="tm.title">Set up TotalMix</h2>
-      <p class="lead" data-i18n="tm.summary">Global OSC in TotalMix FX 2.1+: host 127.0.0.1, ports 7001 and 9001, Compatibility (Mode) Global OSC, then Send Status, Send level data, Peak hold and Send all data on start.</p>
+      <p class="lead" data-i18n="tm.lead">The app speaks Global OSC. In TotalMix FX 2.1 or newer:</p>
     </div>
+    <ol class="steps" data-reveal>
+      <li class="step"><span class="step__num">01</span><p data-i18n="tm.one">Set the OSC host to 127.0.0.1 and the ports to 7001 and 9001.</p></li>
+      <li class="step"><span class="step__num">02</span><p data-i18n="tm.two">Open Options → Mixer Settings → OSC and set Compatibility (Mode) to Global OSC.</p></li>
+      <li class="step"><span class="step__num">03</span><p data-i18n="tm.three">Turn on Send Status.</p></li>
+      <li class="step"><span class="step__num">04</span><p data-i18n="tm.four">Turn on Send level data.</p></li>
+      <li class="step"><span class="step__num">05</span><p data-i18n="tm.five">Turn on Peak hold.</p></li>
+      <li class="step"><span class="step__num">06</span><p data-i18n="tm.six">Turn on Send all data on start.</p></li>
+    </ol>
+    <p class="setup__after" data-reveal data-i18n="tm.note">Then open Settings → Connection in RME Control and use the same ports.</p>
   </section>
 
   <section class="specs" id="specs">
@@ -213,7 +222,7 @@
   </div>
 </footer>
 
-<script src="./i18n.js?v=3" defer></script>
+<script src="./i18n.js?v=4" defer></script>
 <script src="./apple.js?v=3" defer></script>
 </body>
 </html>
