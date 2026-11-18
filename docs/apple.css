@@ -278,6 +278,7 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
   .cmd__copy { position: static; min-height: 30px; font-size: 12px; }
 }
 .install__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+.install__note { margin-top: 16px; font-size: 14px; line-height: 1.45; color: var(--text-2); max-width: 52ch; }
 .nowrap { white-space: nowrap; }
 
 /* TotalMix setup: the same six-step rhythm as the install card, on the ground. */
