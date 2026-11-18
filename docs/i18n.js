@@ -23,7 +23,7 @@
       "new.stat.models": "models",
       "new.engine.kicker": "Correction engine",
       "new.engine.title": "Powered by roomeq",
-      "new.engine.text": "Sweeps are captured by sotf-capture and the correction is calculated by roomeq from the AutoEQ project. Save your own calibration presets; microphone calibration files are supported.",
+      "new.engine.text": "Sweeps are captured by sotf-capture and the correction is calculated by roomeq — both by Pierre Aubert and contributors; roomeq continues the AutoEQ project by Jaakko Pasanen. Save your own calibration presets; microphone calibration files are supported.",
       "screens.eyebrow": "Screens", "screens.title": "What the app looks like",
       "shot.product.name": "Measure and Room EQ",
       "shot.product": "Setup, the measurement, the result and the Room EQ that receives it.",
@@ -61,7 +61,8 @@
       "specs.license": "License", "specs.source": "Source",
       "foot.note": "A menu bar controller for TotalMix FX, written in Swift and shipped as source.",
       "foot.repo": "Repository", "foot.releases": "Releases", "foot.license": "MIT license",
-      "foot.legal": "RME, TotalMix and the RME logo are trademarks of RME Audio AG. This is an independent tool, not affiliated with or endorsed by RME Audio."
+      "foot.legal": "RME, TotalMix and the RME logo are trademarks of RME Audio AG. This is an independent tool, not affiliated with or endorsed by RME Audio.",
+      "foot.credits": "Measurement: sotf-capture. Correction: roomeq, continuing AutoEQ by Jaakko Pasanen. Both by Pierre Aubert and contributors, GPL-3.0."
     },
     ru: {
       "meta.title": "RME Control — TotalMix в строке меню",
@@ -84,7 +85,7 @@
       "new.stat.models": "моделей",
       "new.engine.kicker": "Движок коррекции",
       "new.engine.title": "На движке roomeq",
-      "new.engine.text": "Замер выполняет sotf-capture, коррекцию считает roomeq из проекта AutoEQ. Свои пресеты калибровки сохраняются, калибровочные файлы микрофонов поддерживаются.",
+      "new.engine.text": "Замер выполняет sotf-capture, коррекцию считает roomeq — оба от Pierre Aubert и участников проекта; roomeq продолжает AutoEQ Яакко Пасанена. Свои пресеты калибровки сохраняются, калибровочные файлы микрофонов поддерживаются.",
       "screens.eyebrow": "Экраны", "screens.title": "Как это выглядит",
       "shot.product.name": "Замер и Room EQ",
       "shot.product": "Настройка, замер, результат и Room EQ, в который он попадает.",
@@ -122,7 +123,8 @@
       "specs.license": "Лицензия", "specs.source": "Исходники",
       "foot.note": "Пульт для TotalMix FX в строке меню, на Swift и с открытым исходным кодом.",
       "foot.repo": "Репозиторий", "foot.releases": "Релизы", "foot.license": "Лицензия MIT",
-      "foot.legal": "RME, TotalMix и логотип RME — товарные знаки RME Audio AG. Это независимый инструмент, не связанный с RME Audio."
+      "foot.legal": "RME, TotalMix и логотип RME — товарные знаки RME Audio AG. Это независимый инструмент, не связанный с RME Audio.",
+      "foot.credits": "Замер: sotf-capture. Коррекция: roomeq, продолжение AutoEQ Яакко Пасанена. Авторы — Pierre Aubert и участники, GPL-3.0."
     },
     de: {
       "meta.title": "RME Control — TotalMix in der Menüleiste",
@@ -145,7 +147,7 @@
       "new.stat.models": "Modelle",
       "new.engine.kicker": "Korrektur-Engine",
       "new.engine.title": "Angetrieben von roomeq",
-      "new.engine.text": "Die Sweeps nimmt sotf-capture auf, die Korrektur berechnet roomeq aus dem AutoEQ-Projekt. Eigene Kalibrier-Presets und Mikrofon-Kalibrierdateien werden unterstützt.",
+      "new.engine.text": "Die Sweeps nimmt sotf-capture auf, die Korrektur berechnet roomeq — beide von Pierre Aubert und Mitwirkenden; roomeq führt das AutoEQ-Projekt von Jaakko Pasanen fort. Eigene Kalibrier-Presets und Mikrofon-Kalibrierdateien werden unterstützt.",
       "screens.eyebrow": "Bildschirme", "screens.title": "So sieht die App aus",
       "shot.product.name": "Messung und Room EQ",
       "shot.product": "Setup, die Messung, das Ergebnis und der Room EQ, der es aufnimmt.",
@@ -183,7 +185,8 @@
       "specs.license": "Lizenz", "specs.source": "Quellcode",
       "foot.note": "Ein Menüleisten-Controller für TotalMix FX, in Swift geschrieben und als Quellcode veröffentlicht.",
       "foot.repo": "Repository", "foot.releases": "Releases", "foot.license": "MIT-Lizenz",
-      "foot.legal": "RME, TotalMix und das RME-Logo sind Marken der RME Audio AG. Dies ist ein unabhängiges Werkzeug, nicht mit RME Audio verbunden."
+      "foot.legal": "RME, TotalMix und das RME-Logo sind Marken der RME Audio AG. Dies ist ein unabhängiges Werkzeug, nicht mit RME Audio verbunden.",
+      "foot.credits": "Messung: sotf-capture. Korrektur: roomeq, Fortführung von AutoEQ von Jaakko Pasanen. Beides von Pierre Aubert und Mitwirkenden, GPL-3.0."
     }
   };
 

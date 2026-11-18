@@ -19,7 +19,7 @@ Works via Global OSC only with TotalMix 2.1+.
 
 1. **Room EQ fully carried over from TotalMix.** Nine bands per output, and the **Mix** and **Crossfeed** controls now live right inside the Room EQ window.
 2. **A large library of presets for the most popular headphones.** 25 brands, 80 models, based on AutoEQ and independent measurements.
-3. **Correction powered by roomeq (AutoEQ).** Sweeps are captured by `sotf-capture`; the correction is calculated by `roomeq` from the [AutoEQ](https://github.com/pierreaubert/autoeq) project. Save your own calibration presets; microphone calibration files are supported.
+3. **Correction powered by roomeq (AutoEQ).** Sweeps are captured by `sotf-capture`; the correction is calculated by `roomeq` from the [AutoEQ](https://github.com/pierreaubert/autoeq) project. Both engines are by Pierre Aubert and contributors; `roomeq` continues the AutoEQ project by Jaakko Pasanen. Save your own calibration presets; microphone calibration files are supported.
 
 Beta: the calibrator was tested on the Fireface 802 FS and may behave differently on other interfaces.
 
