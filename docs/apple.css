@@ -442,14 +442,15 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
   border: 1px solid var(--line);
   background: #111;
 }
-.shot--result { max-width: 520px; }
+.shot--result, .shot--setup { max-width: 660px; }
 .gallery__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(20px, 3vw, 32px);
 }
 .gallery__grid .shot img {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   border-radius: 16px;
   border: 1px solid var(--line);
   background: #111;
@@ -572,3 +573,5 @@ main > section { padding-inline: var(--gutter); max-width: var(--measure); margi
   .chapter--reverse .chapter__media { order: 0; }
   .chapter__media--stat { justify-content: flex-start; }
 }
+
+.shot--levels img { width: 188px; max-width: 100%; height: auto; }
