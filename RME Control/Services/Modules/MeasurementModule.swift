@@ -55,6 +55,11 @@ final class MeasurementModule {
     /// Все файлы приложения — в Application Support: папка «Документы» под TCC,
     /// из-за неё загрузка молча падала без разрешения на доступ к файлам.
     nonisolated static var root: URL {
+        // Переопределение для тестов: позволяет проверить установку и удаление
+        // во временной папке, не трогая реальный модуль пользователя.
+        if let override = ProcessInfo.processInfo.environment["RME_MODULE_ROOT"], !override.isEmpty {
+            return URL(fileURLWithPath: override, isDirectory: true)
+        }
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Library/Application Support")
         return base.appendingPathComponent("RME Control", isDirectory: true)
@@ -66,18 +71,35 @@ final class MeasurementModule {
         root.appendingPathComponent("Modules/current", isDirectory: true)
     }
 
-    /// Переносит старую раскладку `Modules/<версия>` в `Modules/current`.
+    /// Собирает любую старую раскладку `Modules/<версия>` в `Modules/current`:
+    /// иначе оставшаяся папка прошлой версии считалась установленным модулем
+    /// и мешала удалению.
     private static func migrateLegacyLayout() {
         let fileManager = FileManager.default
         guard !fileManager.fileExists(atPath: installDirectory.path) else { return }
-        for candidate in [installedVersion, version] {
-            let legacy = root.appendingPathComponent("Modules/\(candidate)", isDirectory: true)
-            guard fileManager.isExecutableFile(
-                atPath: legacy.appendingPathComponent(binaryNames[0]).path) else { continue }
-            try? fileManager.createDirectory(at: installDirectory.deletingLastPathComponent(),
-                                             withIntermediateDirectories: true)
-            try? fileManager.moveItem(at: legacy, to: installDirectory)
-            return
+        let modules = root.appendingPathComponent("Modules", isDirectory: true)
+        let entries = (try? fileManager.contentsOfDirectory(at: modules,
+                                                            includingPropertiesForKeys: [.isDirectoryKey])) ?? []
+        let legacy = entries
+            .filter { entry in
+                (try? entry.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
+                    && entry.lastPathComponent != "current"
+                    && binaryNames.allSatisfy {
+                        fileManager.isExecutableFile(atPath: entry.appendingPathComponent($0).path)
+                    }
+            }
+            .sorted { $0.lastPathComponent.compare($1.lastPathComponent, options: .numeric) == .orderedAscending }
+        guard let newest = legacy.last else { return }
+        try? fileManager.createDirectory(at: installDirectory.deletingLastPathComponent(),
+                                         withIntermediateDirectories: true)
+        guard (try? fileManager.moveItem(at: newest, to: installDirectory)) != nil else { return }
+        let name = newest.lastPathComponent
+        if name.first?.isNumber == true {
+            try? name.write(to: versionFile, atomically: true, encoding: .utf8)
+        }
+        // Прочие старые папки больше не нужны.
+        for entry in entries where entry.lastPathComponent != "current" && entry != newest {
+            try? fileManager.removeItem(at: entry)
         }
     }
 
@@ -86,31 +108,19 @@ final class MeasurementModule {
         root.appendingPathComponent("Modules/measure-\(version).zip")
     }
 
-    /// Бинарник модуля: сначала `Modules/current`, потом папки старых версий,
-    /// и только затем запасной вариант в бандле.
+    /// Бинарник модуля: `Modules/current`, иначе запасной вариант в бандле.
+    /// Старые раскладки сначала переносятся в `current` при запуске.
     nonisolated static func binary(named name: String) -> URL? {
-        for url in installedBinaryURLs(name) {
-            return url
-        }
+        let installed = installDirectory.appendingPathComponent(name)
+        if FileManager.default.isExecutableFile(atPath: installed.path) { return installed }
         return Bundle.main.url(forResource: name, withExtension: nil)
     }
 
-    /// Установленные копии, включая раскладку `Modules/<версия>` до миграции.
-    private nonisolated static func installedBinaryURLs(_ name: String) -> [URL] {
-        var urls = [installDirectory.appendingPathComponent(name)]
-        let modules = root.appendingPathComponent("Modules", isDirectory: true)
-        let entries = (try? FileManager.default.contentsOfDirectory(
-            at: modules, includingPropertiesForKeys: [.isDirectoryKey])) ?? []
-        for entry in entries {
-            let isDirectory = (try? entry.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
-            guard isDirectory, entry.lastPathComponent != "current" else { continue }
-            urls.append(entry.appendingPathComponent(name))
-        }
-        return urls.filter { FileManager.default.isExecutableFile(atPath: $0.path) }
-    }
-
     nonisolated static var isInstalled: Bool {
-        binaryNames.allSatisfy { !installedBinaryURLs($0).isEmpty }
+        binaryNames.allSatisfy {
+            FileManager.default.isExecutableFile(
+                atPath: installDirectory.appendingPathComponent($0).path)
+        }
     }
 
     // MARK: - Состояние
@@ -225,25 +235,38 @@ final class MeasurementModule {
     /// а также следы старых установок в бандле и Application Support.
     func remove() {
         let fileManager = FileManager.default
-        try? fileManager.removeItem(at: Self.installDirectory)
-        try? fileManager.removeItem(at: Self.cachedArchive)
+        let modules = Self.root.appendingPathComponent("Modules", isDirectory: true)
 
+        // Сносим всё содержимое `Modules`: `current`, старые версии вида
+        // `Modules/<версия>` и скачанные архивы. Раньше удалялся только
+        // `current`, а оставшаяся старая папка снова считалась установкой.
+        let entries = (try? fileManager.contentsOfDirectory(at: modules,
+                                                           includingPropertiesForKeys: nil)) ?? []
+        for entry in entries {
+            try? fileManager.removeItem(at: entry)
+        }
+        try? fileManager.removeItem(at: Self.versionFile)
+
+        // Следы прежних установок вне рабочей папки.
         let legacy = [
             Bundle.main.bundleURL.appendingPathComponent("Contents/Resources/Modules/\(Self.version)"),
             URL(fileURLWithPath: NSHomeDirectory())
                 .appendingPathComponent("Library/Application Support/RME Control/Modules/\(Self.version)"),
             URL(fileURLWithPath: NSHomeDirectory())
                 .appendingPathComponent("Library/Application Support/RME Control/Modules/measure-\(Self.version).zip"),
-            Self.root.appendingPathComponent("Modules/current"),
-            Self.versionFile,
-            Self.root.appendingPathComponent("Modules/\(Self.version)")
+            URL(fileURLWithPath: NSHomeDirectory())
+                .appendingPathComponent("Documents/RME Control/Modules")
         ]
         for url in legacy where fileManager.fileExists(atPath: url.path) {
             try? fileManager.removeItem(at: url)
         }
+
         updateVersion = nil
+        updateURL = nil
+        checkResult = nil
         phase = .missing
         refreshPhase()
+        NSLog("measure module: removed, installed = %@", Self.isInstalled ? "yes" : "no")
     }
 
     /// Проверка релизов `measure-*` на GitHub. Без `force` — не чаще раза в сутки.
