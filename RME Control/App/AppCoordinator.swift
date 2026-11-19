@@ -164,6 +164,7 @@ final class AppCoordinator {
         bindDimIndicator()
         bindWebServer()
         observeSystemEvents()
+
     }
 
     func stop() {

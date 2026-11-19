@@ -62,17 +62,11 @@ struct RoomCorrection: Identifiable, Codable, Sendable {
     var residualRMS: Double
     /// roomeq принял коррекцию; false — его политика оставила ответ без изменений.
     var engineAccepted: Bool = true
+    /// Сколько фильтров движка не поместилось в девять полос Room EQ.
+    /// Optional, чтобы старые файлы результатов продолжали читаться.
+    var droppedFilters: Int?
 
     var id: String { channel.rawValue }
-}
-
-/// Как калибровщик отправляет звук: через матрицу TotalMix или напрямую
-/// в software playback-пару.
-enum CalibrationRoutingMode: String, Codable, CaseIterable, Identifiable, Sendable {
-    case osc
-    case softwarePlayback
-
-    var id: String { rawValue }
 }
 
 /// Одна точка прослушивания: левый и правый динамик.
@@ -97,6 +91,8 @@ struct RoomCalibrationResult: Codable, Sendable {
     var outputLabel: String
     var outputAddress: String
     var targetTilt: Double
+    /// Зерно оптимизации: с ним пересчёт с тем же замером даёт тот же результат.
+    var seed: Int?
     var corrections: [RoomCorrection]
 }
 

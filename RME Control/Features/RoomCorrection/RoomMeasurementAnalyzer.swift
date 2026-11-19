@@ -3,7 +3,11 @@ import Foundation
 /// Сглаживание и объединение измеренных АЧХ.
 enum RoomMeasurementAnalyzer {
     static let sampleRate: Double = 48_000
-    static let sweepDuration: Double = 8
+    /// Сколько длится один свип в sotf-capture. Должно совпадать с `--duration`,
+    /// иначе roomeq получает неверное описание замера.
+    static let captureDuration: Double = 5
+    /// Сколько свипов снимается на каждый канал.
+    static let sweepsPerChannel = 4
     static let sweepStart: Double = 20
     static let sweepEnd: Double = 20_000
     static let responsePoints = 240
@@ -18,22 +22,28 @@ enum RoomMeasurementAnalyzer {
         }
     }
 
-    /// Средняя АЧХ по нескольким точкам, по мощности.
+    /// Средняя АЧХ по нескольким точкам, по мощности. Кривые интерполируются
+    /// на частоты первой: у разных свипов сетка может не совпадать по индексам.
     static func average(_ curves: [[RoomResponsePoint]]) -> [RoomResponsePoint] {
         let nonEmpty = curves.filter { !$0.isEmpty }
         guard let first = nonEmpty.first else { return [] }
         guard nonEmpty.count > 1 else { return first }
-        return first.indices.map { index in
-            let frequency = first[index].frequency
+        return first.map { point in
             var power = 0.0
-            var count = 0
-            for curve in nonEmpty where curve.indices.contains(index) {
-                power += pow(10, curve[index].db / 10)
-                count += 1
+            for curve in nonEmpty {
+                let db = interpolate(curve.map { (frequency: $0.frequency, db: $0.db) },
+                                     frequency: point.frequency)
+                power += pow(10, db / 10)
             }
-            let db = 10 * log10(max(power / Double(max(count, 1)), 1e-12))
-            return RoomResponsePoint(frequency: frequency, db: db)
+            let db = 10 * log10(max(power / Double(nonEmpty.count), 1e-12))
+            return RoomResponsePoint(frequency: point.frequency, db: db)
         }
+    }
+
+    /// Значение АЧХ на произвольной частоте, с интерполяцией по краям.
+    static func value(_ points: [RoomResponsePoint], at frequency: Double) -> Double {
+        guard !points.isEmpty else { return 0 }
+        return interpolate(points.map { (frequency: $0.frequency, db: $0.db) }, frequency: frequency)
     }
 
     /// Усреднение нескольких свипов: мощность по АЧХ, вектор по фазе.

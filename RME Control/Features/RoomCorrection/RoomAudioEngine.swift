@@ -172,10 +172,10 @@ final class RoomAudioEngine {
             case .noDevice: return String(localized: "No RME audio device found.")
             case .noInput: return String(localized: "The selected microphone input is unavailable.")
             case .noOutput: return String(localized: "The selected speaker output is unavailable.")
-            case .engine(let message): return message
+            case .engine: return String(localized: "The audio engine stopped.")
             case .silent: return String(localized: "No signal from the microphone. Check the input and level.")
             case .tooShort: return String(localized: "The recording is too short. Try again.")
-            case .channelUnavailable: return String(localized: "CoreAudio does not expose this channel. Choose another channel or check the TotalMix routing.")
+            case .channelUnavailable: return String(localized: "The interface does not expose this channel.")
             }
         }
     }

@@ -69,14 +69,6 @@ final class RoomCorrectionViewModel {
                                                          scope: kAudioDevicePropertyScopeInput)
     }
 
-    /// Маршрут через TotalMix или прямой software playback.
-    var usesOSCRouting: Bool { mixer.calibrationRouting == .osc }
-
-    var playbackPairTitle: String {
-        let left = max(mixer.calibrationPlaybackPair, 0) * 2
-        return "\(left + 1)/\(left + 2)"
-    }
-
     /// Есть устройство и выбранный OSC-выход.
     var hasValidOutput: Bool {
         selectedDevice != nil && selectedOutput != nil && outputChannelPair != nil
@@ -109,15 +101,22 @@ final class RoomCorrectionViewModel {
 
     var devices: [RoomAudioDevice] = []
     var selectedDeviceID: AudioDeviceID?
+    /// Живая частота выбранного устройства: снимок из `devices` устаревает,
+    /// как только её меняют в Audio MIDI Setup.
+    var deviceSampleRate: Double?
     var calibration: MicCalibration?
     var calibrationPath: String?
     var positionCount = 1 { didSet { persistIfReady() } }
+    /// Зерно оптимизации на текущую сессию: пересчёт при смене наклона идёт с ним же,
+    /// поэтому варианты остаются сравнимыми.
+    private(set) var calibrationSeed: Int?
     var positions: [RoomPositionMeasurement] = []
     var corrections: [RoomCorrectionChannel: RoomCorrection] = [:]
     var selectedChannel: RoomCorrectionChannel = .stereo
     var stage: Stage = .setup
     var progress: RoomCorrectionProgress?
-    var errorMessage: String?
+    /// Отказ замера: крупный заголовок и подсказка в окне Measure.
+    var failure: MeasurementFailure?
     var status = ""
     var inputChannel = 0 { didSet { persistIfReady() } }
     var leftOutputChannel = 0 { didSet { persistIfReady() } }
@@ -141,6 +140,10 @@ final class RoomCorrectionViewModel {
     private var routingState: CalibrationRoutingState?
     private var routingApplied = false
     private var micCheckTask: Task<Void, Never>?
+    private var rateTask: Task<Void, Never>?
+    /// На время замера клавиши громкости наводятся на выбранный выход,
+    /// после — возвращаются к настройке пользователя.
+    private var volumeKeysOverridden = false
     private var testToneTask: Task<Void, Never>?
     private var isClosing = false
 
@@ -191,7 +194,7 @@ final class RoomCorrectionViewModel {
         clampChannels()
         refreshChannelNames()
 
-        positionCount = 1
+        positionCount = max(1, preferences.positionCount)
         smoothing = preferences.smoothing
         targetTilt = preferences.targetTilt
         calibrationPath = preferences.calibrationPath
@@ -215,7 +218,7 @@ final class RoomCorrectionViewModel {
         preferences.inputChannel = inputChannel
         preferences.leftOutputChannel = leftOutputChannel
         preferences.rightOutputChannel = rightOutputChannel
-        preferences.positionCount = 1
+        preferences.positionCount = positionCount
         preferences.smoothing = smoothing
         preferences.targetTilt = targetTilt
         preferences.calibrationPath = calibrationPath
@@ -232,6 +235,10 @@ final class RoomCorrectionViewModel {
     var microphoneAccessDenied = false
 
     func requestMicrophoneAccess() async {
+        // Системный диалог микрофона блокирует главный поток: пока он открыт,
+        // перехват клавиш снят, иначе ввод «залипает».
+        VolumeKeyMonitor.current?.suspendForModal()
+        defer { VolumeKeyMonitor.current?.resumeAfterModal() }
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:
             microphoneAccessDenied = false
@@ -241,6 +248,9 @@ final class RoomCorrectionViewModel {
         default:
             microphoneAccessDenied = true
         }
+        // TCC-диалог сворачивается не мгновенно: даём модальному циклу закрыться,
+        // и только потом возвращаем перехват клавиш (defer сработает после паузы).
+        try? await Task.sleep(for: .milliseconds(450))
     }
 
     var selectedDevice: RoomAudioDevice? {
@@ -284,14 +294,94 @@ final class RoomCorrectionViewModel {
         selectedDeviceID = RoomAudioDeviceService.preferred(deviceName: mixer.deviceName)?.id
             ?? devices.first?.id
         clampChannels()
+        refreshDeviceSampleRate()
     }
 
     func selectDevice(_ id: AudioDeviceID?) {
         stopLevelTest()
+        // Маршрут замера принадлежит прежнему устройству: сначала возвращаем
+        // TotalMix как было при его числе выходов, и только потом переключаемся.
+        // Иначе откат считался бы по каналам нового интерфейса и часть mute
+        // осталась бы висеть.
+        let hadSession = routingApplied
+        endCalibrationSession()
         selectedDeviceID = id
         clampChannels()
         refreshChannelNames()
+        refreshDeviceSampleRate()
         persistPreferences()
+        // Замер на другом интерфейсе недействителен — начинаем с чистого листа.
+        task?.cancel()
+        task = nil
+        positions = []
+        corrections = [:]
+        countdown = nil
+        progress = nil
+        isRecalculating = false
+        stage = .setup
+        status = ""
+        failure = nil
+        if hadSession {
+            Task { [weak self] in
+                await self?.startCalibrationSession()
+            }
+        }
+    }
+
+    /// На время замера клавиши громкости управляют выбранным выходом.
+    private func overrideVolumeKeys(to id: UUID?) {
+        guard id != nil else { return }
+        volumeKeysOverridden = true
+        mixer.setTemporaryVolumeKeyOutput(id)
+    }
+
+    /// Возвращает клавиши громкости туда, где они были до открытия Measure.
+    private func restoreVolumeKeys() {
+        guard volumeKeysOverridden else { return }
+        mixer.setTemporaryVolumeKeyOutput(nil)
+        volumeKeysOverridden = false
+    }
+
+    /// Читает частоту устройства из CoreAudio прямо сейчас.
+    func refreshDeviceSampleRate() {
+        guard let id = selectedDeviceID else {
+            deviceSampleRate = nil
+            return
+        }
+        let rate = RoomAudioDeviceService.nominalSampleRate(id)
+        if deviceSampleRate != rate { deviceSampleRate = rate }
+    }
+
+    /// Опрос, пока окно Measure открыто: смена частоты в Audio MIDI Setup
+    /// должна снимать предупреждение без переоткрытия окна.
+    func startWatchingSampleRate() {
+        refreshDeviceSampleRate()
+        rateTask?.cancel()
+        rateTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                guard let self, !Task.isCancelled else { return }
+                self.refreshDeviceSampleRate()
+            }
+        }
+    }
+
+    func stopWatchingSampleRate() {
+        rateTask?.cancel()
+        rateTask = nil
+    }
+
+    /// Движок замера работает только на 48 кГц: пока интерфейс на другой
+    /// частоте, запуск закрыт. Частота читается живьём, поэтому переключение
+    /// в Audio MIDI Setup сразу снимает запрет.
+    var isSampleRateReady: Bool {
+        guard let rate = deviceSampleRate, rate > 0 else { return false }
+        return abs(rate - RoomMeasurementAnalyzer.sampleRate) <= 1
+    }
+
+    /// Подсказка в Setup нужна только когда интерфейс есть, а частота не та.
+    var showsSampleRateWarning: Bool {
+        selectedDevice != nil && !isSampleRateReady
     }
 
     /// Выбирает OSC-выход калибровки. Звук идёт в playback 1/2, а маршрут
@@ -299,12 +389,13 @@ final class RoomCorrectionViewModel {
     func selectOutput(_ id: UUID?) {
         let wasTesting = isLevelTestRunning
         stopLevelTest()
+        overrideVolumeKeys(to: id)
         selectedOutputID = id
         positions = []
         corrections = [:]
         stage = .setup
         status = ""
-        errorMessage = nil
+        failure = nil
         persistPreferences()
         applyRouting()
         if wasTesting {
@@ -320,10 +411,6 @@ final class RoomCorrectionViewModel {
     /// выход и замьютить остальные. Запускается из вью при открытии окна.
     func startCalibrationSession() async {
         guard !routingApplied, !isClosing else { return }
-        guard usesOSCRouting else {
-            applyPlaybackChannels()
-            return
-        }
         mixer.requestCalibrationState()
         // Ждём не фиксированные 500 мс, а пока TotalMix пришлёт состояние:
         // от него зависит корректный откат mute и посылов.
@@ -340,10 +427,6 @@ final class RoomCorrectionViewModel {
         guard !isClosing,
               let device = selectedDevice,
               let pair = outputChannelPair else { return }
-        guard usesOSCRouting else {
-            applyPlaybackChannels()
-            return
-        }
         if routingState == nil {
             routingState = mixer.calibrationRoutingState()
         }
@@ -355,6 +438,7 @@ final class RoomCorrectionViewModel {
 
     /// Возвращает TotalMix как было: mute выходов и посылы, которые меняли.
     func endCalibrationSession() {
+        restoreVolumeKeys()
         guard routingApplied else { return }
         guard let device = selectedDevice else {
             routingState = nil
@@ -391,9 +475,9 @@ final class RoomCorrectionViewModel {
             calibrationPath = url.path
             persistPreferences()
             status = String(format: String(localized: "Calibration: %@"), calibration?.name ?? "")
-            errorMessage = nil
+            failure = nil
         } catch {
-            errorMessage = error.localizedDescription
+            failure = MeasurementFailure(title: error.localizedDescription)
         }
     }
 
@@ -407,27 +491,38 @@ final class RoomCorrectionViewModel {
     func startMeasurement() {
         stopLevelTest()
         guard !microphoneAccessDenied else {
-            errorMessage = String(localized: "Allow microphone access in System Settings → Privacy & Security → Microphone.")
+            failure = MeasurementFailure(
+                title: String(localized: "RME Control has no microphone access."),
+                hint: String(localized: "Allow it in System Settings → Privacy & Security → Microphone.")
+            )
             return
         }
         guard let device = selectedDevice, hasValidChannels else {
-            errorMessage = String(localized: "Choose the RME interface, the stereo output and the microphone input.")
+            failure = MeasurementFailure(title: String(localized: "Choose the RME interface, the stereo output and the microphone input."))
             return
         }
         clampChannels()
         guard inputChannel < device.inputChannels else {
-            errorMessage = String(localized: "The microphone channel is outside the device inputs.")
+            failure = MeasurementFailure(title: String(localized: "The microphone channel is outside the device inputs."))
             return
         }
         guard rightOutputChannel < device.outputChannels else {
-            errorMessage = String(localized: "The stereo output pair is outside the device outputs.")
+            failure = MeasurementFailure(title: String(localized: "The stereo output pair is outside the device outputs."))
+            return
+        }
+        // Частоту читаем прямо сейчас, а не из последнего опроса: иначе окно
+        // в секунду между переключением в Audio MIDI Setup и опросом врёт.
+        refreshDeviceSampleRate()
+        guard isSampleRateReady else {
+            failure = .sampleRateMismatch(rate: deviceSampleRate)
             return
         }
         positions = []
         corrections = [:]
         progress = nil
         didApply = false
-        errorMessage = nil
+        failure = nil
+        calibrationSeed = Int.random(in: 1...Int(Int32.max))
         stage = .position(1)
         status = ""
     }
@@ -437,6 +532,13 @@ final class RoomCorrectionViewModel {
               let device = selectedDevice,
               hasValidChannels,
               task == nil else { return }
+        // Частоту могли поменять уже после входа в замер: свип на 48 кГц
+        // в интерфейсе на 96 кГц не сойдётся, поэтому честно отказываем.
+        refreshDeviceSampleRate()
+        guard isSampleRateReady else {
+            failure = .sampleRateMismatch(rate: deviceSampleRate)
+            return
+        }
         stage = .measuring(index)
         progress = nil
         countdown = 5
@@ -475,7 +577,7 @@ final class RoomCorrectionViewModel {
                 self.task = nil
                 self.stage = .position(index)
                 if !(error is CancellationError) {
-                    self.errorMessage = error.localizedDescription
+                    self.present(error)
                 }
             }
         }
@@ -492,6 +594,7 @@ final class RoomCorrectionViewModel {
             outputLabel: target.label,
             outputAddress: target.address,
             targetTilt: targetTilt,
+            seed: calibrationSeed,
             corrections: Array(corrections.values).sorted { $0.channel.rawValue < $1.channel.rawValue }
         )
     }
@@ -505,10 +608,11 @@ final class RoomCorrectionViewModel {
         for correction in result.corrections { loaded[correction.channel] = correction }
         corrections = loaded
         targetTilt = result.targetTilt
+        calibrationSeed = result.seed
         selectedChannel = corrections[.stereo] != nil ? .stereo : (corrections.keys.first ?? .stereo)
         stage = .results
         status = String(format: String(localized: "Loaded calibration result: %@"), result.outputLabel)
-        errorMessage = nil
+        failure = nil
     }
 
     func compute(preservingSelection: Bool = false, keepResults: Bool = false) {
@@ -526,11 +630,16 @@ final class RoomCorrectionViewModel {
         task = Task { [weak self] in
             guard let self else { return }
             let target = RoomCorrectionTarget(tiltDBPerOctave: self.targetTilt)
+            if self.calibrationSeed == nil {
+                self.calibrationSeed = Int.random(in: 1...Int(Int32.max))
+            }
+            let seed = self.calibrationSeed ?? 1
             do {
                 let dimensions = self.roomDimensions
                 let corrections = try await self.service.corrections(positions: self.positions,
                                                                      target: target,
-                                                                     dimensions: dimensions)
+                                                                     dimensions: dimensions,
+                                                                     seed: seed)
                 guard !Task.isCancelled else { return }
                 self.corrections = corrections
                 self.selectedChannel = preservingSelection
@@ -538,12 +647,12 @@ final class RoomCorrectionViewModel {
                     : .stereo
                 self.endCalibrationSession()
                 self.stage = .results
-                self.errorMessage = nil
+                self.failure = nil
                 self.isRecalculating = false
                 self.status = ""
             } catch {
                 guard !Task.isCancelled else { return }
-                self.errorMessage = error.localizedDescription
+                self.present(error)
                 self.isRecalculating = false
                 if !keepResults { self.stage = .setup }
                 self.status = ""
@@ -560,6 +669,7 @@ final class RoomCorrectionViewModel {
 
     func rescan() {
         stopLevelTest()
+        restoreVolumeKeys()
         task?.cancel()
         task = nil
         positions = []
@@ -576,6 +686,12 @@ final class RoomCorrectionViewModel {
 
     func apply() {
         guard let correction = selectedCorrection else { return }
+        // Движок сам сказал, что правка ничего не даёт: записывать её нельзя,
+        // иначе мы затрём текущую коррекцию нейтральными полосами.
+        guard correction.engineAccepted else {
+            failure = .engineUnchanged
+            return
+        }
         let channel: RoomEQChannel
         switch selectedChannel {
         case .left: channel = .left
@@ -635,12 +751,12 @@ final class RoomCorrectionViewModel {
                 let level = try await service.inputLevel(device: device, inputChannel: inputChannel)
                 micLevelDB = level
                 if level < -70 {
-                    errorMessage = String(localized: "The microphone level is very low. Check the input and gain.")
+                    failure = MeasurementFailure(title: String(localized: "The microphone level is very low. Check the input and gain."))
                 } else {
-                    errorMessage = nil
+                    failure = nil
                 }
             } catch {
-                errorMessage = error.localizedDescription
+                present(error)
             }
         }
     }
@@ -653,7 +769,7 @@ final class RoomCorrectionViewModel {
             return
         }
         guard let device = selectedDevice, hasValidChannels else {
-            errorMessage = String(localized: "Choose the RME interface, the stereo output and the microphone input.")
+            failure = MeasurementFailure(title: String(localized: "Choose the RME interface, the stereo output and the microphone input."))
             return
         }
         do {
@@ -666,7 +782,7 @@ final class RoomCorrectionViewModel {
             levelTest = session
             isLevelTestRunning = true
             levelTestDB = nil
-            errorMessage = nil
+            failure = nil
             levelTask = Task { [weak self] in
                 guard let self else { return }
                 while !Task.isCancelled {
@@ -676,7 +792,7 @@ final class RoomCorrectionViewModel {
             }
         } catch {
             stopLevelTest()
-            errorMessage = error.localizedDescription
+            present(error)
         }
     }
 
@@ -693,12 +809,12 @@ final class RoomCorrectionViewModel {
     /// каким пойдёт свип, чтобы проверка совпадала с замером.
     func playTest(left: Bool) {
         guard let device = selectedDevice, hasValidOutput else {
-            errorMessage = String(localized: "Choose the RME interface and the output pair.")
+            failure = MeasurementFailure(title: String(localized: "Choose the RME interface and the output pair."))
             return
         }
         guard !isTestingOutput else { return }
         isTestingOutput = true
-        errorMessage = nil
+        failure = nil
         testToneTask?.cancel()
         testToneTask = Task { [weak self] in
             guard let self else { return }
@@ -708,7 +824,7 @@ final class RoomCorrectionViewModel {
                                                 outputChannel: left ? self.leftOutputChannel : self.rightOutputChannel)
             } catch {
                 if !(error is CancellationError) {
-                    self.errorMessage = error.localizedDescription
+                    self.present(error)
                 }
             }
         }
@@ -727,21 +843,18 @@ final class RoomCorrectionViewModel {
         endCalibrationSession()
     }
 
-    private func applyPlaybackChannels() {
-        if usesOSCRouting {
-            leftOutputChannel = 0
-            rightOutputChannel = 1
-        } else {
-            let left = max(mixer.calibrationPlaybackPair, 0) * 2
-            leftOutputChannel = left
-            rightOutputChannel = left + 1
-        }
-    }
-
-    /// Вход держим в пределах каналов карты; playback-пара — из настроек.
+    /// Вход держим в пределах каналов карты. Звук всегда идёт в playback 1/2,
+    /// а TotalMix по OSC направляет его в выбранный выход.
     private func clampChannels() {
         guard let device = selectedDevice else { return }
-        applyPlaybackChannels()
+        leftOutputChannel = 0
+        rightOutputChannel = 1
         inputChannel = min(max(inputChannel, 0), max(device.inputChannels - 1, 0))
+    }
+
+    /// Показывает отказ: технический текст движка уходит в лог, в окне —
+    /// понятная пара строк.
+    private func present(_ error: Error) {
+        failure = MeasurementFailure.describing(error)
     }
 }

@@ -31,7 +31,7 @@ final class RoomCorrectionService {
             inputChannel: inputChannel,
             outputChannel: leftOutputChannel,
             calibrationPath: calibrationPath,
-            repeats: 4
+            repeats: RoomMeasurementAnalyzer.sweepsPerChannel
         ) { value in
             progress(RoomCorrectionProgress(position: index, totalPositions: total,
                                             label: leftLabel, fraction: value * 0.48))
@@ -45,7 +45,7 @@ final class RoomCorrectionService {
             inputChannel: inputChannel,
             outputChannel: rightOutputChannel,
             calibrationPath: calibrationPath,
-            repeats: 4
+            repeats: RoomMeasurementAnalyzer.sweepsPerChannel
         ) { value in
             progress(RoomCorrectionProgress(position: index, totalPositions: total,
                                             label: rightLabel, fraction: 0.5 + value * 0.48))
@@ -76,11 +76,16 @@ final class RoomCorrectionService {
     /// Считает L, R и общую стерео-коррекцию настоящим roomeq CLI.
     func corrections(positions: [RoomPositionMeasurement],
                      target: RoomCorrectionTarget,
-                     dimensions: RoomDimensions?) async throws -> [RoomCorrectionChannel: RoomCorrection] {
+                     dimensions: RoomDimensions?,
+                     seed: Int) async throws -> [RoomCorrectionChannel: RoomCorrection] {
         guard !positions.isEmpty else { return [:] }
-        let left = positions[0].left
-        let right = positions[0].right
-        let stereo = RoomMeasurementAnalyzer.combined(left, right)
+        // Показываем ту же кривую, что получил движок: среднее по всем точкам,
+        // а не первую позицию.
+        let left = RoomMeasurementAnalyzer.average(positions.map(\.left))
+        let right = RoomMeasurementAnalyzer.average(positions.map(\.right))
+        let stereo = RoomMeasurementAnalyzer.average(
+            positions.map { RoomMeasurementAnalyzer.combined($0.left, $0.right) }
+        )
 
         let leftCurves = positions.flatMap { position in
             position.leftCurves.isEmpty
@@ -100,11 +105,15 @@ final class RoomCorrectionService {
                                                     right: rightCurves,
                                                     tilt: target.tiltDBPerOctave,
                                                     sampleRate: sampleRate,
-                                                    dimensions: dimensions)
+                                                    dimensions: dimensions,
+                                                    seed: seed,
+                                                    positionCount: positions.count)
         async let monoTask = RoomEQCLI.optimizeSingle(measurements: stereoCurves,
                                                       tilt: target.tiltDBPerOctave,
                                                       sampleRate: sampleRate,
-                                                      dimensions: dimensions)
+                                                      dimensions: dimensions,
+                                                      seed: seed,
+                                                      positionCount: positions.count)
         let (pair, mono) = try await (pairTask, monoTask)
 
         func correction(_ set: RoomEQFilterSet,
@@ -119,7 +128,8 @@ final class RoomCorrectionService {
                                   measured: measured,
                                   predicted: predicted,
                                   residualRMS: residual,
-                                  engineAccepted: set.accepted)
+                                  engineAccepted: set.accepted,
+                                  droppedFilters: set.dropped)
         }
 
         return [

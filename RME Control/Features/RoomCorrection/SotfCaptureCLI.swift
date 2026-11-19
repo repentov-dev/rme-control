@@ -4,15 +4,28 @@ enum SotfCaptureError: LocalizedError {
     case binaryMissing
     case failed(String)
     case badResponse
+    /// Движок записал звук, но не нашёл в нём свип.
+    case noSignalLock
+    /// Вход перегружен: форма свипа искажена, корреляция не находится.
+    case clipped
+    /// Устройство не удалось открыть или в нём нет нужных каналов.
+    case deviceUnavailable
 
     var errorDescription: String? {
         switch self {
         case .binaryMissing:
-            return String(localized: "The sotf-capture engine is missing from the app bundle. Rebuild the app.")
-        case .failed(let message):
-            return String(format: String(localized: "sotf-capture failed: %@"), message)
+            return String(localized: "A measurement engine is missing from this build.")
+        case .failed:
+            // Текст движка уходит в системный лог при показе ошибки (MeasurementFailure).
+            return String(localized: "The measurement failed.")
         case .badResponse:
-            return String(localized: "sotf-capture returned no usable measurement.")
+            return String(localized: "The engine returned no usable measurement.")
+        case .noSignalLock:
+            return String(localized: "Could not recognise the signal.")
+        case .clipped:
+            return String(localized: "The recording is clipped.")
+        case .deviceUnavailable:
+            return String(localized: "Could not open the audio device.")
         }
     }
 }
@@ -87,7 +100,7 @@ enum SotfCaptureCLI {
 
         var arguments = [
             "capture", "--signal", "sweep",
-            "--duration", "5",
+            "--duration", String(Int(RoomMeasurementAnalyzer.captureDuration)),
             "--sample-rate", "48000",
             "--channels", "1",
             "--hwaudio-send-to", "\(outputChannel)",
@@ -119,7 +132,22 @@ enum SotfCaptureCLI {
         let output = String(decoding: stdout.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
         let errorText = String(decoding: stderr.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
         guard process.terminationStatus == 0 else {
-            throw SotfCaptureError.failed(errorText.isEmpty ? "exit \(process.terminationStatus)" : errorText)
+            let text = errorText.isEmpty ? "exit \(process.terminationStatus)" : errorText
+            if text.contains("No reliable signal lock") {
+                throw SotfCaptureError.noSignalLock
+            }
+            if text.contains("Recording clipped") || text.contains("clipped hard") {
+                throw SotfCaptureError.clipped
+            }
+            if text.contains("identify playback device")
+                || text.contains("identify microphone device")
+                || text.contains("enumerate input devices")
+                || text.contains("enumerate output devices")
+                || text.contains("default input config")
+                || text.contains("supported output configs") {
+                throw SotfCaptureError.deviceUnavailable
+            }
+            throw SotfCaptureError.failed(text)
         }
 
         let jsonLine = output
@@ -163,7 +191,8 @@ enum SotfCaptureCLI {
     }
 
     private static var binaryURL: URL? {
-        if let url = Bundle.main.url(forResource: "sotf-capture", withExtension: nil) {
+        // Модуль замера может быть скачан отдельно — он важнее бандла.
+        if let url = MeasurementModule.binary(named: "sotf-capture") {
             return url
         }
         let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)

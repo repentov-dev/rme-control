@@ -8,6 +8,8 @@ struct RoomEQFilterSet: Sendable {
     var gainDB: Double
     /// roomeq счёл коррекцию достаточно полезной и принял её.
     var accepted: Bool
+    /// Фильтры, которые движок вернул, но девяти полос Room EQ не хватило.
+    var dropped: Int = 0
 }
 
 enum RoomEQCLIError: LocalizedError {
@@ -19,13 +21,14 @@ enum RoomEQCLIError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .binaryMissing:
-            return String(localized: "The roomeq engine is missing from the app bundle. Rebuild the app.")
+            return String(localized: "A measurement engine is missing from this build.")
         case .badMeasurement:
-            return String(localized: "The measurement is too short to calculate a correction.")
-        case .failed(let message):
-            return String(format: String(localized: "roomeq failed: %@"), message)
+            return String(localized: "The measurement is too short.")
+        case .failed:
+            // Текст движка уходит в системный лог при показе ошибки (MeasurementFailure).
+            return String(localized: "Could not calculate the correction.")
         case .noCorrection:
-            return String(localized: "roomeq did not return a correction.")
+            return String(localized: "The engine returned no correction.")
         }
     }
 }
@@ -37,11 +40,14 @@ enum RoomEQCLI {
                              right: [RoomMeasurementCurve],
                              tilt: Double,
                              sampleRate: Double,
-                             dimensions: RoomDimensions?) async throws -> (left: RoomEQFilterSet, right: RoomEQFilterSet) {
+                             dimensions: RoomDimensions?,
+                             seed: Int?,
+                             positionCount: Int) async throws -> (left: RoomEQFilterSet, right: RoomEQFilterSet) {
         let holder = CancellableProcess()
         let work = Task(priority: .userInitiated) {
             try optimizePairSync(left: left, right: right, tilt: tilt,
                                  sampleRate: sampleRate, dimensions: dimensions,
+                                 seed: seed, positionCount: positionCount,
                                  holder: holder)
         }
         return try await withTaskCancellationHandler {
@@ -55,11 +61,14 @@ enum RoomEQCLI {
     static func optimizeSingle(measurements: [RoomMeasurementCurve],
                                tilt: Double,
                                sampleRate: Double,
-                               dimensions: RoomDimensions?) async throws -> RoomEQFilterSet {
+                               dimensions: RoomDimensions?,
+                               seed: Int?,
+                               positionCount: Int) async throws -> RoomEQFilterSet {
         let holder = CancellableProcess()
         let work = Task(priority: .userInitiated) {
             try optimizeSingleSync(measurements: measurements, tilt: tilt,
                                    sampleRate: sampleRate, dimensions: dimensions,
+                                   seed: seed, positionCount: positionCount,
                                    holder: holder)
         }
         return try await withTaskCancellationHandler {
@@ -84,11 +93,17 @@ enum RoomEQCLI {
 
     // MARK: - Synchronous implementation (runs off the main actor)
 
+    /// Границы полосы коррекции. Те же числа уходят в конфиг roomeq.
+    static let minFrequency = 20.0
+    static let maxFrequency = 1_600.0
+
     private static func optimizePairSync(left: [RoomMeasurementCurve],
                                          right: [RoomMeasurementCurve],
                                          tilt: Double,
                                          sampleRate: Double,
                                          dimensions: RoomDimensions?,
+                                         seed: Int?,
+                                         positionCount: Int,
                                          holder: CancellableProcess) throws -> (left: RoomEQFilterSet, right: RoomEQFilterSet) {
         guard left.allSatisfy({ $0.points.count > 8 }), right.allSatisfy({ $0.points.count > 8 }),
               !left.isEmpty, !right.isEmpty else { throw RoomEQCLIError.badMeasurement }
@@ -97,7 +112,9 @@ enum RoomEQCLI {
             system: ["model": "stereo", "speakers": ["L": "left", "R": "right"]],
             tilt: tilt,
             sampleRate: sampleRate,
-            dimensions: dimensions
+            dimensions: dimensions,
+            seed: seed,
+            positionCount: positionCount
         )
         let output = try run(config: config, sampleRate: sampleRate, holder: holder)
         guard let channels = output["channels"] as? [String: Any] else {
@@ -115,6 +132,8 @@ enum RoomEQCLI {
                                            tilt: Double,
                                            sampleRate: Double,
                                            dimensions: RoomDimensions?,
+                                           seed: Int?,
+                                           positionCount: Int,
                                            holder: CancellableProcess) throws -> RoomEQFilterSet {
         guard !measurements.isEmpty, measurements.allSatisfy({ $0.points.count > 8 }) else {
             throw RoomEQCLIError.badMeasurement
@@ -124,7 +143,9 @@ enum RoomEQCLI {
             system: nil,
             tilt: tilt,
             sampleRate: sampleRate,
-            dimensions: dimensions
+            dimensions: dimensions,
+            seed: seed,
+            positionCount: positionCount
         )
         let output = try run(config: config, sampleRate: sampleRate, holder: holder)
         guard let channels = output["channels"] as? [String: Any] else {
@@ -142,7 +163,9 @@ enum RoomEQCLI {
                                    system: [String: Any]?,
                                    tilt: Double,
                                    sampleRate: Double,
-                                   dimensions: RoomDimensions?) throws -> [String: Any] {
+                                   dimensions: RoomDimensions?,
+                                   seed: Int?,
+                                   positionCount: Int) throws -> [String: Any] {
         var config: [String: Any] = [
             "version": "3.0.0",
             "speakers": speakers.mapValues { measurements -> [String: Any] in
@@ -165,8 +188,8 @@ enum RoomEQCLI {
                 "algorithm": "autoeq:cmaes",
                 "num_filters": 9,
                 "peq_model": "ls-pk-hs",
-                "min_freq": 20.0,
-                "max_freq": 1_600.0,
+                "min_freq": minFrequency,
+                "max_freq": maxFrequency,
                 "min_q": 0.5,
                 "max_q": 3.0,
                 "min_db": -12.0,
@@ -197,17 +220,26 @@ enum RoomEQCLI {
         if let system {
             config["system"] = system
         }
+        if let seed {
+            // Без зерна каждый пересчёт даёт другой результат: менять наклон и
+            // сравнивать варианты становилось бы невозможно.
+            var optimizer = config["optimizer"] as? [String: Any] ?? [:]
+            optimizer["seed"] = seed
+            config["optimizer"] = optimizer
+        }
 
         var recording: [String: Any] = [
             "recording_sample_rate": sampleRate,
             "signal_type": "Sweep",
-            "signal_duration_secs": RoomMeasurementAnalyzer.sweepDuration,
+            // Длительность и число свипов должны совпадать с тем, что реально
+            // делает sotf-capture: иначе движок отчитывается о другом замере.
+            "signal_duration_secs": RoomMeasurementAnalyzer.captureDuration,
             "sweep_start_freq": RoomMeasurementAnalyzer.sweepStart,
             "sweep_end_freq": RoomMeasurementAnalyzer.sweepEnd,
-            "num_sweeps": 4,
+            "num_sweeps": RoomMeasurementAnalyzer.sweepsPerChannel,
             "pre_silence_s": 2.0,
             "signal_level_db": -6.02,
-            "num_positions": speakers.values.map(\.count).max() ?? 1,
+            "num_positions": max(positionCount, 1),
             "channel_names": speakers.keys.sorted()
         ]
         if let dimensions, dimensions.length > 0, dimensions.width > 0, dimensions.height > 0 {
@@ -235,31 +267,26 @@ enum RoomEQCLI {
 
         let configURL = directory.appendingPathComponent("config.json")
         let outputURL = directory.appendingPathComponent("output.json")
-        let errorURL = directory.appendingPathComponent("stderr.log")
         let data = try JSONSerialization.data(withJSONObject: config, options: [])
         try data.write(to: configURL)
-        fileManager.createFile(atPath: errorURL.path, contents: nil)
-        let errorHandle = try FileHandle(forWritingTo: errorURL)
-        defer { try? errorHandle.close() }
 
-        let process = Process()
-        process.executableURL = binary
-        process.arguments = ["--config", configURL.path,
-                             "--output", outputURL.path,
-                             "--sample-rate", String(sampleRate)]
-        process.currentDirectoryURL = directory
-        process.environment = ProcessInfo.processInfo.environment.merging(["RUST_LOG": "error"]) { $1 }
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = errorHandle
-        holder.attach(process)
-        try process.run()
-        process.waitUntilExit()
+        let base = ["--config", configURL.path,
+                    "--output", outputURL.path,
+                    "--sample-rate", String(sampleRate)]
+
+        // Проверка конфига самим движком: он же проверяет измерительные файлы
+        // и объясняет ошибку внятнее, чем «файла результата нет».
+        let dry = try execute(binary: binary, arguments: base + ["--dry-run"],
+                              directory: directory, holder: holder)
+        guard dry.status == 0 else { throw RoomEQCLIError.failed(dry.log) }
+        try? fileManager.removeItem(at: outputURL)
+
+        let run = try execute(binary: binary, arguments: base,
+                              directory: directory, holder: holder)
         try Task.checkCancellation()
-
-        let log = (try? String(contentsOf: errorURL, encoding: .utf8)) ?? ""
+        guard run.status == 0 else { throw RoomEQCLIError.failed(run.log) }
         guard fileManager.fileExists(atPath: outputURL.path) else {
-            let tail = log.suffix(1200)
-            throw RoomEQCLIError.failed(tail.isEmpty ? "exit \(process.terminationStatus)" : String(tail))
+            throw RoomEQCLIError.noCorrection
         }
         let outputData = try Data(contentsOf: outputURL)
         guard let output = try JSONSerialization.jsonObject(with: outputData) as? [String: Any] else {
@@ -268,8 +295,29 @@ enum RoomEQCLI {
         return output
     }
 
+    /// Один запуск roomeq. stderr читается до конца процесса, чтобы длинный
+    /// лог не заблокировал пайп.
+    private static func execute(binary: URL, arguments: [String], directory: URL,
+                                holder: CancellableProcess) throws -> (status: Int32, log: String) {
+        let pipe = Pipe()
+        let process = Process()
+        process.executableURL = binary
+        process.arguments = arguments
+        process.currentDirectoryURL = directory
+        process.environment = ProcessInfo.processInfo.environment.merging(["RUST_LOG": "error"]) { $1 }
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = pipe
+        holder.attach(process)
+        try process.run()
+        let errorData = pipe.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        let log = String(decoding: errorData, as: UTF8.self)
+        return (process.terminationStatus, String(log.suffix(1_200)))
+    }
+
     private static var binaryURL: URL? {
-        if let url = Bundle.main.url(forResource: "roomeq", withExtension: nil) {
+        // Модуль замера может быть скачан отдельно — он важнее бандла.
+        if let url = MeasurementModule.binary(named: "roomeq") {
             return url
         }
         let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
@@ -341,51 +389,62 @@ enum RoomEQCLI {
                 gainDB += gain
             }
         }
+
+        // Шельф, прижатый к границе полосы коррекции, — это не правка полосы,
+        // а общий наклон всего, что за границей. Такой слот остаётся нейтральным.
         let lowShelf = filters.first { $0.kind == .lowShelf }
         let highShelf = filters.first { $0.kind == .highShelf }
+        let lowShelfFits = lowShelf.map { abs(log2($0.frequency / minFrequency)) > 0.15 } ?? false
+        let highShelfFits = highShelf.map { abs(log2($0.frequency / maxFrequency)) > 0.15 } ?? false
+        var dropped = 0
+        if lowShelf != nil && !lowShelfFits { dropped += 1 }
+        if highShelf != nil && !highShelfFits { dropped += 1 }
+
         var peaks = filters.filter { $0.kind == .peak }.sorted { $0.frequency < $1.frequency }
         if peaks.count > 7 {
+            dropped += peaks.count - 7
             peaks = Array(peaks.sorted { abs($0.gain) > abs($1.gain) }.prefix(7))
                 .sorted { $0.frequency < $1.frequency }
         }
 
         var bands: [RoomCorrectionBand] = []
-        bands.append(RoomCorrectionBand(
-            frequency: clamp(lowShelf?.frequency ?? 60, 20, 20_000),
-            gain: clamp(lowShelf?.gain ?? 0, -20, 6),
-            q: clamp(lowShelf?.q ?? 0.7, 0.4, 9.9),
-            type: 1
-        ))
+        if lowShelfFits, let shelf = lowShelf {
+            bands.append(band(shelf, type: 1))
+        } else {
+            bands.append(RoomCorrectionBand(frequency: 60, gain: 0, q: 0.7, type: 1))
+        }
 
         let neutralFrequencies = [120.0, 250, 500, 1_000, 2_000, 4_000, 8_000]
         for index in 0..<7 {
             if index < peaks.count {
-                let peak = peaks[index]
-                bands.append(RoomCorrectionBand(
-                    frequency: clamp(peak.frequency, 20, 20_000),
-                    gain: clamp(peak.gain, -20, 6),
-                    q: clamp(peak.q, 0.4, 9.9),
-                    type: 0
-                ))
+                bands.append(band(peaks[index], type: 0))
             } else {
                 bands.append(RoomCorrectionBand(frequency: neutralFrequencies[index],
                                                 gain: 0, q: 1, type: 0))
             }
         }
 
-        bands.append(RoomCorrectionBand(
-            frequency: clamp(highShelf?.frequency ?? 10_000, 20, 20_000),
-            gain: clamp(highShelf?.gain ?? 0, -20, 6),
-            q: clamp(highShelf?.q ?? 0.7, 0.4, 9.9),
-            type: 1
-        ))
+        if highShelfFits, let shelf = highShelf {
+            bands.append(band(shelf, type: 1))
+        } else {
+            bands.append(RoomCorrectionBand(frequency: 10_000, gain: 0, q: 0.7, type: 1))
+        }
 
         let maximum = bands.map(\.gain).max() ?? 0
         let preamp = clamp(-max(maximum, 0), -20, 0)
         return RoomEQFilterSet(bands: bands,
                                preamp: (preamp * 10).rounded() / 10,
                                gainDB: (gainDB * 10).rounded() / 10,
-                               accepted: accepted)
+                               accepted: accepted,
+                               dropped: dropped)
+    }
+
+    /// Фильтр движка в полосу Room EQ, с приведением к пределам TotalMix.
+    private static func band(_ filter: Filter, type: Int) -> RoomCorrectionBand {
+        RoomCorrectionBand(frequency: clamp(filter.frequency, 20, 20_000),
+                           gain: clamp(filter.gain, -20, 6),
+                           q: clamp(filter.q, 0.4, 9.9),
+                           type: type)
     }
 
     private static func number(_ value: Any?) -> Double? {

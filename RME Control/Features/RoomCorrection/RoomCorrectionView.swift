@@ -13,6 +13,8 @@ struct RoomCorrectionView: View {
     @State private var showBands = false
     @State private var hostWindow: NSWindow?
     @State private var contentHeight: CGFloat = 0
+    /// Система просит меньше движения — переходы становятся короткими и плоскими.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var onClose: @MainActor () -> Void
 
@@ -33,19 +35,18 @@ struct RoomCorrectionView: View {
             Divider().opacity(0.55)
             content
                 .padding(18)
-            if let error = model.errorMessage {
-                Text(error)
-                    .font(.caption)
-                    .foregroundStyle(Color(nsColor: .systemRed))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 6)
-                    .background(Color(nsColor: .systemRed).opacity(0.07))
-            }
+                .id(stageKey)
+                .transition(.asymmetric(
+                    insertion: .opacity.combined(with: .offset(y: 10)),
+                    removal: .opacity
+                ))
+                .animation(animation(RoomMotion.stage), value: stageKey)
             footer
         }
         .frame(width: Self.contentSize.width)
         .fixedSize(horizontal: false, vertical: true)
+        .overlay { errorOverlay }
+        .animation(animation(RoomMotion.overlay), value: model.failure)
         .background(
             GeometryReader { proxy in
                 Color.clear.preference(key: RoomCorrectionHeightKey.self, value: proxy.size.height)
@@ -61,11 +62,15 @@ struct RoomCorrectionView: View {
             resizeWindow()
         })
         .panelSurface(cornerRadius: 12)
-        .onDisappear { model.cancel() }
+        .onDisappear {
+            model.stopWatchingSampleRate()
+            model.cancel()
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.willCloseNotification)) { note in
             guard let window = note.object as? NSWindow, window === hostWindow else { return }
             model.cancel()
         }
+        .task { model.startWatchingSampleRate() }
         .task { await model.requestMicrophoneAccess() }
         .task { await model.startCalibrationSession() }
         .sheet(isPresented: $showingSavePreset) {
@@ -189,6 +194,20 @@ struct RoomCorrectionView: View {
         }
     }
 
+    /// Шаги окна одной группой: внутри замера переход не нужен, между шагами — да.
+    private var stageKey: Int {
+        switch model.stage {
+        case .setup: return 0
+        case .position, .measuring: return 1
+        case .computing: return 2
+        case .results: return 3
+        }
+    }
+
+    private func animation(_ base: Animation) -> Animation? {
+        reduceMotion ? .easeInOut(duration: 0.12) : base
+    }
+
     // MARK: - Setup
 
     private var setup: some View {
@@ -214,27 +233,26 @@ struct RoomCorrectionView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            if let rate = model.selectedDevice?.sampleRate, rate > 0, abs(rate - 48_000) > 1 {
-                Label("Set the interface to 48 kHz before measuring. The measurement engine runs at 48 kHz.",
-                      systemImage: "exclamationmark.triangle")
-                    .font(.caption2)
-                    .foregroundStyle(.orange)
-                    .fixedSize(horizontal: false, vertical: true)
+            if model.showsSampleRateWarning {
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("Set the interface to 48 kHz before measuring. The measurement engine runs at 48 kHz.",
+                          systemImage: "exclamationmark.triangle")
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let rate = model.deviceSampleRate, rate > 0 {
+                        Text(String(format: String(localized: "Interface rate: %@"),
+                                    String(format: "%.1f kHz", rate / 1_000)))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .font(.caption2)
+                .foregroundStyle(.orange)
             }
 
-            if model.usesOSCRouting {
-                Label("Only the selected output is active while Measure is open. All other outputs are muted and will be restored when the measurement finishes or you close Measure.",
-                      systemImage: "info.circle")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else {
-                Label("Sound goes to software playback \(model.playbackPairTitle). Make sure TotalMix routes it to the selected output.",
-                      systemImage: "info.circle")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            Label("Only the selected output is active while Measure is open. All other outputs are muted and will be restored when the measurement finishes or you close Measure.",
+                  systemImage: "info.circle")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             levelCard
         }
@@ -342,6 +360,8 @@ struct RoomCorrectionView: View {
                 Image(systemName: model.calibration == nil ? "doc.badge.plus" : "checkmark.seal.fill")
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(model.calibration == nil ? Color.secondary : Color.green)
+                    .contentTransition(.symbolEffect(.replace))
+                    .animation(animation(RoomMotion.state), value: model.calibration == nil)
                     .frame(width: 26, height: 26)
                     .background(Circle().fill(Color.primary.opacity(0.06)))
 
@@ -368,6 +388,17 @@ struct RoomCorrectionView: View {
                 }
             }
 
+            Divider().opacity(0.5)
+
+            WizardField("Positions") {
+                Picker("", selection: $model.positionCount) {
+                    Text(verbatim: "1").tag(1)
+                    Text(verbatim: "3").tag(3)
+                }
+                .labelsHidden()
+                .pickerStyle(.segmented)
+                .frame(maxWidth: 120)
+            }
         }
     }
 
@@ -399,7 +430,7 @@ struct RoomCorrectionView: View {
                 Spacer()
                 if model.isLevelTestRunning {
                     HStack(spacing: 4) {
-                        Circle().fill(Color.green).frame(width: 6, height: 6)
+                        LiveDot()
                         Text("Live")
                             .font(.caption2)
                             .foregroundStyle(.green)
@@ -432,10 +463,25 @@ struct RoomCorrectionView: View {
         VStack(spacing: 12) {
             Text("Measurement starts in")
                 .font(.headline)
-            Text("\(countdown)")
-                .font(.system(size: 76, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(Color.accentColor)
+
+            ZStack {
+                Circle()
+                    .stroke(Color.accentColor.opacity(0.14), lineWidth: 3)
+                Circle()
+                    .trim(from: 0, to: CGFloat(countdown) / 5)
+                    .stroke(Color.accentColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .animation(animation(.linear(duration: 1)), value: countdown)
+                Text("\(countdown)")
+                    .font(.system(size: 64, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.accentColor)
+                    .contentTransition(.numericText(countsDown: true))
+                    .animation(animation(.spring(response: 0.32, dampingFraction: 0.72)), value: countdown)
+            }
+            .frame(width: 132, height: 132)
+            .padding(.vertical, 2)
+
             Text("Move away from the microphone.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
@@ -466,11 +512,16 @@ struct RoomCorrectionView: View {
                 VStack(spacing: 5) {
                     ProgressView(value: progress.fraction)
                         .progressViewStyle(.linear)
+                        .animation(animation(.linear(duration: 0.25)), value: progress.fraction)
                     HStack {
                         Text(progress.label)
+                        if progress.totalPositions > 1 {
+                            Text(verbatim: "\(progress.position)/\(progress.totalPositions)")
+                        }
                         Spacer()
                         Text("\(Int(progress.fraction * 100))%")
                             .monospacedDigit()
+                            .contentTransition(.numericText())
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -553,32 +604,62 @@ struct RoomCorrectionView: View {
                     HStack(spacing: 8) {
                         StatTile(value: String(format: "%.2f dB", correction.residualRMS),
                                  label: "Residual")
-                        StatTile(value: String(format: "%+.1f dB", correction.preamp),
-                                 label: "Gain")
-                        StatTile(value: "9", label: "Bands")
+                        StatTile(value: "\(correction.bands.filter { abs($0.gain) > 0.05 }.count)",
+                                 label: "Bands")
+                        if let dropped = correction.droppedFilters, dropped > 0 {
+                            StatTile(value: "\(dropped)", label: "Dropped")
+                        }
                     }
 
-                    if !correction.engineAccepted {
-                        Label("roomeq: unchanged — correction is below its acceptance threshold.",
-                              systemImage: "exclamationmark.triangle")
+                    // Калибровка громкости — часть результата АЧХ, а не отдельная
+                    // карточка: держим её одной строкой под графиком.
+                    HStack(spacing: 8) {
+                        Image(systemName: "speaker.wave.2")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Color.accentColor)
+                        Text("Volume calibration")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Spacer(minLength: 8)
+                        Text(String(format: "%+.1f dB", commonVolumeCalibration(correction)))
+                            .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                        Text("Both channels")
                             .font(.caption2)
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 7)
+                    .background(RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(Color.primary.opacity(0.04)))
+
+                    if !correction.engineAccepted {
+                        // Движок отказался менять ответ: записывать такую коррекцию нельзя.
+                        // Отказ объясняем на месте — кнопка Apply рядом недоступна.
+                        VStack(alignment: .leading, spacing: 3) {
+                            Label("The engine found nothing to change.",
+                                  systemImage: "exclamationmark.triangle")
+                                .font(.callout.weight(.medium))
+                                .foregroundStyle(.orange)
+                            Text("This correction is below the engine's threshold. Applying it would only overwrite the current Room EQ.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
                 }
             }
 
             if let correction = model.selectedCorrection {
-                levelCard(correction)
-
                 WizardCard(icon: "slider.horizontal.3", title: "Correction bands") {
                     DisclosureGroup(isExpanded: $showBands) {
                         BandGrid(bands: correction.bands)
                             .padding(.top, 8)
                     } label: {
-                        Text(showBands ? String(localized: "Hide bands") : String(localized: "Show nine bands"))
+                        Text(showBands ? String(localized: "Hide bands") : String(localized: "Show bands"))
                             .font(.callout)
                     }
                 }
+                .animation(animation(RoomMotion.state), value: showBands)
             }
         }
     }
@@ -606,6 +687,7 @@ struct RoomCorrectionView: View {
                 .background(Capsule().fill(selected ? color.opacity(0.16) : Color.clear))
         }
         .buttonStyle(.plain)
+        .animation(animation(RoomMotion.state), value: selected)
     }
 
     private var smoothingPicker: some View {
@@ -634,15 +716,58 @@ struct RoomCorrectionView: View {
         }
     }
 
-    private func levelCard(_ correction: RoomCorrection) -> some View {
-        let common = min(correction.preamp,
-                         model.corrections[.left]?.preamp ?? correction.preamp,
-                         model.corrections[.right]?.preamp ?? correction.preamp)
-        return WizardCard(icon: "speaker.wave.2", title: "Volume calibration",
-                          subtitle: "One common value for both channels — headroom for the EQ. Delay is not touched; set it manually in Room EQ.") {
-            HStack(spacing: 8) {
-                StatTile(value: String(format: "%+.1f dB", common), label: "Both channels")
+    /// Общий запас для обоих каналов: самый консервативный из трёх коррекций.
+    private func commonVolumeCalibration(_ correction: RoomCorrection) -> Double {
+        min(correction.preamp,
+            model.corrections[.left]?.preamp ?? correction.preamp,
+            model.corrections[.right]?.preamp ?? correction.preamp)
+    }
+
+    /// Отказ движка читается по центру окна: крупный понятный заголовок,
+    /// под ним — что делать. Технические подробности остаются в логе.
+    @ViewBuilder
+    private var errorOverlay: some View {
+        if let failure = model.failure {
+            ZStack {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+                    .onTapGesture {}
+                VStack(spacing: 14) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 34, weight: .semibold))
+                        .foregroundStyle(.orange)
+                    VStack(spacing: 8) {
+                        Text(failure.title)
+                            .font(.title2.weight(.semibold))
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if let hint = failure.hint {
+                            Text(hint)
+                                .font(.callout)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .frame(maxWidth: 400)
+                    Button("OK") { model.failure = nil }
+                        .keyboardShortcut(.cancelAction)
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                        .padding(.top, 2)
+                }
+                .padding(.horizontal, 32)
+                .padding(.vertical, 28)
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
+                }
+                .shadow(color: .black.opacity(0.35), radius: 24, y: 10)
+                .transition(.scale(scale: 0.94).combined(with: .opacity))
             }
+            .transition(.opacity)
+            .accessibilityAddTraits(.isModal)
         }
     }
 
@@ -682,7 +807,10 @@ struct RoomCorrectionView: View {
             Button("Continue") { model.startMeasurement() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
-                .disabled(!model.hasValidChannels || model.isLevelTestRunning)
+                .disabled(!model.hasValidChannels || model.isLevelTestRunning || !model.isSampleRateReady)
+                .help(model.isSampleRateReady
+                      ? ""
+                      : String(localized: "Set the interface to 48 kHz before measuring. The measurement engine runs at 48 kHz."))
 
         case .position:
             Button("Cancel") { model.rescan() }
@@ -717,7 +845,9 @@ struct RoomCorrectionView: View {
             Button(model.didApply ? "Apply again" : "Apply to Room EQ") { model.apply() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
-                .disabled(model.selectedCorrection == nil || model.isRecalculating)
+                .disabled(model.selectedCorrection == nil
+                          || model.isRecalculating
+                          || model.selectedCorrection?.engineAccepted == false)
         }
     }
 
@@ -728,15 +858,29 @@ struct RoomCorrectionView: View {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.json]
         panel.nameFieldStringValue = "Room Calibration \(result.outputLabel).json"
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-        do {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            try encoder.encode(result).write(to: url, options: .atomic)
-            model.status = String(format: String(localized: "Saved calibration result: %@"),
-                                  url.lastPathComponent)
-        } catch {
-            model.errorMessage = error.localizedDescription
+        presentSheet(panel) { url in
+            guard let url else { return }
+            do {
+                let encoder = JSONEncoder()
+                encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+                try encoder.encode(result).write(to: url, options: .atomic)
+                model.status = String(format: String(localized: "Saved calibration result: %@"),
+                                      url.lastPathComponent)
+            } catch {
+                model.failure = MeasurementFailure(title: error.localizedDescription)
+            }
+        }
+    }
+
+    /// Панель выбора файла листом к окну Measure: без собственного runloop,
+    /// поэтому главный поток и перехват клавиш не блокируются.
+    private func presentSheet(_ panel: NSSavePanel, completion: @escaping (URL?) -> Void) {
+        guard let window = hostWindow else {
+            completion(nil)
+            return
+        }
+        panel.beginSheetModal(for: window) { response in
+            completion(response == .OK ? panel.url : nil)
         }
     }
 
@@ -745,11 +889,13 @@ struct RoomCorrectionView: View {
         panel.allowedContentTypes = [.json]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-        do {
-            try model.loadCalibrationResult(from: url)
-        } catch {
-            model.errorMessage = error.localizedDescription
+        presentSheet(panel) { url in
+            guard let url else { return }
+            do {
+                try model.loadCalibrationResult(from: url)
+            } catch {
+                model.failure = MeasurementFailure(title: error.localizedDescription)
+            }
         }
     }
 
@@ -758,8 +904,10 @@ struct RoomCorrectionView: View {
         panel.allowedContentTypes = [.commaSeparatedText, .plainText, .text]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-        model.setCalibration(url: url)
+        presentSheet(panel) { url in
+            guard let url else { return }
+            model.setCalibration(url: url)
+        }
     }
 }
 
@@ -927,6 +1075,8 @@ private struct WizardStepperRow: View {
 private struct LevelMeter: View {
     let level: Double
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         VStack(spacing: 3) {
             GeometryReader { proxy in
@@ -953,6 +1103,7 @@ private struct LevelMeter: View {
                         .fill(color)
                         .frame(width: max(x(level), 2), height: 8)
                 }
+                .animation(reduceMotion ? nil : .linear(duration: 0.12), value: level)
             }
             .frame(height: 12)
 
@@ -1002,9 +1153,11 @@ private struct BandGrid: View {
     let bands: [RoomCorrectionBand]
 
     var body: some View {
+        // Нулевая полоса ничего не делает: писать её в TotalMix незачем, и в списке ей не место.
+        let active = Array(bands.enumerated()).filter { abs($0.element.gain) > 0.05 }
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
-            ForEach(Array(bands.enumerated()), id: \.offset) { index, band in
-                BandCell(index: index + 1, band: band)
+            ForEach(active, id: \.offset) { item in
+                BandCell(index: item.offset + 1, band: item.element)
             }
         }
     }
@@ -1129,13 +1282,15 @@ private struct CorrectionGraph: View {
                 return path
             }
 
-            // Целевой наклон — прямая в логарифмическом масштабе, 0 дБ на 1 кГц.
+            // Целевой наклон — прямая в логарифмическом масштабе. Крепим её к уровню
+            // измерения на 1 кГц: иначе прямая висит в абсолютном нуле и не показывает разрыв.
+            let anchorDB = RoomMeasurementAnalyzer.value(shownMeasured, at: 1_000)
             let tilt = RoomCorrectionTarget(tiltDBPerOctave: targetTilt)
             var targetPath = Path()
             let tiltSamples = 64
             for index in 0...tiltSamples {
                 let frequency = 20 * pow(1_000, Double(index) / Double(tiltSamples))
-                let point = CGPoint(x: x(frequency), y: y(tilt.db(at: frequency)))
+                let point = CGPoint(x: x(frequency), y: y(anchorDB + tilt.db(at: frequency)))
                 if index == 0 { targetPath.move(to: point) } else { targetPath.addLine(to: point) }
             }
             context.stroke(targetPath,
@@ -1149,11 +1304,26 @@ private struct CorrectionGraph: View {
                            with: .color(Color.accentColor),
                            style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
 
-            for frequency in [20.0, 100, 1000, 10000] {
-                let label = frequency >= 1000 ? "\(Int(frequency / 1000))k" : "\(Int(frequency))"
+            // Та же насечка, что у децибельной оси, и подписи на опорных частотах.
+            let frequencyTicks: [(frequency: Double, label: String)] = [
+                (20, "20"), (50, "50"), (100, "100"), (200, "200"), (500, "500"),
+                (1_000, "1k"), (2_000, "2k"), (5_000, "5k"), (10_000, "10k"), (20_000, "20k")
+            ]
+            let labelled: Set<Double> = width >= 360
+                ? Set(frequencyTicks.map(\.frequency))
+                : [20, 100, 1_000, 10_000]
+
+            for tick in frequencyTicks {
+                let tickX = x(tick.frequency)
+                var mark = Path()
+                mark.move(to: CGPoint(x: tickX, y: size.height - pad))
+                mark.addLine(to: CGPoint(x: tickX, y: size.height - pad + 4))
+                context.stroke(mark, with: .color(Color.primary.opacity(0.22)), lineWidth: 1)
+
+                guard labelled.contains(tick.frequency) else { continue }
                 context.draw(
-                    Text(label).font(.system(size: 8)).foregroundStyle(.secondary),
-                    at: CGPoint(x: x(frequency), y: size.height - 5)
+                    Text(tick.label).font(.system(size: 8)).foregroundStyle(.secondary),
+                    at: CGPoint(x: min(max(tickX, 8), size.width - 8), y: size.height - 5)
                 )
             }
         }
@@ -1170,5 +1340,33 @@ private extension RoomCorrectionViewModel.Stage {
     var isMeasuring: Bool {
         if case .measuring = self { return true }
         return false
+    }
+}
+
+/// Один набор движения на мастер замера: пружина на смену шага, мягкое затухание
+/// на мелочи. Всё это отключается, когда система просит меньше движения.
+private enum RoomMotion {
+    static let stage = Animation.spring(response: 0.42, dampingFraction: 0.86)
+    static let state = Animation.easeOut(duration: 0.22)
+    static let overlay = Animation.spring(response: 0.34, dampingFraction: 0.8)
+}
+
+/// Точка «Live»: дышит, пока идёт тест уровня, и стоит при reduce motion.
+private struct LiveDot: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var pulsing = false
+
+    var body: some View {
+        Circle()
+            .fill(Color.green)
+            .frame(width: 6, height: 6)
+            .scaleEffect(pulsing ? 1.45 : 0.85)
+            .opacity(pulsing ? 0.55 : 1)
+            .onAppear {
+                guard !reduceMotion else { return }
+                withAnimation(.easeInOut(duration: 0.85).repeatForever(autoreverses: true)) {
+                    pulsing = true
+                }
+            }
     }
 }
