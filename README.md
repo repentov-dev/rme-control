@@ -32,7 +32,7 @@ Works via Global OSC only with TotalMix 2.1+.
 Beta: the calibrator was tested on the Fireface 802 FS and may behave differently on other interfaces.
 
 <p align="center">
-  <img src="docs/screenshots/measure.png" width="760" alt="Measure setup, Room EQ and the measurement result">
+  <img src="docs/screenshots/measure.png?v=2" width="760" alt="Measure setup, Room EQ and the measurement result">
 </p>
 
 ## Requirements
@@ -53,7 +53,7 @@ cd rme-control
 compiler works), copies resources and translations, ad-hoc signs the bundle and installs
 `/Applications/RME Control.app`. Progress is reported as `[1/5]` … `[5/5]`.
 
-The measurement engines (`roomeq`, `sotf-capture`, 82 MB together) are not part of the repository:
+The measurement engines (`roomeq`, `sotf-capture`) are not part of the repository:
 they ship as a GitHub release and are downloaded by the app from **Settings → Modules** (or by the
 **Load** button in Room EQ). Keep them in `RME Control/Resources/` if you want a self-contained build,
 or start from `./build.sh --no-module` — the build stops bundling them automatically when they are absent.

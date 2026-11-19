@@ -20,20 +20,20 @@
 <header class="nav">
   <div class="nav__inner">
     <a class="nav__brand" href="#top">RME Control</a>
-    <nav class="nav__links" aria-label="Sections">
+    <nav class="nav__links" aria-label="Sections" data-i18n-aria-label="nav.sections">
       <a href="#features" data-i18n="nav.features">Features</a>
       <a href="#new" data-i18n="nav.new">What's new</a>
       <a href="#screens" data-i18n="nav.screens">Screens</a>
       <a href="#install" data-i18n="nav.install">Install</a>
       <a href="https://repentov-dev.github.io/repentov-site/" data-i18n="nav.site" target="_blank" rel="noopener">Website</a>
-      <span class="lang" role="group" aria-label="Language">
-        <button type="button" data-lang="en">EN</button>
-        <button type="button" data-lang="ru">RU</button>
-        <button type="button" data-lang="de">DE</button>
+      <span class="lang" role="group" aria-label="Language" data-i18n-aria-label="nav.language">
+        <button type="button" data-lang="en" lang="en" aria-label="English">EN</button>
+        <button type="button" data-lang="ru" lang="ru" aria-label="Русский">RU</button>
+        <button type="button" data-lang="de" lang="de" aria-label="Deutsch">DE</button>
       </span>
       <a class="nav__cta" href="https://github.com/repentov-dev/rme-control/releases/download/v4.1/RME-Control-4.1.pkg" data-i18n="nav.download">Download 4.1</a>
     </nav>
-    <button class="nav__burger" type="button" aria-label="Menu" aria-expanded="false">
+    <button class="nav__burger" type="button" aria-label="Menu" aria-expanded="false" data-i18n-aria-label="nav.menu">
       <span></span><span></span>
     </button>
   </div>
@@ -54,7 +54,7 @@
     </div>
     <div class="hero__stage">
       <div class="hero__tilt">
-        <img class="hero__shot" src="./screenshots/popover-window.png" width="560" height="993" alt="RME Control popover">
+        <img class="hero__shot" src="./screenshots/popover-window.png" width="560" height="993" alt="RME Control popover" data-i18n-alt="shot.popover.alt">
       </div>
     </div>
   </section>
@@ -103,7 +103,7 @@
       <article class="new__row" data-reveal style="--i:0">
         <p class="chapter__kicker" data-i18n="new.module.kicker">Measure</p>
         <h3 data-i18n="new.module.title">A module you download</h3>
-        <p data-i18n="new.module.text">Measure is now a separate module: install it from Settings → Modules, remove it to free 82 MB. The app itself is 14 MB.</p>
+        <p data-i18n="new.module.text">Measure is now a separate module: install it from Settings → Modules.</p>
       </article>
       <article class="new__row" data-reveal style="--i:1">
         <p class="chapter__kicker" data-i18n="new.presets.kicker">Presets</p>
@@ -135,7 +135,7 @@
     </div>
 
     <figure class="shot shot--wide shot--product" data-reveal>
-      <img src="./screenshots/app.png" width="1156" height="752" alt="RME Control windows">
+      <img src="./screenshots/app.png" width="1156" height="752" alt="RME Control windows" data-i18n-alt="shot.windows.alt">
       <figcaption>
         <span class="shot__name" data-i18n="shot.app.name">RME Control</span>
         <span class="shot__text" data-i18n="shot.app">The mixer in the menu bar, the channel EQ, the compressor and the level window.</span>
@@ -143,7 +143,7 @@
     </figure>
 
     <figure class="shot shot--wide shot--product" data-reveal>
-      <img src="./screenshots/measure.png" width="1781" height="1355" alt="Measure setup, Room EQ and the measurement result">
+      <img src="./screenshots/measure.png?v=2" width="1781" height="1355" alt="Measure setup, Room EQ and the measurement result" data-i18n-alt="shot.measure.alt">
       <figcaption>
         <span class="shot__name" data-i18n="shot.product.name">Measure and Room EQ</span>
         <span class="shot__text" data-i18n="shot.product">Setup, the measurement, the result and the Room EQ that receives it.</span>
@@ -232,7 +232,7 @@
       <p class="foot__mark">RME Control</p>
       <p class="foot__note" data-i18n="foot.note">A free, open-source menu bar controller for TotalMix FX, written in Swift.</p>
     </div>
-    <nav class="foot__links" aria-label="Elsewhere">
+    <nav class="foot__links" aria-label="Elsewhere" data-i18n-aria-label="foot.links">
       <a href="https://github.com/repentov-dev/rme-control" data-i18n="foot.repo">Repository</a>
       <a href="https://github.com/repentov-dev/rme-control/releases" data-i18n="foot.releases">Releases</a>
       <a href="https://github.com/repentov-dev/rme-control/blob/main/LICENSE" data-i18n="foot.license">MIT license</a>
@@ -250,7 +250,7 @@
   </div>
 </footer>
 
-<script src="./i18n.js?v=10" defer></script>
+<script src="./i18n.js?v=12" defer></script>
 <script src="./apple.js?v=5" defer></script>
 </body>
 </html>
