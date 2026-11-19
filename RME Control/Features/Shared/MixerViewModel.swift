@@ -26,8 +26,6 @@ final class MixerViewModel {
     // MARK: - Выходы
 
     var outputs: [OutputConfig] { settings.outputs }
-    var calibrationRouting: CalibrationRoutingMode { settings.calibrationRouting }
-    var calibrationPlaybackPair: Int { settings.calibrationPlaybackPair }
     var showMuteButtons: Bool { settings.showMuteButtons }
 
     func outputName(for id: UUID) -> String {
@@ -113,6 +111,12 @@ final class MixerViewModel {
     // MARK: - Клавиши громкости
 
     var volumeKeyOutputID: UUID? { settings.volumeKeyOutput?.id }
+
+    /// Временно навести клавиши громкости на другой выход (замер) или вернуть прежний.
+    /// `nil` снимает переназначение — настройка пользователя не трогается.
+    func setTemporaryVolumeKeyOutput(_ id: UUID?) {
+        settings.temporaryVolumeKeyOutputID = id
+    }
     var unmuteOnVolumeChange: Bool { settings.unmuteOnVolumeChange }
 
     var isVolumeKeyOutputMuted: Bool {
@@ -127,6 +131,16 @@ final class MixerViewModel {
     var speakerBOn: Bool { state.speakerBOn }
     var dimOn: Bool { state.dimOn }
     var monoOn: Bool { state.monoOn }
+
+    /// Отправляет EQ и Dynamics всех каналов в TotalMix.
+    func pushChannelProcessing() { mixer.pushChannelProcessing() }
+
+    /// Живое состояние пульта для пресета и его восстановление.
+    func mixerSnapshot() -> SettingsPreset.MixerSnapshot { mixer.mixerSnapshot() }
+    func applyMixerSnapshot(_ snapshot: SettingsPreset.MixerSnapshot) { mixer.applyMixerSnapshot(snapshot) }
+    func applyChannelProcessing(_ map: [String: SettingsPreset.ChannelProcessing]) {
+        mixer.applyChannelProcessing(map)
+    }
 
     func toggleSpeakerB() { mixer.toggleSpeakerB() }
     func toggleDim() { mixer.toggleDim() }
@@ -225,6 +239,10 @@ final class MixerViewModel {
 
     func setCompressorParameter(_ target: CompressorTarget, _ parameter: CompressorParameter, _ value: Double) {
         mixer.setCompressorParameter(target, parameter: parameter, value: value)
+    }
+
+    func setDynamicsMode(_ target: CompressorTarget, _ mode: DynamicsMode) {
+        mixer.setDynamicsMode(target, mode: mode)
     }
 
     /// Уровень на входе компрессора: уровень входа или уровень выхода в dBFS.

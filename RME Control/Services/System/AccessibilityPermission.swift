@@ -10,13 +10,24 @@ enum AccessibilityPermission {
 
     /// Показывает алерт с предложением открыть системные настройки.
     static func prompt() {
+        // Не блокируем вызывающий код: пока крутится модальный runloop, активный
+        // event tap перехвата клавиш успевает застопорить ввод.
+        DispatchQueue.main.async {
+            showPrompt()
+        }
+    }
+
+    private static func showPrompt() {
         let alert = NSAlert()
         alert.messageText = String(localized: "Accessibility Permission")
         alert.informativeText = String(localized: "To control Main volume with the macOS volume keys, RME Control needs the Accessibility permission. Open System Settings → Privacy & Security → Accessibility, add RME Control, then restart the app.")
         alert.alertStyle = .warning
         alert.addButton(withTitle: String(localized: "Open Settings"))
         alert.addButton(withTitle: String(localized: "Later"))
+        // Пока диалог крутит свой runloop, перехват клавиш не держим.
+        VolumeKeyMonitor.current?.suspendForModal()
         let response = alert.runModal()
+        VolumeKeyMonitor.current?.resumeAfterModal()
         if response == .alertFirstButtonReturn {
             openSystemSettings()
         }

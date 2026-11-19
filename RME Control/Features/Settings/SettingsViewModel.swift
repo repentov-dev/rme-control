@@ -250,10 +250,12 @@ final class SettingsViewModel {
     // MARK: - Пресеты настроек
 
     var presets: [SettingsPreset] { settings.presets }
-    var calibrationRouting: CalibrationRoutingMode { settings.calibrationRouting }
 
     func savePreset(named name: String) {
-        settings.savePreset(named: name, roomEQs: mixer.roomEQStates)
+        // Пресет — отпечаток всего: конфигурация, Room EQ и живое состояние пульта.
+        settings.savePreset(named: name,
+                            roomEQs: mixer.roomEQStates,
+                            mixer: mixer.mixerSnapshot())
     }
 
     func applyPreset(_ preset: SettingsPreset) {
@@ -261,6 +263,17 @@ final class SettingsViewModel {
         if let roomEQs = preset.snapshot.roomEQs {
             mixer.applyRoomEQStates(roomEQs)
         }
+        if let live = preset.snapshot.mixer {
+            mixer.applyChannelProcessing(live.processing ?? [:])
+            mixer.applyMixerSnapshot(live)
+        }
+        // Эквалайзеры, фильтры и динамика — тоже часть отпечатка.
+        mixer.pushChannelProcessing()
+    }
+
+    /// Импорт из файла: пресеты добавляются к текущим, ничего не затирая.
+    func importPresets(_ presets: [SettingsPreset]) {
+        settings.addPresets(presets)
     }
 
     func removePreset(_ preset: SettingsPreset) {

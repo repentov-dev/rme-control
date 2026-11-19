@@ -245,7 +245,14 @@ final class MixerService {
         compressor.set(parameter, value: value)
         let clamped = compressor.value(for: parameter)
         updateCompressor(target) { $0.set(parameter, value: clamped) }
-        osc.send(address + parameter.oscSuffix, Float(clamped))
+        osc.send(address + parameter.oscSuffix(for: compressor.mode), Float(clamped))
+    }
+
+    /// Переключение компрессор/экспандер. В Global OSC у TotalMix нет адреса
+    /// режима — он выбирается в его панели Dynamics, поэтому здесь меняется
+    /// только набор полей, которыми управляет приложение.
+    func setDynamicsMode(_ target: CompressorTarget, mode: DynamicsMode) {
+        updateCompressor(target) { $0.mode = mode }
     }
 
     /// Адрес канала для секции Dynamics; у входов компрессор доступен только комбо-входам.
@@ -553,6 +560,121 @@ final class MixerService {
         case .input: state.updateInput(target.id) { mutate(&$0.eq) }
         case .output: state.updateOutput(target.id) { mutate(&$0.eq) }
         }
+    }
+
+    /// Отправляет в TotalMix весь тракт каналов из конфигурации: Low Cut, EQ и
+    /// Dynamics. Нужен после применения пресета — иначе меняются только настройки
+    /// приложения, а эквалайзеры в TotalMix остаются прежними.
+    func pushChannelProcessing() {
+        for output in settings.outputs {
+            let live = state.output(output.id)
+            pushEQ(EQTarget(bus: .output, id: output.id), eq: live.eq)
+            pushDynamics(CompressorTarget(bus: .output, id: output.id), compressor: live.compressor)
+        }
+        for input in settings.inputs where input.type.showsCompressor {
+            let live = state.input(input.id)
+            pushEQ(EQTarget(bus: .input, id: input.id), eq: live.eq)
+            pushDynamics(CompressorTarget(bus: .input, id: input.id), compressor: live.compressor)
+        }
+    }
+
+    private func pushEQ(_ target: EQTarget, eq: EQState) {
+        setEQEnabled(target, enabled: eq.enabled)
+        setLowCutEnabled(target, enabled: eq.lowCutEnabled)
+        let values: [(EQParameter, Double)] = [
+            (.lowCutFreq, eq.lowCutFreq),
+            (.lowCutSlope, Double(eq.lowCutSlope)),
+            (.band1Type, Double(eq.band1Type)), (.band1Gain, eq.band1Gain),
+            (.band1Freq, eq.band1Freq), (.band1Q, eq.band1Q),
+            (.band2Gain, eq.band2Gain), (.band2Freq, eq.band2Freq), (.band2Q, eq.band2Q),
+            (.band3Type, Double(eq.band3Type)), (.band3Gain, eq.band3Gain),
+            (.band3Freq, eq.band3Freq), (.band3Q, eq.band3Q)
+        ]
+        for (parameter, value) in values {
+            setEQParameter(target, parameter, value: value)
+        }
+    }
+
+    private func pushDynamics(_ target: CompressorTarget, compressor: CompressorState) {
+        setCompressorEnabled(target, enabled: compressor.enabled)
+        for parameter in CompressorParameter.allCases {
+            setCompressorParameter(target, parameter: parameter,
+                                   value: compressor.value(for: parameter))
+        }
+    }
+
+    /// Текущее живое состояние пульта для пресета.
+    func mixerSnapshot() -> SettingsPreset.MixerSnapshot {
+        var outputValues: [UUID: Double] = [:]
+        var outputMuted: [UUID: Bool] = [:]
+        for output in settings.outputs {
+            let live = state.output(output.id)
+            outputValues[output.id] = live.value
+            outputMuted[output.id] = live.muted
+        }
+        var sendValues: [UUID: Double] = [:]
+        var sendMuted: [UUID: Bool] = [:]
+        for send in settings.sends {
+            let live = state.send(send.id)
+            sendValues[send.id] = live.value
+            sendMuted[send.id] = live.muted
+        }
+        var processing: [String: SettingsPreset.ChannelProcessing] = [:]
+        for output in settings.outputs {
+            let live = state.output(output.id)
+            processing[output.oscAddress] = SettingsPreset.ChannelProcessing(eq: live.eq,
+                                                                             compressor: live.compressor)
+        }
+        for input in settings.inputs {
+            let live = state.input(input.id)
+            processing[input.oscAddress] = SettingsPreset.ChannelProcessing(eq: live.eq,
+                                                                            compressor: live.compressor)
+        }
+        return SettingsPreset.MixerSnapshot(outputValues: outputValues,
+                                            outputMuted: outputMuted,
+                                            sendValues: sendValues,
+                                            sendMuted: sendMuted,
+                                            inputGains: nil,
+                                            dimOn: state.dimOn,
+                                            monoOn: state.monoOn,
+                                            speakerBOn: state.speakerBOn,
+                                            processing: processing)
+    }
+
+    /// Возвращает EQ и Dynamics каналов из снимка (в состояние, без OSC).
+    func applyChannelProcessing(_ map: [String: SettingsPreset.ChannelProcessing]) {
+        for output in settings.outputs {
+            guard let saved = map[output.oscAddress] else { continue }
+            state.updateOutput(output.id) { live in
+                live.eq = saved.eq
+                live.compressor = saved.compressor
+            }
+        }
+        for input in settings.inputs {
+            guard let saved = map[input.oscAddress] else { continue }
+            state.updateInput(input.id) { live in
+                live.eq = saved.eq
+                live.compressor = saved.compressor
+            }
+        }
+    }
+
+    /// Возвращает пульт к снимку: сначала mute, потом фейдеры, чтобы не
+    /// размьютить канал громкостью.
+    func applyMixerSnapshot(_ snapshot: SettingsPreset.MixerSnapshot) {
+        // Сначала уровень, потом mute: `setVolume` снимает mute при
+        // unmuteOnVolumeChange, и обратный порядок терял сохранённый mute.
+        for output in settings.outputs {
+            if let value = snapshot.outputValues[output.id] { setVolume(outputID: output.id, value: value) }
+            if let muted = snapshot.outputMuted[output.id] { setMuted(outputID: output.id, muted: muted) }
+        }
+        for send in settings.sends {
+            if let value = snapshot.sendValues[send.id] { setSendVolume(id: send.id, value: value) }
+            if let muted = snapshot.sendMuted[send.id] { setSendMuted(id: send.id, muted: muted) }
+        }
+        if state.dimOn != snapshot.dimOn { toggleDim() }
+        if state.monoOn != snapshot.monoOn { toggleMono() }
+        if state.speakerBOn != snapshot.speakerBOn { toggleSpeakerB() }
     }
 
     // MARK: - Конфигурация каналов

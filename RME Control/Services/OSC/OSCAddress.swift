@@ -23,7 +23,8 @@ enum OSCAddress {
         static let instrument = "/instrument"
     }
 
-    /// Секция Dynamics (компрессор) в Global OSC: `/input/8` + `/dynamics/enable`.
+    /// Секция Dynamics в Global OSC: `/input/8` + `/dynamics/enable`.
+    /// Порог и соотношение у компрессора и экспандера свои, остальное общее.
     enum Dynamics {
         static let enable = "/dynamics/enable"
         static let gain = "/dynamics/gain"
@@ -31,6 +32,8 @@ enum OSCAddress {
         static let release = "/dynamics/release"
         static let threshold = "/dynamics/compthres"
         static let ratio = "/dynamics/compratio"
+        static let expandThreshold = "/dynamics/expthres"
+        static let expandRatio = "/dynamics/expratio"
     }
 
     /// Секция EQ и Low Cut в Global OSC: `/input/8` + `/eq/band1gain`.

@@ -46,14 +46,37 @@ struct SettingsPreset: Codable, Identifiable, Equatable {
         /// остаются читаемыми и просто не меняют комбинации.
         var hotkeys: [String: Hotkey]?
 
-        /// Маршрутизация калибровщика.
-        var calibrationRouting: CalibrationRoutingMode?
-        var calibrationPlaybackPair: Int?
         /// Room EQ по OSC-адресам выходов: полосы, калибровка и служебные поля.
         var roomEQs: [String: RoomEQState]?
         /// Пресеты, сохранённые из замеров Room EQ.
         var roomEQUserPresets: [RoomEQUserPreset]?
         /// Настройки мастера замера.
         var roomCorrectionPreferences: RoomCorrectionPreferences?
+        /// Версия схемы снимка. Старые файлы без поля читаются как версия 1.
+        var version: Int?
+        /// Живое состояние пульта на момент сохранения: фейдеры, mute и кнопки
+        /// Control Room. `nil` в старых файлах — тогда их не трогаем.
+        var mixer: MixerSnapshot?
+    }
+
+    /// Отпечаток того, что TotalMix показывает прямо сейчас: фейдеры, mute
+    /// и кнопки Control Room.
+    struct MixerSnapshot: Codable, Equatable {
+        var outputValues: [UUID: Double]
+        var outputMuted: [UUID: Bool]
+        var sendValues: [UUID: Double]
+        var sendMuted: [UUID: Bool]
+        var inputGains: [UUID: Double]?
+        var dimOn: Bool
+        var monoOn: Bool
+        var speakerBOn: Bool
+        /// EQ и Dynamics по OSC-адресам каналов: это тоже часть отпечатка.
+        var processing: [String: ChannelProcessing]?
+    }
+
+    /// Эквалайзер и динамика одного канала.
+    struct ChannelProcessing: Codable, Equatable {
+        var eq: EQState
+        var compressor: CompressorState
     }
 }

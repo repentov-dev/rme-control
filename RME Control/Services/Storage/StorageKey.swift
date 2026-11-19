@@ -60,10 +60,6 @@ enum StorageKey: String, CaseIterable {
     // MARK: Настройки мастера замера Room EQ (JSON)
     case roomCorrectionPreferences = "roomCorrectionPreferences"
 
-    // MARK: Маршрутизация калибровщика
-    case calibrationRouting = "calibrationRouting"
-    case calibrationPlaybackPair = "calibrationPlaybackPair"
-
     // MARK: Язык интерфейса
     case language = "appLanguage"
 

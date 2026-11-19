@@ -1,5 +1,11 @@
 import AppKit
 import SwiftUI
+import UniformTypeIdentifiers
+
+/// Наши типы документов: объявлены в Info.plist, чтобы Finder и панели
+/// понимали расширения без путаницы с обычным JSON.
+private let presetSetType = UTType(exportedAs: "com.rme.volumes.presets", conformingTo: .json)
+private let presetType = UTType(exportedAs: "com.rme.volumes.preset", conformingTo: .json)
 
 // MARK: - General
 
@@ -9,6 +15,7 @@ struct GeneralSettingsSection: View {
     @State private var launchAtLogin = false
     @State private var accessibilityGranted = false
     @State private var presetName = ""
+    @State private var importStatus: String?
 
     var body: some View {
         VStack(spacing: 16) {
@@ -21,6 +28,20 @@ struct GeneralSettingsSection: View {
                         presetName = ""
                     }
                     .disabled(presetName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+
+                HStack(spacing: 8) {
+                    Button("Import…") { importPresets() }
+                    Button("Export…") { exportPresets() }
+                        .disabled(viewModel.presets.isEmpty)
+                    Spacer()
+                }
+                .controlSize(.small)
+
+                if let importStatus {
+                    Text(importStatus)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 if viewModel.presets.isEmpty {
@@ -50,13 +71,18 @@ struct GeneralSettingsSection: View {
                             Button("Apply") {
                                 viewModel.applyPreset(preset)
                             }
-                            Button(role: .destructive) {
-                                viewModel.removePreset(preset)
+                            Menu {
+                                Button("Export…") { exportPreset(preset) }
+                                Divider()
+                                Button("Delete", role: .destructive) { viewModel.removePreset(preset) }
                             } label: {
-                                Image(systemName: "trash")
+                                Image(systemName: "ellipsis.circle")
+                                    .font(.system(size: 11, weight: .semibold))
                             }
-                            .buttonStyle(.borderless)
-                            .help("Delete preset")
+                            .menuStyle(.borderlessButton)
+                            .menuIndicator(.hidden)
+                            .fixedSize()
+                            .help("Preset actions")
                         }
                         if preset.id != viewModel.presets.last?.id {
                             Divider()
@@ -147,7 +173,68 @@ struct GeneralSettingsSection: View {
     private func refreshAccessibility() {
         accessibilityGranted = viewModel.accessibilityGranted
     }
+    /// Экспорт одного пресета из его меню.
+    private func exportPreset(_ preset: SettingsPreset) {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [presetType]
+        panel.nameFieldStringValue = "\(preset.name).rmepreset"
+        FilePanel.present(panel) { url in
+            guard let url else { return }
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            guard let data = try? encoder.encode([preset]) else { return }
+            try? data.write(to: url, options: .atomic)
+        }
+    }
+
+    /// Экспорт всех пресетов одним JSON — переносится на другой Mac.
+    private func exportPresets() {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [presetSetType]
+        panel.nameFieldStringValue = "RME Control Presets.rmepresets"
+        FilePanel.present(panel) { url in
+            guard let url else { return }
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            guard let data = try? encoder.encode(viewModel.presets) else { return }
+            try? data.write(to: url, options: .atomic)
+        }
+    }
+
+    /// Импорт пресетов из файла; одноимённые не дублируются.
+    private func importPresets() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        // Фильтр типов не ставим: .rmepresets/.rmepreset/.json и любые старые
+        // файлы должны выбираться, даже если LaunchServices ещё не знает тип.
+        FilePanel.present(panel) { url in
+            guard let url, let data = try? Data(contentsOf: url) else { return }
+            let decoder = JSONDecoder()
+            // Набор пресетов — массив; одиночный файл тоже массив из одного,
+            // но понимаем и просто объект.
+            let presets = (try? decoder.decode([SettingsPreset].self, from: data))
+                ?? (try? decoder.decode(SettingsPreset.self, from: data)).map { [$0] }
+            guard let presets, !presets.isEmpty else {
+                NSLog("import presets: не удалось разобрать файл %@", url.lastPathComponent)
+                importStatus = String(localized: "Could not read this preset file.")
+                return
+            }
+            viewModel.importPresets(presets)
+            // Говорим, сколько добавилось: одноимённые пресеты не дублируются,
+            // и «ничего не произошло» иначе выглядит как ошибка.
+            let added = presets.filter { preset in
+                !viewModel.presets.contains { $0.name.caseInsensitiveCompare(preset.name) == .orderedSame }
+            }.count
+            if added > 0 {
+                importStatus = String(format: String(localized: "Imported presets: %ld"), added)
+            } else {
+                importStatus = String(localized: "These presets are already in the list.")
+            }
+        }
+    }
 }
+
 
 // MARK: - Menu bar panel
 
@@ -708,56 +795,5 @@ private extension Binding where Value == Set<UUID> {
                 }
             }
         )
-    }
-}
-
-// MARK: - Calibration
-
-/// Маршрутизация мастера замера: через матрицу TotalMix или напрямую
-/// в software playback-пару.
-struct CalibrationSettingsSection: View {
-    let viewModel: SettingsViewModel
-
-    var body: some View {
-        VStack(spacing: 16) {
-            SettingsCard("Routing", subtitle: "How the measurement wizard sends sound to the interface. OSC routes the playback pair and mutes other outputs in TotalMix; software playback sends audio directly and leaves the matrix untouched.") {
-                HStack {
-                    Text("Mode")
-                        .font(.callout)
-                    Spacer(minLength: 12)
-                    Picker("", selection: viewModel.binding(\.calibrationRouting)) {
-                        Text("OSC (TotalMix)").tag(CalibrationRoutingMode.osc)
-                        Text("Software playback").tag(CalibrationRoutingMode.softwarePlayback)
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .frame(width: 220)
-                }
-
-                Divider().opacity(0.5)
-
-                HStack {
-                    Text("Software playback output")
-                        .font(.callout)
-                    Spacer(minLength: 12)
-                    Picker("", selection: viewModel.binding(\.calibrationPlaybackPair)) {
-                        ForEach(0..<16, id: \.self) { left in
-                            Text(verbatim: "\(left * 2 + 1)/\(left * 2 + 2)").tag(left)
-                        }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .frame(width: 220)
-                    .disabled(viewModel.calibrationRouting == .osc)
-                }
-
-                Text(viewModel.calibrationRouting == .osc
-                     ? "Default: the wizard routes the selected output through OSC and restores TotalMix when the measurement finishes."
-                     : "The wizard plays into the chosen playback pair only. Make sure TotalMix routes it to the speakers you are measuring.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
     }
 }

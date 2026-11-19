@@ -32,8 +32,34 @@ enum CompressorParameter: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Нейтральное значение (TotalMix не сжимает и ничего не добавляет).
-    var neutral: Double { self == .ratio ? 1 : 0 }
+    /// Подпись значения: у экспандера соотношение читается как 1:2.0.
+    func formatted(_ value: Double, mode: DynamicsMode) -> String {
+        if self == .ratio, mode == .expander {
+            return String(format: "1:%.1f", value)
+        }
+        return formatted(value)
+    }
+
+    /// Нейтральное значение для активного режима (двойной клик по ручке).
+    func neutral(for mode: DynamicsMode) -> Double {
+        switch self {
+        case .ratio: return 1
+        case .threshold: return mode == .compressor ? 0 : -40
+        default: return 0
+        }
+    }
+
+    /// Порог и соотношение шлются в поля своего режима.
+    func oscSuffix(for mode: DynamicsMode) -> String {
+        switch self {
+        case .threshold:
+            return mode == .compressor ? OSCAddress.Dynamics.threshold : OSCAddress.Dynamics.expandThreshold
+        case .ratio:
+            return mode == .compressor ? OSCAddress.Dynamics.ratio : OSCAddress.Dynamics.expandRatio
+        default:
+            return oscSuffix
+        }
+    }
 
     /// Единица измерения для подписи (пусто у безразмерного ratio).
     var unit: String {
@@ -64,19 +90,39 @@ enum CompressorParameter: String, CaseIterable, Identifiable {
     }
 }
 
-/// Настройки компрессора входного канала и их влияние на уровень.
-struct CompressorState: Equatable, Sendable {
-    var enabled = false
-    var gain: Double = 0       // make-up gain, dB (−30…+30)
-    var attack: Double = 0     // мс (0…200)
-    var release: Double = 200  // мс (100…999)
-    var threshold: Double = 0  // dB (−60…0)
-    var ratio: Double = 1      // (1…10)
+/// Какой прибор секции Dynamics работает в TotalMix. Порог и соотношение
+/// у компрессора и экспандера свои, gain/attack/release — общие.
+enum DynamicsMode: String, Codable, CaseIterable, Identifiable, Sendable {
+    case compressor
+    case expander
 
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .compressor: return String(localized: "Compressor")
+        case .expander: return String(localized: "Expander")
+        }
+    }
+}
+
+/// Настройки секции Dynamics входного или выходного канала.
+struct CompressorState: Codable, Equatable, Sendable {
+    var enabled = false
+    var mode: DynamicsMode = .compressor
+    var gain: Double = 0            // make-up gain, dB (−30…+30)
+    var attack: Double = 0          // мс (0…200)
+    var release: Double = 200       // мс (100…999)
+    var threshold: Double = 0       // компрессор, dB (−60…0)
+    var ratio: Double = 1           // компрессор (1…10)
+    var expandThreshold: Double = -40   // экспандер, dB (−60…0)
+    var expandRatio: Double = 2         // экспандер (1…10)
+
+    /// Порог и соотношение читаются у активного режима.
     func value(for parameter: CompressorParameter) -> Double {
         switch parameter {
-        case .threshold: return threshold
-        case .ratio: return ratio
+        case .threshold: return mode == .compressor ? threshold : expandThreshold
+        case .ratio: return mode == .compressor ? ratio : expandRatio
         case .attack: return attack
         case .release: return release
         case .gain: return gain
@@ -86,19 +132,45 @@ struct CompressorState: Equatable, Sendable {
     mutating func set(_ parameter: CompressorParameter, value: Double) {
         let clamped = min(max(value, parameter.range.lowerBound), parameter.range.upperBound)
         switch parameter {
-        case .threshold: threshold = clamped
-        case .ratio: ratio = clamped
+        case .threshold:
+            if mode == .compressor { threshold = clamped } else { expandThreshold = clamped }
+        case .ratio:
+            if mode == .compressor { ratio = clamped } else { expandRatio = clamped }
         case .attack: attack = clamped
         case .release: release = clamped
         case .gain: gain = clamped
         }
     }
 
+    /// Кривая вход → выход в dB с учётом make-up. Компрессор загибает хвост
+    /// вниз выше порога, экспандер — ниже порога.
+    func transfer(_ db: Double) -> Double {
+        guard enabled else { return db + gain }
+        switch mode {
+        case .compressor:
+            guard ratio > 1, db > threshold else { return db + gain }
+            return threshold + (db - threshold) / ratio + gain
+        case .expander:
+            guard expandRatio > 1, db < expandThreshold else { return db + gain }
+            return expandThreshold + (db - expandThreshold) * expandRatio + gain
+        }
+    }
+
     /// Ослабление в dB при заданном уровне входа (dBFS) по статической кривой.
     /// TotalMix не отдаёт gain reduction по OSC — считаем сами.
     func gainReduction(forInputLevel level: Double) -> Double {
-        guard enabled, ratio > 1, level > threshold else { return 0 }
-        return (level - threshold) * (1 - 1 / ratio)
+        guard enabled, level > -99 else { return 0 }
+        let reduction: Double
+        switch mode {
+        case .compressor:
+            guard ratio > 1, level > threshold else { return 0 }
+            reduction = (level - threshold) * (1 - 1 / ratio)
+        case .expander:
+            guard expandRatio > 1, level < expandThreshold else { return 0 }
+            reduction = (expandThreshold - level) * (expandRatio - 1)
+        }
+        // Оценка для индикатора: глубже 30 dB показывать нечего.
+        return min(reduction, 30)
     }
 }
 
@@ -177,7 +249,7 @@ enum EQParameter: String, CaseIterable, Identifiable, Sendable {
 }
 
 /// Настройки 3-полосного EQ и Low Cut одного канала.
-struct EQState: Equatable, Sendable {
+struct EQState: Codable, Equatable, Sendable {
     var enabled = false
 
     var band1Type = 1      // 0 Bell, 1 Low Shelf, 2 High-Pass, 3 Low Pass

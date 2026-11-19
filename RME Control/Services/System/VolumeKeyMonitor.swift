@@ -8,6 +8,8 @@ import ApplicationServices
 /// Требует разрешение «Специальные возможности»; без него повторяет попытку каждые 5 секунд.
 @MainActor
 final class VolumeKeyMonitor {
+    /// Текущий монитор: по нему модальные окна снимают перехват.
+    nonisolated(unsafe) static weak var current: VolumeKeyMonitor?
     private enum VolumeAction {
         case up
         case down
@@ -69,11 +71,34 @@ final class VolumeKeyMonitor {
         CGEvent.tapEnable(tap: tap, enable: true)
         CGEvent.tapEnable(tap: keyTap, enable: true)
         isStarted = true
+        Self.current = self
+    }
+
+    /// На время модального окна перехват снимается: активный tap, пока главный
+    /// поток занят диалогом, и есть причина «залипших» клавиатуры и трекпада.
+    func suspendForModal() {
+        guard isStarted else { return }
+        for tap in [eventTap, keyTap].compactMap({ $0 }) {
+            CGEvent.tapEnable(tap: tap, enable: false)
+        }
+    }
+
+    func resumeAfterModal() {
+        guard isStarted else { return }
+        // Не в том же тике, где закрылся диалог: даём WindowServer снять
+        // модальное состояние, иначе tap остаётся выключенным системой.
+        let taps = [eventTap, keyTap].compactMap { $0 }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            for tap in taps where CFMachPortIsValid(tap) {
+                CGEvent.tapEnable(tap: tap, enable: true)
+            }
+        }
     }
 
     func stop() {
         guard isStarted else { return }
         isStarted = false
+        Self.current = nil
         for source in [runLoopSource, keyTapSource].compactMap({ $0 }) {
             CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes)
         }

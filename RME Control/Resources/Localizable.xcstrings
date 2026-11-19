@@ -1,6 +1,796 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Check for updates": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверить обновления"
+          }
+        }
+      }
+    },
+    "Check the module release on GitHub": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверить релиз модуля на GitHub"
+          }
+        }
+      }
+    },
+    "Version %@ is the latest.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Версия %@ — последняя."
+          }
+        }
+      }
+    },
+    "Version %@ is available.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доступна версия %@."
+          }
+        }
+      }
+    },
+    "Could not check for updates.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось проверить обновления."
+          }
+        }
+      }
+    },
+    "Could not read this preset file.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось прочитать файл пресетов."
+          }
+        }
+      }
+    },
+    "Imported presets: %ld": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импортировано пресетов: %ld"
+          }
+        }
+      }
+    },
+    "These presets are already in the list.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Такие пресеты уже есть в списке."
+          }
+        }
+      }
+    },
+    "Measure (%@)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Измерить (%@)"
+          }
+        }
+      }
+    },
+    "Measure the room and calculate a correction · module %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Измерить комнату и рассчитать коррекцию · модуль %@"
+          }
+        }
+      }
+    },
+    "Export…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Экспорт…"
+          }
+        }
+      }
+    },
+    "Import…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импорт…"
+          }
+        }
+      }
+    },
+    "Preset actions": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Действия с пресетом"
+          }
+        }
+      }
+    },
+    "From file…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Из файла…"
+          }
+        }
+      }
+    },
+    "The module release is not published on GitHub yet.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Релиз модуля ещё не опубликован на GitHub."
+          }
+        }
+      }
+    },
+    "Modules": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Модули"
+          }
+        }
+      }
+    },
+    "The measurement module for Room EQ: download, update and remove.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Модуль замера для Room EQ: загрузка, обновление и удаление."
+          }
+        }
+      }
+    },
+    "Measurement module": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Модуль замера"
+          }
+        }
+      }
+    },
+    "Room EQ measurement: roomeq and sotf-capture. Downloaded once and stored outside the app.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Замер для Room EQ: roomeq и sotf-capture. Качается один раз и хранится вне приложения."
+          }
+        }
+      }
+    },
+    "Measurement module %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Модуль замера %@"
+          }
+        }
+      }
+    },
+    "Downloading… %ld%%": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загрузка… %ld%%"
+          }
+        }
+      }
+    },
+    "The measurement module did not install.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Модуль замера не установился."
+          }
+        }
+      }
+    },
+    "The measurement module is not installed.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Модуль замера не установлен."
+          }
+        }
+      }
+    },
+    "Version %@ is available — %@ now installed.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доступна версия %@ — сейчас установлено %@."
+          }
+        }
+      }
+    },
+    "Installed, %@ on disk.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Установлен, %@ на диске."
+          }
+        }
+      }
+    },
+    "Downloading from GitHub.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скачивается с GitHub."
+          }
+        }
+      }
+    },
+    "Room EQ asks for it before the first measurement.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Room EQ попросит его перед первым замером."
+          }
+        }
+      }
+    },
+    "Update to %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обновить до %@"
+          }
+        }
+      }
+    },
+    "Delete": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить"
+          }
+        }
+      }
+    },
+    "Download": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загрузить"
+          }
+        }
+      }
+    },
+    "Download measure": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загрузить замер"
+          }
+        }
+      }
+    },
+    "Download the measurement module": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скачать модуль замера"
+          }
+        }
+      }
+    },
+    "Download failed (HTTP %lld).": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загрузка не удалась (HTTP %lld)."
+          }
+        }
+      }
+    },
+    "Could not unpack the module archive.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось распаковать архив модуля."
+          }
+        }
+      }
+    },
+    "The archive does not contain the measurement engines.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В архиве нет движков замера."
+          }
+        }
+      }
+    },
+    "Expander": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Экспандер"
+          }
+        }
+      }
+    },
+    "Close": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Закрыть"
+          }
+        }
+      }
+    },
+    "Compressor": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Компрессор"
+          }
+        }
+      }
+    },
+    "Equalizer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эквалайзер"
+          }
+        }
+      }
+    },
+    "Room EQ presets": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пресеты Room EQ"
+          }
+        }
+      }
+    },
+    "Measure the room and calculate a correction": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Измерить комнату и рассчитать коррекцию"
+          }
+        }
+      }
+    },
+    "Headphone and room correction preset": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пресет для наушников и коррекции комнаты"
+          }
+        }
+      }
+    },
+    "Mix": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Микс"
+          }
+        }
+      }
+    },
+    "Double-click to type a value": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Двойной клик — ввести значение"
+          }
+        }
+      }
+    },
+    "Comp": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Комп"
+          }
+        }
+      }
+    },
+    "RME interface": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Интерфейс RME"
+          }
+        }
+      }
+    },
+    "Output": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выход"
+          }
+        }
+      }
+    },
+    "Microphone": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Микрофон"
+          }
+        }
+      }
+    },
+    "Result": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Результат"
+          }
+        }
+      }
+    },
+    "Level test": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверка уровня"
+          }
+        }
+      }
+    },
+    "Frequency response": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "АЧХ"
+          }
+        }
+      }
+    },
+    "Correction bands": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Полосы коррекции"
+          }
+        }
+      }
+    },
+    "Volume calibration": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Калибровка громкости"
+          }
+        }
+      }
+    },
+    "One common value for both channels — headroom for the EQ. Delay is not touched; set it manually in Room EQ.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Одно общее значение для обоих каналов — запас для эквалайзера. Задержка не меняется, выставьте её вручную в Room EQ."
+          }
+        }
+      }
+    },
+    "Menu bar control for RME TotalMix FX over OSC.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Управление RME TotalMix FX из строки меню по OSC."
+          }
+        }
+      }
+    },
+    "Room EQ engine: roomeq / AutoEQ (GPL-3.0)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Движок Room EQ: roomeq / AutoEQ (GPL-3.0)"
+          }
+        }
+      }
+    },
+    "Measurement engine: sotf-capture (GPL-3.0)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Движок замера: sotf-capture (GPL-3.0)"
+          }
+        }
+      }
+    },
+    "RME, TotalMix and the RME logo are trademarks of RME Audio AG. This project is an independent tool and is not affiliated with, endorsed by, or supported by RME Audio.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RME, TotalMix и логотип RME — товарные знаки RME Audio AG. Этот проект — независимый инструмент: он не связан с RME Audio, не одобрен ею и не поддерживается."
+          }
+        }
+      }
+    },
+    "Input %lld": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вход %lld"
+          }
+        }
+      }
+    },
+    "Menu Bar Panel": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Панель в строке меню"
+          }
+        }
+      }
+    },
+    "Vocals": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вокал"
+          }
+        }
+      }
+    },
+    "Clean": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чистый"
+          }
+        }
+      }
+    },
+    "Male": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мужской"
+          }
+        }
+      }
+    },
+    "Female": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Женский"
+          }
+        }
+      }
+    },
+    "Rap": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Рэп"
+          }
+        }
+      }
+    },
+    "Speech": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Речь"
+          }
+        }
+      }
+    },
+    "Soft": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мягкий"
+          }
+        }
+      }
+    },
+    "Loud": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Громкий"
+          }
+        }
+      }
+    },
+    "Guitar": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Гитара"
+          }
+        }
+      }
+    },
+    "Electric": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Электрогитара"
+          }
+        }
+      }
+    },
+    "Acoustic": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Акустика"
+          }
+        }
+      }
+    },
+    "Bass": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Бас"
+          }
+        }
+      }
+    },
+    "Bass Guitar": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Бас-гитара"
+          }
+        }
+      }
+    },
+    "Keys": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Клавишные"
+          }
+        }
+      }
+    },
+    "Piano": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пиано"
+          }
+        }
+      }
+    },
+    "Synth": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Синтезатор"
+          }
+        }
+      }
+    },
+    "Drums": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Барабаны"
+          }
+        }
+      }
+    },
+    "Film": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кино"
+          }
+        }
+      }
+    },
+    "Cinema": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кинотеатр"
+          }
+        }
+      }
+    },
     "": {},
     "%@ connected": {
       "localizations": {
@@ -19234,16 +20024,6 @@
         }
       }
     },
-    "Allow microphone access in System Settings → Privacy & Security → Microphone.": {
-      "localizations": {
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Разрешите доступ к микрофону в «Системные настройки» → «Конфиденциальность и безопасность» → «Микрофон»."
-          }
-        }
-      }
-    },
     "Band": {
       "localizations": {
         "ru": {
@@ -19350,16 +20130,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Выберите устройство и микрофон."
-          }
-        }
-      }
-    },
-    "CoreAudio does not expose this channel. Choose another channel or check the TotalMix routing.": {
-      "localizations": {
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CoreAudio не предоставляет этот канал. Выберите другой канал или проверьте маршрутизацию TotalMix."
           }
         }
       }
@@ -19804,16 +20574,6 @@
         }
       }
     },
-    "Show nine bands": {
-      "localizations": {
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Показать девять полос"
-          }
-        }
-      }
-    },
     "Smoothing": {
       "localizations": {
         "ru": {
@@ -19884,16 +20644,6 @@
         }
       }
     },
-    "The measurement is too short to calculate a correction.": {
-      "localizations": {
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Замер слишком короткий для расчёта коррекции."
-          }
-        }
-      }
-    },
     "The microphone channel is outside the device inputs.": {
       "localizations": {
         "ru": {
@@ -19934,16 +20684,6 @@
         }
       }
     },
-    "The roomeq engine is missing from the app bundle. Rebuild the app.": {
-      "localizations": {
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Движок roomeq отсутствует в приложении. Пересоберите приложение."
-          }
-        }
-      }
-    },
     "The selected microphone input is unavailable.": {
       "localizations": {
         "ru": {
@@ -19960,16 +20700,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Выбранный выход недоступен."
-          }
-        }
-      }
-    },
-    "The sotf-capture engine is missing from the app bundle. Rebuild the app.": {
-      "localizations": {
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Движок sotf-capture отсутствует в приложении. Пересоберите приложение."
           }
         }
       }
@@ -20024,16 +20754,6 @@
         }
       }
     },
-    "roomeq did not return a correction.": {
-      "localizations": {
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "roomeq не вернул коррекцию."
-          }
-        }
-      }
-    },
     "roomeq failed: %@": {
       "localizations": {
         "ru": {
@@ -20044,32 +20764,12 @@
         }
       }
     },
-    "roomeq: unchanged — correction is below its acceptance threshold.": {
-      "localizations": {
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "roomeq: без изменений — коррекция ниже порога принятия."
-          }
-        }
-      }
-    },
     "sotf-capture failed: %@": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Сбой sotf-capture: %@"
-          }
-        }
-      }
-    },
-    "sotf-capture returned no usable measurement.": {
-      "localizations": {
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "sotf-capture не вернул пригодный замер."
           }
         }
       }
@@ -20114,92 +20814,1042 @@
         }
       }
     },
-    "How the measurement wizard sends sound and restores TotalMix.": {
+    "Positions": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Как мастер замера отправляет звук и возвращает TotalMix."
+            "value": "Позиции"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Positionen"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Positions"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posiciones"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posizioni"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posições"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posities"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pozycje"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konumlar"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Позиції"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "測定点"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "측정 위치"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测点"
           }
         }
       }
     },
-    "How the measurement wizard sends sound to the interface. OSC routes the playback pair and mutes other outputs in TotalMix; software playback sends audio directly and leaves the matrix untouched.": {
+    "Dropped": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Как мастер замера отправляет звук в интерфейс. OSC направляет playback-пару и мьютит остальные выходы в TotalMix; software playback играет напрямую и не трогает матрицу."
+            "value": "Отброшено"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verworfen"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écartés"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descartados"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scartati"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descartados"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verworpen"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odrzucone"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atlanan"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відкинуто"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除外"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "제외됨"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已舍弃"
           }
         }
       }
     },
-    "Mode": {
+    "Bands": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Режим"
+            "value": "Полосы"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bänder"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bandes"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bandas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bande"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bandas"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Banden"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasma"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bantlar"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Смуги"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バンド"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "밴드"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "频段"
           }
         }
       }
     },
-    "OSC (TotalMix)": {
+    "Show bands": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "OSC (TotalMix)"
+            "value": "Показать полосы"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bänder anzeigen"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les bandes"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar bandas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra bande"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar bandas"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Banden tonen"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pokaż pasma"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bantları göster"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Показати смуги"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バンドを表示"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "밴드 표시"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示频段"
           }
         }
       }
     },
-    "Software playback": {
+    "Interface rate: %@": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Software playback"
+            "value": "Частота интерфейса: %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interface-Takt: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fréquence de l'interface : %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frecuencia de la interfaz: %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frequenza dell'interfaccia: %@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taxa da interface: %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interfacefrequentie: %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Częstotliwość interfejsu: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arayüz hızı: %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Частота інтерфейсу: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インターフェースのサンプルレート: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "인터페이스 샘플레이트: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接口采样率：%@"
           }
         }
       }
     },
-    "Software playback output": {
+    "Could not recognise the signal.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Выход software playback"
+            "value": "Не удалось распознать сигнал."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Signal konnte nicht erkannt werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de reconnaître le signal."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo reconocer la señal."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile riconoscere il segnale."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível reconhecer o sinal."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het signaal kon niet worden herkend."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie udało się rozpoznać sygnału."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sinyal tanınamadı."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не вдалося розпізнати сигнал."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "信号を認識できませんでした。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "신호를 인식하지 못했습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法识别信号。"
           }
         }
       }
     },
-    "Default: the wizard routes the selected output through OSC and restores TotalMix when the measurement finishes.": {
+    "The measurement failed.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "По умолчанию мастер направляет выбранный выход через OSC и возвращает TotalMix после замера."
+            "value": "Измерение не удалось."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Messung ist fehlgeschlagen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La mesure a échoué."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La medición falló."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La misurazione non è riuscita."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A medição falhou."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De meting is mislukt."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pomiar nie powiódł się."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ölçüm başarısız oldu."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вимірювання не вдалося."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "測定に失敗しました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "측정에 실패했습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测量失败。"
           }
         }
       }
     },
-    "The wizard plays into the chosen playback pair only. Make sure TotalMix routes it to the speakers you are measuring.": {
+    "The recording is clipped.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Мастер играет только в выбранную playback-пару. Убедитесь, что TotalMix направляет её на измеряемые колонки."
+            "value": "Запись перегружена."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Aufnahme ist übersteuert."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'enregistrement sature."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La grabación está saturada."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La registrazione è satura."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A gravação está saturada."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De opname is overstuurd."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nagranie jest przesterowane."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kayıt kırpılıyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запис перевантажено."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録音がクリップしています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "녹음이 클리핑되었습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录音削波。"
           }
         }
       }
     },
-    "Sound goes to software playback %@. Make sure TotalMix routes it to the selected output.": {
+    "Could not open the audio device.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Звук идёт в software playback %@. Убедитесь, что TotalMix направляет его на выбранный выход."
+            "value": "Не удалось открыть аудиоустройство."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Audiogerät konnte nicht geöffnet werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'ouvrir le périphérique audio."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo abrir el dispositivo de audio."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile aprire il dispositivo audio."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível abrir o dispositivo de áudio."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het audioapparaat kon niet worden geopend."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie udało się otworzyć urządzenia audio."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses aygıtı açılamadı."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не вдалося відкрити аудіопристрій."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オーディオデバイスを開けませんでした。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오디오 장치를 열 수 없습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法打开音频设备。"
+          }
+        }
+      }
+    },
+    "Could not calculate the correction.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось рассчитать коррекцию."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Korrektur konnte nicht berechnet werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de calculer la correction."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo calcular la corrección."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile calcolare la correzione."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível calcular a correção."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De correctie kon niet worden berekend."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie udało się obliczyć korekcji."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düzeltme hesaplanamadı."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не вдалося розрахувати корекцію."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "補正を計算できませんでした。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보정을 계산할 수 없습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法计算校正。"
+          }
+        }
+      }
+    },
+    "A measurement engine is missing from this build.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В этой сборке нет измерительного движка."
+          }
+        }
+      }
+    },
+    "The engine returned no usable measurement.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Движок не вернул пригодный замер."
+          }
+        }
+      }
+    },
+    "The engine returned no correction.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Движок не вернул коррекцию."
+          }
+        }
+      }
+    },
+    "The engine found nothing to change.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Движок не нашёл, что менять."
+          }
+        }
+      }
+    },
+    "The measurement is too short.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Замер слишком короткий."
+          }
+        }
+      }
+    },
+    "The audio engine stopped.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Звуковой движок остановился."
+          }
+        }
+      }
+    },
+    "The interface does not expose this channel.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Интерфейс не отдаёт этот канал."
+          }
+        }
+      }
+    },
+    "RME Control has no microphone access.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "У RME Control нет доступа к микрофону."
+          }
+        }
+      }
+    },
+    "Reinstall RME Control.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переустановите RME Control."
+          }
+        }
+      }
+    },
+    "Check the microphone input and the gain, then measure again.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверьте вход микрофона и усиление, затем замерьте снова."
+          }
+        }
+      }
+    },
+    "Drag to move · Scroll to change Q · Double-click to flatten": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тяните точку — частота и усиление · колесо — Q · двойной клик — обнулить"
+          }
+        }
+      }
+    },
+    "Lower the microphone gain and measure again.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уменьшите усиление микрофона и замерьте снова."
+          }
+        }
+      }
+    },
+    "Quit other audio apps, check the cable, then try again.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Закройте другие аудиоприложения, проверьте кабель и попробуйте снова."
+          }
+        }
+      }
+    },
+    "Run a full measurement before calculating a correction.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сначала выполните полный замер, потом считайте коррекцию."
+          }
+        }
+      }
+    },
+    "Measure again. If it repeats, the room is already close to the target.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Замерьте ещё раз. Если повторится, комната уже близка к целевой кривой."
+          }
+        }
+      }
+    },
+    "The engine rejected this measurement. Measure again, or reduce the target tilt.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Движок отклонил этот замер. Замерьте снова или уменьшите наклон цели."
+          }
+        }
+      }
+    },
+    "This correction is below the engine's threshold. Applying it would only overwrite the current Room EQ.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эта коррекция ниже порога движка. Применение только затрёт текущую Room EQ."
+          }
+        }
+      }
+    },
+    "Connect the interface and reopen Measure.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключите интерфейс и откройте Measure заново."
+          }
+        }
+      }
+    },
+    "Choose another channel in Measure.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выберите другой канал в Measure."
+          }
+        }
+      }
+    },
+    "Reopen Measure. If it repeats, restart RME Control.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Откройте Measure заново. Если повторится, перезапустите RME Control."
+          }
+        }
+      }
+    },
+    "Choose another channel or check the routing in TotalMix.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выберите другой канал или проверьте маршрут в TotalMix."
+          }
+        }
+      }
+    },
+    "Allow it in System Settings → Privacy & Security → Microphone.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешите доступ в «Системные настройки» → «Конфиденциальность и безопасность» → «Микрофон»."
           }
         }
       }
