@@ -31,7 +31,7 @@
         <button type="button" data-lang="ru">RU</button>
         <button type="button" data-lang="de">DE</button>
       </span>
-      <a class="nav__cta" href="https://github.com/repentov-dev/rme-control/releases/download/v4.0/RME-Control-4.0.pkg" data-i18n="nav.download">Download 4.0</a>
+      <a class="nav__cta" href="https://github.com/repentov-dev/rme-control/releases/download/v4.1/RME-Control-4.1.pkg" data-i18n="nav.download">Download 4.1</a>
     </nav>
     <button class="nav__burger" type="button" aria-label="Menu" aria-expanded="false">
       <span></span><span></span>
@@ -46,14 +46,10 @@
       <h1 data-i18n="hero.title">TotalMix in the menu bar</h1>
       <p class="hero__sub" data-i18n="hero.sub">Free, open-source control for TotalMix FX: volume and output switching, Room EQ and calibration, headphone presets — from the menu bar.</p>
       <div class="hero__actions">
-        <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v4.0/RME-Control-4.0.pkg" data-i18n="hero.download">Download 4.0</a>
+        <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v4.1/RME-Control-4.1.pkg" data-i18n="hero.download">Download 4.1</a>
         <a class="btn btn--tint" href="https://github.com/repentov-dev/rme-control" data-i18n="hero.source">Read the source</a>
         <a class="btn btn--tint" href="https://forum.rme-audio.de/viewtopic.php?id=43536" data-i18n="hero.forum">RME forum</a>
       </div>
-      <p class="hero__alt">
-        <span data-i18n="hero.old">Prefer a build without Room EQ?</span>
-        <a href="./downloads/RME-Control-3.8.pkg" data-i18n="hero.old.link">Download 3.8</a>
-      </p>
       <p class="hero__note" data-i18n="hero.note">Global OSC, TotalMix 2.1 or newer. macOS 14+, Apple Silicon and Intel.</p>
     </div>
     <div class="hero__stage">
@@ -100,25 +96,34 @@
 
   <section class="new" id="new">
     <div class="section-head" data-reveal>
-      <p class="eyebrow" data-i18n="new.eyebrow">Version 4.0</p>
-      <h2 data-i18n="new.title">New in version 4.0</h2>
+      <p class="eyebrow" data-i18n="new.eyebrow">Version 4.1</p>
+      <h2 data-i18n="new.title">New in version 4.1</h2>
     </div>
     <div class="new__list">
       <article class="new__row" data-reveal style="--i:0">
-        <p class="chapter__kicker" data-i18n="new.eq.kicker">Room EQ</p>
-        <h3 data-i18n="new.eq.title">Fully carried over from TotalMix</h3>
-        <p data-i18n="new.eq.text">Nine bands on every output, with Mix and Crossfeed right inside the Room EQ window.</p>
+        <p class="chapter__kicker" data-i18n="new.module.kicker">Measure</p>
+        <h3 data-i18n="new.module.title">A module you download</h3>
+        <p data-i18n="new.module.text">Measure is now a separate module: install it from Settings → Modules, remove it to free 82 MB. The app itself is 14 MB.</p>
       </article>
       <article class="new__row" data-reveal style="--i:1">
-        <p class="chapter__kicker" data-i18n="new.hp.kicker">Headphones</p>
-        <h3 data-i18n="new.hp.title">Presets for popular headphones</h3>
-        <p data-i18n="new.hp.text">A large library of presets for the most popular headphones. Pick a model and the curve lands in Room EQ.</p>
-        <p class="new__stat"><strong>25</strong> <span data-i18n="new.stat.brands">brands</span> · <strong>80</strong> <span data-i18n="new.stat.models">models</span></p>
+        <p class="chapter__kicker" data-i18n="new.presets.kicker">Presets</p>
+        <h3 data-i18n="new.presets.title">The whole app in one preset</h3>
+        <p data-i18n="new.presets.text">Presets capture channels, equalizers, dynamics, Room EQ, faders and Control Room buttons — and restore all of it. Export to a file, import on another Mac.</p>
       </article>
       <article class="new__row" data-reveal style="--i:2">
-        <p class="chapter__kicker" data-i18n="new.engine.kicker">Correction engine</p>
-        <h3 data-i18n="new.engine.title">Correction system</h3>
-        <p data-i18n="new.engine.text">Measure both speakers, get left, right and stereo corrections and apply them to Room EQ. Save your own calibration presets; microphone calibration files are supported.</p>
+        <p class="chapter__kicker" data-i18n="new.ux.kicker">Interface</p>
+        <h3 data-i18n="new.ux.title">Better equalizer and Room EQ</h3>
+        <p data-i18n="new.ux.text">A denser frequency axis with ticks, live readings under the cursor, a compressor/expander switch, and Room EQ redraws about five times faster.</p>
+      </article>
+      <article class="new__row" data-reveal style="--i:3">
+        <p class="chapter__kicker" data-i18n="new.expander.kicker">Dynamics</p>
+        <h3 data-i18n="new.expander.title">Expander</h3>
+        <p data-i18n="new.expander.text">Dynamics switches between compressor and expander, with the matching curve and TotalMix's own expander parameters.</p>
+      </article>
+      <article class="new__row" data-reveal style="--i:4">
+        <p class="chapter__kicker" data-i18n="new.measure11.kicker">Measure 1.1</p>
+        <h3 data-i18n="new.measure11.title">Measurement engine update</h3>
+        <p data-i18n="new.measure11.text">Clear error handling, a smoother measurement flow and an algorithm aligned with the engine author's recommendations.</p>
       </article>
     </div>
   </section>
@@ -158,7 +163,7 @@
       <ol class="steps">
         <li class="step">
           <span class="step__num">01</span>
-          <p><span data-i18n="install.one">Download</span> <span class="nowrap">RME-Control-4.0.pkg</span> <span data-i18n="install.one.b">and open it.</span></p>
+          <p><span data-i18n="install.one">Download</span> <span class="nowrap">RME-Control-4.1.pkg</span> <span data-i18n="install.one.b">and open it.</span></p>
         </li>
         <li class="step">
           <span class="step__num">02</span>
@@ -181,9 +186,8 @@
         </li>
       </ol>
       <div class="install__actions">
-        <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v4.0/RME-Control-4.0.pkg" data-i18n="install.download">Download the installer</a>
+        <a class="btn btn--fill" href="https://github.com/repentov-dev/rme-control/releases/download/v4.1/RME-Control-4.1.pkg" data-i18n="install.download">Download the installer</a>
         <a class="btn btn--tint" href="https://github.com/repentov-dev/rme-control#build-and-install" data-i18n="install.build">Build it yourself</a>
-        <a class="btn btn--tint" href="./downloads/RME-Control-3.8.pkg" data-i18n="install.old">Download 3.8 without Room EQ</a>
       </div>
     </div>
   </section>
@@ -211,7 +215,7 @@
       <h2 data-i18n="specs.title">On the label</h2>
     </div>
     <dl class="sheet sheet--specs" data-reveal>
-      <div class="row"><dt data-i18n="specs.version">Version</dt><dd>4.0</dd></div>
+      <div class="row"><dt data-i18n="specs.version">Version</dt><dd>4.1</dd></div>
       <div class="row"><dt data-i18n="specs.system">System</dt><dd data-i18n="specs.system.v">macOS 14 Sonoma or newer</dd></div>
       <div class="row"><dt data-i18n="specs.arch">Architecture</dt><dd data-i18n="specs.arch.v">arm64 and x86_64, one universal build</dd></div>
       <div class="row"><dt data-i18n="specs.languages">Interface</dt><dd data-i18n="specs.languages.v">14 languages</dd></div>
