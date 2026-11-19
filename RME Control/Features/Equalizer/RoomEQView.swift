@@ -21,6 +21,7 @@ struct RoomEQView: View {
     @State private var headerHovered = false
     @State private var showingSavePreset = false
     @State private var showingManagePresets = false
+    @State private var module = MeasurementModule.shared
     @State private var showingParametricEQ = false
     @State private var hostWindow: NSWindow?
     @State private var presetName = ""
@@ -147,10 +148,7 @@ struct RoomEQView: View {
             .help("Room EQ presets")
 
             if let onMeasure {
-                Button("Measure (beta)", action: onMeasure)
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .help("Measure the room and calculate a correction")
+                measureButton(onMeasure)
             }
 
             Text(target.label)
@@ -195,6 +193,37 @@ struct RoomEQView: View {
         )
     }
 
+    /// Нет модуля замера — кнопка качает его с GitHub, есть — открывает Measure.
+    @ViewBuilder
+    private func measureButton(_ onMeasure: @escaping @MainActor () -> Void) -> some View {
+        switch module.phase {
+        case .installed:
+            Button(String(format: String(localized: "Measure (%@)"), MeasurementModule.version),
+                   action: onMeasure)
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .help("Measure the room and calculate a correction")
+        case .downloading(let progress):
+            HStack(spacing: 5) {
+                ProgressView()
+                    .controlSize(.mini)
+                Text("\(Int(progress * 100))%")
+                    .font(.system(size: 10, weight: .semibold))
+                    .monospacedDigit()
+            }
+            .padding(.horizontal, 8)
+            .frame(height: 18)
+            .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.08)))
+        case .missing, .failed:
+            Button("Download measure") {
+                Task { await module.download() }
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.small)
+            .help("Download the measurement module")
+        }
+    }
+
     // MARK: - Модель графика
 
     private func model(for room: RoomEQState) -> EQGraphModel {
@@ -202,6 +231,10 @@ struct RoomEQView: View {
         let other = target.hasPartner ? viewModel.roomEQ(target, channel: otherSide) : nil
         let selectedColor = roomEQChannelColor(side)
         let otherColor = roomEQChannelColor(otherSide)
+        // Коэффициенты полос считаются один раз на отрисовку, а не на каждую
+        // точку кривой — иначе перетаскивание ручки упирается в ~30 кадров.
+        let prepared = RoomEQResponse.Prepared(state: room)
+        let preparedOther = other.map { RoomEQResponse.Prepared(state: $0) }
 
         return EQGraphModel(
             bands: (1...RoomEQState.bandCount).map { number in
@@ -222,19 +255,15 @@ struct RoomEQView: View {
             ),
             bandColor: { RoomEQStyle.color(for: $0) },
             cutColor: .purple,
-            responseDb: { frequency in
-                RoomEQResponse.totalDb(state: room, at: frequency)
-            },
+            responseDb: { prepared.db(at: $0) },
             bandResponseDb: { number, frequency in
-                RoomEQResponse.db(band: room.band(number), bandNumber: number, at: frequency)
+                prepared.bandDb(number, at: frequency)
             },
             curveColor: target.hasPartner ? selectedColor : nil,
             fillColor: target.hasPartner ? selectedColor : nil,
             reference: other.map { state in
                 EQGraphReference(
-                    responseDb: { frequency in
-                        RoomEQResponse.totalDb(state: state, at: frequency)
-                    },
+                    responseDb: { preparedOther?.db(at: $0) ?? 0 },
                     color: otherColor,
                     enabled: state.enabled
                 )
@@ -1303,7 +1332,56 @@ enum RoomEQResponse {
         return 20 * log10(max(magnitude(coefficient, at: frequency), 1e-6))
     }
 
-    private static func coefficients(kind: EQTypeIcon.Kind, frequency: Double,
+    /// Коэффициенты всех полос, посчитанные заранее. Каждая полоса — шесть
+    /// чисел; дальше остаётся только арифметика на точку кривой.
+    struct Prepared {
+        private let coefficients: [[Double]]
+
+        init(state: RoomEQState) {
+            coefficients = (1...RoomEQState.bandCount).map { number in
+                let band = state.band(number)
+                let kinds = RoomEQFilterKinds.kinds(for: number)
+                let index = min(max(band.type, 0), kinds.count - 1)
+                return RoomEQResponse.coefficients(kind: kinds[index],
+                                                   frequency: band.frequency,
+                                                   gain: band.gain,
+                                                   q: band.q)
+            }
+        }
+
+        func db(at frequency: Double) -> Double {
+            let w = 2 * Double.pi * frequency / RoomEQResponse.sampleRate
+            let cosW = cos(w), sinW = sin(w)
+            let cos2W = cos(2 * w), sin2W = sin(2 * w)
+            var sum = 0.0
+            for c in coefficients {
+                sum += RoomEQResponse.db(c, cosW: cosW, sinW: sinW, cos2W: cos2W, sin2W: sin2W)
+            }
+            return sum
+        }
+
+        func bandDb(_ number: Int, at frequency: Double) -> Double {
+            guard coefficients.indices.contains(number - 1) else { return 0 }
+            let w = 2 * Double.pi * frequency / RoomEQResponse.sampleRate
+            return RoomEQResponse.db(coefficients[number - 1],
+                                     cosW: cos(w), sinW: sin(w),
+                                     cos2W: cos(2 * w), sin2W: sin(2 * w))
+        }
+    }
+
+    /// Отклик одной полосы по готовым коэффициентам и общим sin/cos.
+    static func db(_ c: [Double], cosW: Double, sinW: Double,
+                   cos2W: Double, sin2W: Double) -> Double {
+        let nr = c[0] + c[1] * cosW + c[2] * cos2W
+        let ni = -(c[1] * sinW + c[2] * sin2W)
+        let dr = c[3] + c[4] * cosW + c[5] * cos2W
+        let di = -(c[4] * sinW + c[5] * sin2W)
+        let d = dr * dr + di * di
+        let magnitude = d < 1e-12 ? 1 : sqrt((nr * nr + ni * ni) / d)
+        return 20 * log10(max(magnitude, 1e-6))
+    }
+
+    static func coefficients(kind: EQTypeIcon.Kind, frequency: Double,
                                      gain: Double, q: Double) -> [Double] {
         let w = 2 * Double.pi * min(max(frequency, 10), sampleRate / 2 - 10) / sampleRate
         let cosW = cos(w), sinW = sin(w)
@@ -1380,17 +1458,17 @@ private struct BandTypeMenu: View {
                                 .frame(width: 22, height: 12)
                             Text(names[index])
                                 .font(.caption)
-                            Spacer(minLength: 0)
                         }
-                        .padding(.horizontal, 6)
+                        .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }
             }
+            // Список обнимает содержимое: лишняя ширина справа только тянет руку.
             .padding(6)
-            .frame(minWidth: 130)
+            .fixedSize()
         }
     }
 }

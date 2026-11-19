@@ -95,6 +95,8 @@ struct EQGraphView: View {
     @State private var showTask: Task<Void, Never>?
     @State private var hideTask: Task<Void, Never>?
     @State private var clearTask: Task<Void, Never>?
+    /// Положение мыши над графиком: по нему рисуется считывание и живёт подсказка.
+    @State private var pointer: CGPoint?
 
     var body: some View {
         GeometryReader { proxy in
@@ -112,7 +114,11 @@ struct EQGraphView: View {
                     },
                     onDrag: { point in dragged(point, geometry: geometry) },
                     onRelease: { point in released(point, geometry: geometry) },
-                    onScroll: { point, delta in scrolled(point, delta: delta, geometry: geometry) }
+                    onScroll: { point, delta in scrolled(point, delta: delta, geometry: geometry) },
+                    cursorFor: { point in
+                        guard let point else { return .arrow }
+                        return node(at: point, geometry: geometry) == nil ? .arrow : .pointingHand
+                    }
                 )
 
                 if let tip {
@@ -129,6 +135,8 @@ struct EQGraphView: View {
                         }
                         .animation(.easeOut(duration: 0.13), value: tipVisible)
                 }
+
+                gestureHint(geometry: geometry)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.primary.opacity(0.045))
@@ -184,11 +192,29 @@ struct EQGraphView: View {
             )
         }
 
-        for frequency in [20.0, 100, 1000, 10000] {
-            let label = frequency >= 1000 ? "\(Int(frequency / 1000))k" : "\(Int(frequency))"
+        // Частотная ось повторяет децибельную: насечка у каждой опорной частоты
+        // и подпись под ней. В узком графике подписи прореживаются, чтобы не липнуть.
+        let frequencyTicks: [(frequency: Double, label: String)] = [
+            (20, "20"), (50, "50"), (100, "100"), (200, "200"), (500, "500"),
+            (1_000, "1k"), (2_000, "2k"), (5_000, "5k"), (10_000, "10k"), (20_000, "20k")
+        ]
+        let plotWidth = geometry.size.width - EQGeometry.padLeft - EQGeometry.padRight
+        let labelled: Set<Double> = plotWidth >= 360
+            ? Set(frequencyTicks.map(\.frequency))
+            : [20, 100, 1_000, 10_000]
+
+        for tick in frequencyTicks {
+            let x = geometry.freqToX(tick.frequency)
+
+            var mark = Path()
+            mark.move(to: CGPoint(x: x, y: geometry.size.height - EQGeometry.padBottom))
+            mark.addLine(to: CGPoint(x: x, y: geometry.size.height - EQGeometry.padBottom + 4))
+            context.stroke(mark, with: .color(Color.primary.opacity(0.22)), lineWidth: 1)
+
+            guard labelled.contains(tick.frequency) else { continue }
             drawText(
-                label,
-                x: geometry.freqToX(frequency),
+                tick.label,
+                x: min(max(x, 10), geometry.size.width - 10),
                 baselineY: geometry.size.height - 4,
                 size: 8,
                 weight: .medium,
@@ -364,6 +390,80 @@ struct EQGraphView: View {
                 context: &context
             )
         }
+
+        drawPointerReadout(context: &context, geometry: geometry)
+    }
+
+    // MARK: - Считывание под курсором
+
+    /// Пока курсор в пустой части графика, под ним живёт вертикаль, точка на
+    /// кривой и плашка с частотой и уровнем: АЧХ можно прочитать, не трогая полосы.
+    private func drawPointerReadout(context: inout GraphicsContext, geometry: EQGeometry) {
+        guard let pointer, active == nil, dragMode == nil, !tipVisible else { return }
+        let plotLeft = EQGeometry.padLeft
+        let plotRight = geometry.size.width - EQGeometry.padRight
+        let plotBottom = geometry.size.height - EQGeometry.padBottom
+        guard pointer.x >= plotLeft, pointer.x <= plotRight,
+              pointer.y >= EQGeometry.padTop, pointer.y <= plotBottom else { return }
+
+        let frequency = min(max(geometry.xToFreq(pointer.x), 20), 20_000)
+        let db = min(max(model.responseDb(frequency), -20), 20)
+
+        var hair = Path()
+        hair.move(to: CGPoint(x: pointer.x, y: EQGeometry.padTop))
+        hair.addLine(to: CGPoint(x: pointer.x, y: plotBottom))
+        context.stroke(hair,
+                       with: .color(Color.primary.opacity(0.16)),
+                       style: StrokeStyle(lineWidth: 1, dash: [2, 3]))
+
+        let dotY = geometry.dbToY(db)
+        let dot = Path(ellipseIn: CGRect(x: pointer.x - 3, y: dotY - 3, width: 6, height: 6))
+        context.fill(dot, with: .color(model.enabled ? Color.accentColor : Color.primary.opacity(0.5)))
+
+        let caption = "\(formatFrequency(frequency)) · \(formatGain(db))"
+        let width = CGFloat(caption.count) * 5.1 + 12
+        let height: CGFloat = 17
+        var left = pointer.x + 12
+        if left + width > plotRight { left = pointer.x - 12 - width }
+        left = min(max(left, plotLeft), max(plotRight - width, plotLeft))
+        var top = pointer.y - height - 10
+        if top < EQGeometry.padTop { top = pointer.y + 12 }
+        top = min(max(top, EQGeometry.padTop), max(plotBottom - height, EQGeometry.padTop))
+
+        let pill = Path(roundedRect: CGRect(x: left, y: top, width: width, height: height),
+                        cornerRadius: 5)
+        context.fill(pill, with: .color(Color.primary.opacity(0.07)))
+        context.stroke(pill, with: .color(Color.primary.opacity(0.10)), lineWidth: 1)
+        context.draw(
+            Text(caption)
+                .font(.system(size: 9, weight: .medium))
+                .foregroundStyle(.secondary),
+            at: CGPoint(x: left + width / 2, y: top + height / 2),
+            anchor: .center
+        )
+    }
+
+    /// Подсказка по жестам: появляется только над пустым графиком и сразу гаснет,
+    /// когда курсор уходит на полосу — постоянной строкой она бы мешала.
+    @ViewBuilder
+    private func gestureHint(geometry: EQGeometry) -> some View {
+        Text("Drag to move · Scroll to change Q · Double-click to flatten")
+            .font(.system(size: 9))
+            .foregroundStyle(Color.secondary.opacity(0.75))
+            .lineLimit(1)
+            .padding(.leading, EQGeometry.padLeft + 6)
+            .padding(.top, 5)
+            .opacity(hintVisible(geometry) ? 1 : 0)
+            .animation(.easeOut(duration: 0.16), value: hintVisible(geometry))
+            .allowsHitTesting(false)
+    }
+
+    private func hintVisible(_ geometry: EQGeometry) -> Bool {
+        guard let pointer, active == nil, dragMode == nil, !tipVisible else { return false }
+        return pointer.x >= EQGeometry.padLeft
+            && pointer.x <= geometry.size.width - EQGeometry.padRight
+            && pointer.y >= EQGeometry.padTop
+            && pointer.y <= geometry.size.height - EQGeometry.padBottom
     }
 
     private func drawText(
@@ -473,6 +573,11 @@ struct EQGraphView: View {
 
     private func hover(_ point: CGPoint?, geometry: EQGeometry) {
         guard dragMode == nil else { return }
+        // Сдвиг меньше пикселя не меняет картинку — не гоняем лишний кадр.
+        if let point, let pointer, hypot(pointer.x - point.x, pointer.y - point.y) < 1 {
+            return
+        }
+        pointer = point
 
         guard let point else {
             focusedBand = nil
@@ -606,6 +711,13 @@ struct EQGraphView: View {
             focusedBand = band
             let frequency = min(max(geometry.xToFreq(point.x), 20), 20000)
             let gain = min(max(geometry.yToDb(point.y), -20), 20)
+            // Мышь шлёт события чаще кадров: микросдвиг не записываем, иначе
+            // каждое движение впустую перерисовывает всё окно.
+            if let current = model.band(band),
+               abs(current.gain - gain) < 0.01,
+               abs(log(current.frequency / frequency)) < 0.0005 {
+                return
+            }
             actions.setPosition(band, frequency, gain)
             pauseTip(.band(band), geometry: geometry)
         case .cut:
@@ -709,7 +821,7 @@ struct EQGraphView: View {
 
     private func scheduleShow(_ node: EQGraphNode) {
         showTask = Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            try? await Task.sleep(nanoseconds: 450_000_000)
             guard !Task.isCancelled else { return }
             showTask = nil
             guard active == node, tip != nil else { return }
@@ -929,6 +1041,9 @@ private struct EQInteractionLayer: NSViewRepresentable {
     var onDrag: (CGPoint) -> Void
     var onRelease: (CGPoint) -> Void
     var onScroll: (CGPoint, CGFloat) -> Void
+    /// Курсор над точкой полосы и над пустым графиком разный: ручка должна
+    /// читаться как то, что можно взять.
+    var cursorFor: (CGPoint?) -> NSCursor
 
     func makeNSView(context: Context) -> EventView {
         let view = EventView()
@@ -946,6 +1061,7 @@ private struct EQInteractionLayer: NSViewRepresentable {
         view.onDrag = onDrag
         view.onRelease = onRelease
         view.onScroll = onScroll
+        view.cursorFor = cursorFor
     }
 
     final class EventView: NSView {
@@ -954,6 +1070,7 @@ private struct EQInteractionLayer: NSViewRepresentable {
         var onDrag: ((CGPoint) -> Void)?
         var onRelease: ((CGPoint) -> Void)?
         var onScroll: ((CGPoint, CGFloat) -> Void)?
+        var cursorFor: ((CGPoint?) -> NSCursor)?
 
         private var tracking: NSTrackingArea?
 
@@ -988,14 +1105,19 @@ private struct EQInteractionLayer: NSViewRepresentable {
         }
 
         override func mouseMoved(with event: NSEvent) {
-            onHover?(point(for: event))
+            let point = point(for: event)
+            cursorFor?(point).set()
+            onHover?(point)
         }
 
         override func mouseEntered(with event: NSEvent) {
-            onHover?(point(for: event))
+            let point = point(for: event)
+            cursorFor?(point).set()
+            onHover?(point)
         }
 
         override func mouseExited(with event: NSEvent) {
+            NSCursor.arrow.set()
             onHover?(nil)
         }
 
@@ -1008,11 +1130,14 @@ private struct EQInteractionLayer: NSViewRepresentable {
         }
 
         override func mouseDragged(with event: NSEvent) {
+            NSCursor.closedHand.set()
             onDrag?(point(for: event))
         }
 
         override func mouseUp(with event: NSEvent) {
-            onRelease?(point(for: event))
+            let point = point(for: event)
+            onRelease?(point)
+            cursorFor?(point).set()
         }
 
         override func scrollWheel(with event: NSEvent) {

@@ -2,13 +2,14 @@ import AppKit
 import SwiftUI
 
 struct CompressorView: View {
-    static let contentSize = NSSize(width: 380, height: 280)
+    static let contentSize = NSSize(width: 380, height: 308)
 
     let viewModel: MixerViewModel
     let target: CompressorTarget
     var onClose: @MainActor () -> Void
 
     @State private var headerHovered = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let compressor = viewModel.compressor(target)
@@ -19,6 +20,7 @@ struct CompressorView: View {
 
         VStack(spacing: 8) {
             header(compressor: compressor, label: label)
+            dynamicsBar(compressor)
 
             HStack(alignment: .top, spacing: 10) {
                 VStack(spacing: 8) {
@@ -29,7 +31,8 @@ struct CompressorView: View {
                         ForEach(CompressorParameter.allCases) { parameter in
                             CompressorKnob(
                                 parameter: parameter,
-                                value: compressor.value(for: parameter)
+                                value: compressor.value(for: parameter),
+                                mode: compressor.mode
                             ) { newValue in
                                 viewModel.setCompressorParameter(target, parameter, newValue)
                             }
@@ -52,18 +55,48 @@ struct CompressorView: View {
         .popoverSurface(cornerRadius: 12)
     }
 
+    /// Переключатель Compressor/Expander и пресеты: одна строка под заголовком,
+    /// чтобы ручки и кривая оставались главным.
+    private func dynamicsBar(_ compressor: CompressorState) -> some View {
+        HStack(spacing: 10) {
+            HStack(spacing: 2) {
+                ForEach(DynamicsMode.allCases) { mode in
+                    let selected = compressor.mode == mode
+                    Button {
+                        viewModel.setDynamicsMode(target, mode)
+                    } label: {
+                        Text(mode.title)
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(selected ? Color.accentColor : Color.secondary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 3)
+                            .background(Capsule().fill(selected ? Color.accentColor.opacity(0.16) : Color.clear))
+                            .contentShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .help(mode.title)
+                }
+            }
+            .padding(2)
+            .background(Capsule().fill(Color.primary.opacity(0.06)))
+            .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.8),
+                       value: compressor.mode)
+
+            Spacer(minLength: 6)
+
+            if compressor.mode == .compressor {
+                CompressorPresetPicker(viewModel: viewModel, target: target, compressor: compressor)
+            }
+        }
+        .frame(height: 24)
+    }
+
     private func header(compressor: CompressorState, label: String) -> some View {
         HStack(spacing: 10) {
             PanelCloseButton(showGlyph: headerHovered, action: onClose)
 
             WindowDragHandle()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            CompressorPresetPicker(
-                viewModel: viewModel,
-                target: target,
-                compressor: compressor
-            )
 
             Text(label)
                 .font(.headline)
@@ -94,29 +127,29 @@ private struct CompressorCurve: View {
     let state: CompressorState
     let level: Double
 
+    private var isCompressor: Bool { state.mode == .compressor }
+    private var threshold: Double { isCompressor ? state.threshold : state.expandThreshold }
+    private var ratio: Double { max(isCompressor ? state.ratio : state.expandRatio, 1) }
+
+    private var fillColor: Color {
+        isCompressor ? Color(nsColor: .systemIndigo) : Color(nsColor: .systemPurple)
+    }
+
     var body: some View {
         Canvas { context, size in
             let pad: CGFloat = 7
             let width = max(size.width - pad * 2, 1)
             let height = max(size.height - pad * 2, 1)
-            let threshold = state.threshold
-            let ratio = max(state.ratio, 1)
             let gain = state.gain
 
             func dbToX(_ db: Double) -> CGFloat {
                 pad + CGFloat((db + 60) / 60) * width
             }
 
+            // Без зажима: кривая уходит за край карточки и обрезается ею —
+            // так видно, что выход выше 0 dB, а не упирается в потолок.
             func dbToY(_ db: Double) -> CGFloat {
-                let clamped = min(max(db, -60), 0)
-                return pad + height - CGFloat((clamped + 60) / 60) * height
-            }
-
-            func compressed(_ db: Double) -> Double {
-                if state.enabled, ratio > 1, db > threshold {
-                    return threshold + (db - threshold) / ratio + gain
-                }
-                return db + gain
+                pad + height - CGFloat((db + 60) / 60) * height
             }
 
             let gridColor = Color.primary.opacity(PanelOpacity.grid)
@@ -157,30 +190,44 @@ private struct CompressorCurve: View {
                 style: StrokeStyle(lineWidth: 1, dash: [3, 3])
             )
 
-            if state.enabled, ratio > 1, threshold < 0 {
+            // Где прибор работает: компрессор загибает хвост выше порога,
+            // экспандер — ниже порога. Заливка показывает именно эту область.
+            if state.enabled, ratio > 1 {
                 var area = Path()
-                let steps = max(Int(0 - threshold), 1)
-                for index in 0...steps {
-                    let db = threshold + (0 - threshold) * Double(index) / Double(steps)
-                    let point = CGPoint(x: dbToX(db), y: dbToY(compressed(db)))
-                    if index == 0 {
-                        area.move(to: point)
-                    } else {
-                        area.addLine(to: point)
+                let steps = 48
+                if isCompressor {
+                    for index in 0...steps {
+                        let db = threshold + (0 - threshold) * Double(index) / Double(steps)
+                        let point = CGPoint(x: dbToX(db), y: dbToY(state.transfer(db)))
+                        if index == 0 {
+                            area.move(to: point)
+                        } else {
+                            area.addLine(to: point)
+                        }
                     }
-                }
-                for index in stride(from: steps, through: 0, by: -1) {
-                    let db = threshold + (0 - threshold) * Double(index) / Double(steps)
-                    area.addLine(to: CGPoint(x: dbToX(db), y: dbToY(db + gain)))
+                    area.addLine(to: CGPoint(x: dbToX(0), y: dbToY(0 + gain)))
+                    area.addLine(to: CGPoint(x: dbToX(threshold), y: dbToY(threshold + gain)))
+                } else {
+                    for index in 0...steps {
+                        let db = -60 + (threshold + 60) * Double(index) / Double(steps)
+                        let point = CGPoint(x: dbToX(db), y: dbToY(state.transfer(db)))
+                        if index == 0 {
+                            area.move(to: point)
+                        } else {
+                            area.addLine(to: point)
+                        }
+                    }
+                    area.addLine(to: CGPoint(x: dbToX(threshold), y: dbToY(threshold + gain)))
+                    area.addLine(to: CGPoint(x: dbToX(-60), y: dbToY(-60 + gain)))
                 }
                 area.closeSubpath()
-                context.fill(area, with: .color(Color(nsColor: .systemIndigo).opacity(PanelOpacity.card)))
+                context.fill(area, with: .color(fillColor.opacity(PanelOpacity.card)))
             }
 
             var curve = Path()
             for index in 0...120 {
                 let db = Double(index) - 60
-                let point = CGPoint(x: dbToX(db), y: dbToY(compressed(db)))
+                let point = CGPoint(x: dbToX(db), y: dbToY(state.transfer(db)))
                 if index == 0 {
                     curve.move(to: point)
                 } else {
@@ -189,7 +236,7 @@ private struct CompressorCurve: View {
             }
             context.stroke(
                 curve,
-                with: .color(Color(nsColor: .systemCyan)),
+                with: .color(isCompressor ? Color(nsColor: .systemCyan) : Color(nsColor: .systemTeal)),
                 style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round)
             )
 
@@ -197,7 +244,7 @@ private struct CompressorCurve: View {
                 let input = min(max(level, -60), 0)
                 let dot = CGRect(
                     x: dbToX(input) - 2.6,
-                    y: dbToY(compressed(input)) - 2.6,
+                    y: dbToY(state.transfer(input)) - 2.6,
                     width: 5.2,
                     height: 5.2
                 )
@@ -216,6 +263,7 @@ private struct CompressorCurve: View {
 private struct CompressorKnob: View {
     let parameter: CompressorParameter
     let value: Double
+    let mode: DynamicsMode
     let onChange: (Double) -> Void
 
     @State private var startValue: Double?
@@ -300,7 +348,7 @@ private struct CompressorKnob: View {
                         if abs(gesture.translation.height) < 2, abs(gesture.translation.width) < 2 {
                             let now = Date()
                             if let lastClick, now.timeIntervalSince(lastClick) < 0.35 {
-                                onChange(parameter.neutral)
+                                onChange(parameter.neutral(for: mode))
                                 self.lastClick = nil
                             } else {
                                 lastClick = now
@@ -310,7 +358,7 @@ private struct CompressorKnob: View {
                     }
             )
 
-            Text(parameter.formatted(value))
+            Text(parameter.formatted(value, mode: mode))
                 .font(.system(size: 10, weight: .semibold))
                 .monospacedDigit()
                 .foregroundStyle(.primary)
@@ -451,9 +499,10 @@ private struct CompressorPresetPicker: View {
         Picker("Preset", selection: selection) {
             Text("Custom").tag("custom")
             ForEach(groups) { group in
-                Section(group.name) {
+                // Имена пресетов — ключи каталога: Text(String) рисовал бы их как есть.
+                Section(LocalizedStringKey(group.name)) {
                     ForEach(group.presets) { preset in
-                        Text(preset.name).tag(preset.id)
+                        Text(LocalizedStringKey(preset.name)).tag(preset.id)
                     }
                 }
             }
