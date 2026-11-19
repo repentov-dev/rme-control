@@ -53,11 +53,17 @@ cd rme-control
 compiler works), copies resources and translations, ad-hoc signs the bundle and installs
 `/Applications/RME Control.app`. Progress is reported as `[1/5]` … `[5/5]`.
 
+The measurement engines (`roomeq`, `sotf-capture`, 82 MB together) are not part of the repository:
+they ship as a GitHub release and are downloaded by the app from **Settings → Modules** (or by the
+**Load** button in Room EQ). Keep them in `RME Control/Resources/` if you want a self-contained build,
+or start from `./build.sh --no-module` — the build stops bundling them automatically when they are absent.
+
 | Command | Result |
 |---|---|
 | `./build.sh` | `build/Release/RME Control.app` in the project folder |
 | `./build.sh --install` | builds, copies to `/Applications` and launches |
 | `./build.sh --zip` | builds and packs `build/RME-Control-<version>.zip` for sharing |
+| `./build.sh --no-module` | builds without the measurement engines; the app downloads them from Settings → Modules |
 | `./make-installer.sh` | builds a `.pkg` installer from an already built app |
 
 The version comes from `MARKETING_VERSION` in the Xcode project, so it is set in one place.

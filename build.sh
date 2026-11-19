@@ -3,6 +3,7 @@
 #   ./build.sh          — собрать build/Release/RME Control.app (Apple Silicon + Intel)
 #   ./build.sh --zip    — то же + архив build/RME-Control-<версия>.zip, чтобы отправить другому
 #   ./build.sh --install — то же + скопировать приложение в /Applications
+#   ./build.sh --no-module — собрать без движков замера (они качаются модулем)
 set -e
 cd "$(dirname "$0")"
 
@@ -12,11 +13,13 @@ trap 'status=$?; if [ $status -ne 0 ]; then echo; echo "BUILD FAILED (exit code 
 
 MAKE_ZIP=0
 INSTALL=0
+NO_MODULE=0
 for arg in "$@"; do
   case "$arg" in
     --zip) MAKE_ZIP=1 ;;
     --install) INSTALL=1 ;;
-    *) echo "Unknown option: $arg (use --zip or --install)" >&2; exit 1 ;;
+    --no-module) NO_MODULE=1 ;;
+    *) echo "Unknown option: $arg (use --zip, --install or --no-module)" >&2; exit 1 ;;
   esac
 done
 
@@ -59,10 +62,18 @@ step 3 "Copying resources and translations"
 
 cp "RME Control/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 cp "RME Control/Resources/RME_Control_Tray.png" "$APP/Contents/Resources/RME_Control_Tray.png"
-cp "RME Control/Resources/roomeq" "$APP/Contents/Resources/roomeq"
-chmod +x "$APP/Contents/Resources/roomeq"
-cp "RME Control/Resources/sotf-capture" "$APP/Contents/Resources/sotf-capture"
-chmod +x "$APP/Contents/Resources/sotf-capture"
+if [ "$NO_MODULE" = 0 ] && [ ! -f "RME Control/Resources/roomeq" ]; then
+  echo "    measurement engines are not in the tree: building without them."
+  echo "    the app downloads the module from Settings > Modules."
+  NO_MODULE=1
+fi
+
+if [ "$NO_MODULE" = 0 ]; then
+  cp "RME Control/Resources/roomeq" "$APP/Contents/Resources/roomeq"
+  chmod +x "$APP/Contents/Resources/roomeq"
+  cp "RME Control/Resources/sotf-capture" "$APP/Contents/Resources/sotf-capture"
+  chmod +x "$APP/Contents/Resources/sotf-capture"
+fi
 cp "RME Control/Resources/THIRD_PARTY_NOTICES.txt" "$APP/Contents/Resources/THIRD_PARTY_NOTICES.txt"
 cp "RME Control/Resources/GPL-3.0.txt" "$APP/Contents/Resources/GPL-3.0.txt"
 cp "RME Control/Resources/Web/remote.html" "$APP/Contents/Resources/remote.html"

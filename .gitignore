@@ -36,3 +36,7 @@ xcuserdata/
 # Local research and dev scratch (moved out of build/ to keep it build-only).
 # Delete this line if any of it should be committed.
 /notes/
+
+# Measurement engines: downloaded as a module (Settings > Modules), not kept in git.
+/RME Control/Resources/roomeq
+/RME Control/Resources/sotf-capture
